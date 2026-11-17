@@ -1,0 +1,9 @@
+node_modules/
+dist/
+coverage/
+.env
+.docker-local/
+*.log
+.DS_Store
+backend/.cache/
+*.tsbuildinfo

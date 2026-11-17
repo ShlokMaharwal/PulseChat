@@ -1,0 +1,205 @@
+name: pulsechat
+
+x-backend-environment: &backend-environment
+  NODE_ENV: production
+  PORT: 8080
+  KAFKA_BROKERS: kafka:9092
+  KAFKA_PARTITIONS: 6
+  KAFKA_REPLICATION_FACTOR: 1
+  KAFKA_REQUEST_TIMEOUT_MS: 30000
+  DEPENDENCY_TIMEOUT_MS: 10000
+  REDIS_URL: redis://redis:6379
+  MONGO_URL: mongodb://mongo:27017
+  MONGO_DB: pulsechat
+  JWT_SECRET: ${JWT_SECRET:-pulsechat-local-development-secret-change-before-deploying}
+
+x-backend: &backend
+  restart: unless-stopped
+  init: true
+  environment: *backend-environment
+  depends_on:
+    kafka:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+    mongo:
+      condition: service_healthy
+  healthcheck:
+    test: [CMD, node, -e, "fetch('http://127.0.0.1:8080/readyz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+    interval: 20s
+    timeout: 25s
+    start_period: 120s
+    retries: 12
+  stop_grace_period: 25s
+
+services:
+  kafka:
+    image: apache/kafka:3.9.1
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:19092:19092
+    environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:19092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_NUM_PARTITIONS: 6
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: [CMD, bash, -ec, 'exec 3<>/dev/tcp/127.0.0.1/9092']
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 18
+
+  redis:
+    image: redis:7.4-alpine
+    restart: unless-stopped
+    command: [redis-server, --appendonly, 'yes', --appendfsync, everysec]
+    ports:
+      - 127.0.0.1:16379:6379
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    command: [mongod, --wiredTigerCacheSizeGB, '0.25']
+    ports:
+      - 127.0.0.1:27018:27017
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: [CMD, bash, -ec, 'exec 3<>/dev/tcp/127.0.0.1/27017']
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 12
+
+  gateway-1:
+    <<: *backend
+    image: pulsechat-gateway:local
+    build:
+      context: ./backend
+      args:
+        SERVICE: gateway
+  gateway-2:
+    <<: *backend
+    image: pulsechat-gateway:local
+    pull_policy: never
+  gateway-3:
+    <<: *backend
+    image: pulsechat-gateway:local
+    pull_policy: never
+
+  processor-1:
+    <<: *backend
+    image: pulsechat-processor:local
+    build:
+      context: ./backend
+      args:
+        SERVICE: processor
+  processor-2:
+    <<: *backend
+    image: pulsechat-processor:local
+    pull_policy: never
+
+  nginx:
+    image: nginx:1.28-alpine
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:8080:80
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      gateway-1:
+        condition: service_healthy
+      gateway-2:
+        condition: service_healthy
+      gateway-3:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, wget -q -O /dev/null http://127.0.0.1/healthz]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+    ports:
+      - 127.0.0.1:9090:9090
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: [CMD-SHELL, wget -q -O /dev/null http://127.0.0.1:9090/-/ready]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  grafana:
+    image: grafana/grafana:11.6.0
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:3000:3000
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-pulsechat-local}
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD-SHELL, wget -q -O /dev/null http://127.0.0.1:3000/api/health]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  smoke:
+    image: pulsechat-gateway:local
+    profiles: [test]
+    environment:
+      <<: *backend-environment
+      GRAFANA_PASSWORD: ${GRAFANA_PASSWORD:-pulsechat-local}
+    command: [node, tests/smoke.mjs]
+    depends_on:
+      nginx:
+        condition: service_healthy
+      processor-1:
+        condition: service_healthy
+      processor-2:
+        condition: service_healthy
+      grafana:
+        condition: service_healthy
+
+volumes:
+  kafka-data:
+  redis-data:
+  mongo-data:
+  prometheus-data:
+  grafana-data:
