@@ -7,6 +7,7 @@ const running: ReturnType<typeof createHealthServer>[] = [];
 async function setup(
   check: () => Promise<DependencyHealth>,
   accepting = () => true,
+  handleRequest?: Parameters<typeof createHealthServer>[0]['handleRequest'],
 ) {
   const onError = vi.fn();
   const health = createHealthServer({
@@ -16,6 +17,7 @@ async function setup(
     accepting,
     onError,
     checkTimeoutMs: 1000,
+    ...(handleRequest ? { handleRequest } : {}),
   });
   running.push(health);
   await new Promise<void>((resolve) =>
@@ -37,6 +39,28 @@ afterEach(async () => {
 });
 
 describe('health endpoints', () => {
+  it('dispatches application POST routes while keeping health endpoints GET-only', async () => {
+    const { base } = await setup(
+      async () => ({ redis: true, mongo: true, kafka: true }),
+      () => true,
+      async (request, response) => {
+        if (request.method !== 'POST' || request.url !== '/auth/register')
+          return false;
+        response.writeHead(201, { 'content-type': 'application/json' });
+        response.end(JSON.stringify({ accepted: true }));
+        return true;
+      },
+    );
+    const application = await fetch(`${base}/auth/register`, {
+      method: 'POST',
+    });
+    expect(application.status).toBe(201);
+    expect(await application.json()).toEqual({ accepted: true });
+    expect((await fetch(`${base}/healthz`, { method: 'POST' })).status).toBe(
+      405,
+    );
+  });
+
   it('keeps liveness independent of dependency outages', async () => {
     const check = vi.fn(async () => ({
       redis: false,

@@ -89,6 +89,14 @@ export const receiptSchema = z
 export const serverFrameSchema = z.discriminatedUnion('type', [
   z
     .object({
+      type: z.literal('welcome'),
+      userId: uuidSchema,
+      gatewayId: z.string().min(1),
+      heartbeatIntervalMs: z.number().int().positive(),
+    })
+    .strict(),
+  z
+    .object({
       type: z.literal('ack'),
       clientMsgId: uuidSchema,
       status: z.enum(['received', 'sent']),
@@ -128,6 +136,7 @@ export const serverFrameSchema = z.discriminatedUnion('type', [
         'INVALID_MESSAGE',
         'UNAUTHORIZED',
         'FORBIDDEN',
+        'CONFLICT',
         'RATE_LIMITED',
         'PAYLOAD_TOO_LARGE',
         'UNAVAILABLE',

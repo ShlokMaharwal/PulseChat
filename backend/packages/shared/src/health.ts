@@ -13,6 +13,10 @@ interface HealthOptions {
   accepting: () => boolean;
   onError: (error: unknown) => void;
   checkTimeoutMs?: number;
+  handleRequest?: (
+    request: IncomingMessage,
+    response: ServerResponse,
+  ) => Promise<boolean>;
 }
 
 export function createHealthServer(options: HealthOptions) {
@@ -52,6 +56,11 @@ export function createHealthServer(options: HealthOptions) {
 
   async function handle(request: IncomingMessage, response: ServerResponse) {
     const path = request.url?.split('?')[0];
+    if (!['/healthz', '/readyz', '/metrics'].includes(path ?? '')) {
+      if (await options.handleRequest?.(request, response)) return;
+      json(response, 404, { error: 'NOT_FOUND' });
+      return;
+    }
     if (request.method !== 'GET') {
       response.setHeader('allow', 'GET');
       json(response, 405, { error: 'METHOD_NOT_ALLOWED' });

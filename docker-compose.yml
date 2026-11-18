@@ -197,6 +197,29 @@ services:
       grafana:
         condition: service_healthy
 
+  integration:
+    image: pulsechat-integration:local
+    profiles: [test]
+    build:
+      context: ./backend
+      target: integration
+    environment:
+      <<: *backend-environment
+      TEST_GATEWAY_A: http://gateway-1:8080
+      TEST_GATEWAY_B: http://gateway-2:8080
+    command: [npm, run, test:integration]
+    depends_on:
+      gateway-1:
+        condition: service_healthy
+      gateway-2:
+        condition: service_healthy
+      gateway-3:
+        condition: service_healthy
+      processor-1:
+        condition: service_healthy
+      processor-2:
+        condition: service_healthy
+
 volumes:
   kafka-data:
   redis-data:

@@ -5,3 +5,4 @@ export * from './kafka.js';
 export * from './dependencies.js';
 export * from './health.js';
 export * from './service.js';
+export * from './sequencing.js';

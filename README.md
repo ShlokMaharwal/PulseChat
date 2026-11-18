@@ -2,7 +2,7 @@
 
 A distributed real-time chat project built in independently verified phases with Node.js, TypeScript, Kafka, Redis, and MongoDB.
 
-**Current scope: Phase 1 infrastructure and backend skeleton.** Auth, messaging, reliability features, application dashboards, and the independent React frontend belong to later phases. The repository does not yet provide a chat UI.
+**Current scope: backend Phases 1–2.** Registration/login, 1:1 chat creation, authenticated WebSockets, Kafka processing, idempotent sequence assignment, MongoDB persistence, and cross-gateway delivery are implemented and verified. Reliability clients/receipts/presence, application dashboards, chaos/load proof, and the independent React frontend follow in later phases. The repository does not yet provide a chat UI.
 
 ## Start locally
 
@@ -44,7 +44,15 @@ npm test
 npm run build
 ```
 
-Unit tests cover configuration rejection, protocol validation, topic bootstrap, readiness failures and recovery, and HTTP behavior. The container smoke test verifies all five replicas, all three Kafka topics and their leaders, MongoDB indexes, Redis connectivity, Nginx proxying, Prometheus scrapes, and Grafana's provisioned datasource. It returns a failing exit code if any assertion fails and does not repair missing topics or indexes.
+Unit tests cover configuration rejection, protocol validation, JWT authentication, bounded HTTP input, topic bootstrap, readiness failures and recovery, and HTTP dispatch. The container smoke test verifies all five replicas, all three Kafka topics and their leaders, MongoDB indexes, Redis connectivity, Nginx proxying, Prometheus scrapes, and Grafana's provisioned datasource. It returns a failing exit code if any assertion fails and does not repair missing topics or indexes.
+
+Run the real backend integration suite after starting the stack:
+
+```sh
+docker compose --parallel 1 run --build --rm integration
+```
+
+The Phase 2 gate passed all four integration cases: authorization boundaries, 1,000 messages across different gateways in order with matching MongoDB sequences and zero duplicate wire delivery, five duplicate sends producing one stored message, and concurrent counter reseeding. This is correctness evidence, not a load benchmark. See [the protocol](docs/PROTOCOL.md), [the design](docs/DESIGN.md), and [Phase 2 verification](docs/phase-2-verification.md).
 
 To run a backend process on the host, start the dependencies with `docker compose up -d kafka redis mongo`, set the environment variables listed in `backend/.env.example`, and run `npm run dev:gateway` or `npm run dev:processor`. Use a different `PORT` for each process. Host clients use Kafka at `localhost:19092`, Redis at `localhost:16379`, and MongoDB at `localhost:27018`. Containers use their service names and native ports; these host database ports avoid collisions with common local database installations.
 
@@ -64,7 +72,7 @@ infra/
 docs/
 ```
 
-The backend is its own npm workspace root. The frontend will be a separate app with its own dependencies in Phase 6. The HTTP/WebSocket contract will be documented in `docs/PROTOCOL.md` in Phase 2.
+The backend is its own npm workspace root. The frontend will be a separate app with its own dependencies in Phase 6. Its HTTP/WebSocket contract is documented in `docs/PROTOCOL.md`.
 
 ## Development phases
 
