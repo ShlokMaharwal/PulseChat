@@ -5,6 +5,7 @@ import {
   receiptEventSchema,
   deadLetterSchema,
   UserRouter,
+  applicationMetrics,
   type ReceiptEvent,
   type ChatReceiptRecord,
   type ServiceContext,
@@ -21,10 +22,15 @@ export class MessageProcessor {
   private readonly allocator;
   private readonly producer;
   private readonly router;
+  private readonly metrics;
+  private readonly peaks = new Map<string, number>();
+  private lagTimer: ReturnType<typeof setInterval> | undefined;
+  private lagWork: Promise<void> | undefined;
   private active = false;
   private stopping = false;
 
   constructor(private readonly context: ServiceContext) {
+    this.metrics = applicationMetrics(context.registry);
     this.consumer = context.dependencies.kafka.consumer({
       groupId: context.config.KAFKA_GROUP_ID,
       sessionTimeout: 30000,
@@ -65,6 +71,55 @@ export class MessageProcessor {
       partitionsConsumedConcurrently: 3,
       eachBatch: (payload) => this.batch(payload),
     });
+    const poll = () => {
+      if (this.lagWork || this.stopping) return;
+      this.lagWork = this.pollLag()
+        .catch((err: unknown) => {
+          this.metrics.lag.reset();
+          this.context.logger.warn({ err }, 'Consumer lag probe failed');
+        })
+        .finally(() => {
+          this.lagWork = undefined;
+        });
+    };
+    poll();
+    this.lagTimer = setInterval(poll, 5000);
+    this.lagTimer.unref();
+  }
+
+  private observePeak(topic: string, partition: number, value: number) {
+    const key = `${topic}:${partition}`;
+    const peak = Math.max(this.peaks.get(key) ?? 0, value);
+    this.peaks.set(key, peak);
+    this.metrics.lagPeak.set({ topic, partition }, peak);
+  }
+
+  private async pollLag() {
+    const { admin } = this.context.dependencies;
+    const committed = await admin.fetchOffsets({
+      groupId: this.context.config.KAFKA_GROUP_ID,
+      topics: ['messages', 'receipts'],
+    });
+    for (const topic of committed) {
+      const heads = await admin.fetchTopicOffsets(topic.topic);
+      for (const head of heads) {
+        const offset =
+          topic.partitions.find(
+            (partition) => partition.partition === head.partition,
+          )?.offset ?? '-1';
+        const pending =
+          BigInt(head.offset) - (BigInt(offset) < 0n ? 0n : BigInt(offset));
+        const lag = Math.max(
+          0,
+          Math.min(Number.MAX_SAFE_INTEGER, Number(pending)),
+        );
+        this.metrics.lag.set(
+          { topic: topic.topic, partition: head.partition },
+          lag,
+        );
+        this.observePeak(topic.topic, head.partition, lag);
+      }
+    }
   }
 
   private async batch({
@@ -77,6 +132,15 @@ export class MessageProcessor {
     let nextOffset: string | undefined;
     for (const record of batch.messages) {
       if (!isRunning() || isStale()) break;
+      if (batch.topic === 'messages') this.metrics.incoming.inc();
+      this.observePeak(
+        batch.topic,
+        batch.partition,
+        Math.max(
+          0,
+          Number(BigInt(batch.highWatermark) - BigInt(record.offset)),
+        ),
+      );
       const completed = await this.retryRecord(
         batch.topic,
         batch.partition,
@@ -159,6 +223,7 @@ export class MessageProcessor {
           acks: -1,
           messages: [{ key: record.key, value: JSON.stringify(deadLetter) }],
         });
+        this.metrics.dlq.inc();
         return true;
       } catch (err) {
         this.context.logger.error(
@@ -197,6 +262,23 @@ export class MessageProcessor {
         $setOnInsert: { chatId: event.chatId, userId: event.userId },
       },
       { upsert: true },
+    );
+    if (event.status === 'delivered' && event.messageCreatedAt)
+      this.metrics.delivery.observe(
+        Math.max(
+          0,
+          (Date.parse(event.timestamp) - Date.parse(event.messageCreatedAt)) /
+            1000,
+        ),
+      );
+    this.context.logger.info(
+      {
+        chatId: event.chatId,
+        userId: event.userId,
+        seq: event.seq,
+        status: event.status,
+      },
+      'Receipt persisted',
     );
     for (const userId of chat.memberIds)
       await this.publish(userId, {
@@ -250,6 +332,7 @@ export class MessageProcessor {
       { projection: { _id: 0 } },
     );
     if (existingRecord) {
+      this.metrics.dedupe.inc();
       const existing = storedMessageSchema.parse(existingRecord);
       this.assertSame(existing, input);
       this.context.logger.info(
@@ -302,6 +385,7 @@ export class MessageProcessor {
       message = storedMessageSchema.parse(canonical);
       this.assertSame(message, input);
       inserted = false;
+      this.metrics.dedupe.inc();
     }
     this.context.logger.info(
       {
@@ -320,6 +404,7 @@ export class MessageProcessor {
       ),
     );
     if (inserted) {
+      this.metrics.outgoing.inc();
       for (const recipientId of new Set(input.recipientIds)) {
         await this.publish(recipientId, { type: 'message', ...message }).catch(
           (err: unknown) =>
@@ -335,6 +420,8 @@ export class MessageProcessor {
 
   async stop() {
     this.stopping = true;
+    clearInterval(this.lagTimer);
+    await this.lagWork;
     this.active = false;
     await this.consumer.stop();
     await this.consumer.disconnect();

@@ -21,7 +21,8 @@
     "test:smoke": "node tests/smoke.mjs",
     "dev:gateway": "tsx packages/gateway/src/index.ts",
     "dev:processor": "tsx packages/processor/src/index.ts",
-    "test:presence": "tsx tests/presence.ts"
+    "test:presence": "tsx tests/presence.ts",
+    "test:observability": "tsx tests/observability.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

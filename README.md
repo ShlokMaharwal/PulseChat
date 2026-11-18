@@ -28,7 +28,7 @@ Only one gateway image and one processor image are built; replicas reuse those i
 | http://localhost:9090 | Prometheus |
 | http://localhost:3000 | Grafana; local defaults `admin` / `pulsechat-local` |
 
-Grafana's Prometheus datasource is provisioned automatically. Backend `/metrics` endpoints export Node process metrics; chat metrics and a dashboard come in Phase 4. Nginx uses `least_conn` and Docker DNS resolution to track recreated gateways. The `/ws` route authenticates JWTs and supports messaging, receipts, sync, and presence.
+Grafana's Prometheus datasource is provisioned automatically. Backend `/metrics` endpoints export process metrics plus connections, message flow, consumer lag, delivery-ACK latency, dedupe, DLQ, and rate-rejection metrics. Open [the live operations dashboard](http://localhost:3000/d/pulsechat-overview) after signing in. See [metric definitions](docs/OBSERVABILITY.md) and [Phase 4 verification](docs/phase-4-verification.md). Nginx uses `least_conn` and Docker DNS resolution to track recreated gateways. The `/ws` route authenticates JWTs and supports messaging, receipts, sync, and presence.
 
 All published ports bind to loopback. The local database and Kafka listeners are unauthenticated. These Compose defaults target a development machine. Copy `.env.example` to `.env` to override the local JWT secret or Grafana password. After Grafana's first start, changing the environment variable alone does not reset its persisted admin password.
 
@@ -86,3 +86,9 @@ The backend is its own npm workspace root. The frontend will be a separate app w
 Each phase must pass its completion checks and receive its own commit before the next begins. No benchmark results, chaos outcomes, or remote CI status are claimed until measured.
 
 Stop the stack with `docker compose down`. Named volumes preserve data across restarts.
+
+## Operations dashboard
+
+Actual Grafana data captured after message traffic and intentional failure-path probes:
+
+![PulseChat operations dashboard](docs/img/dashboard.png)

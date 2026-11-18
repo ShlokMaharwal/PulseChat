@@ -1,0 +1,24 @@
+{
+  "result": "PASS",
+  "capturedAt": "2026-11-18T08:19:28.599Z",
+  "snapshot": {
+    "connections": 2,
+    "ingress": 1.9303844247541369,
+    "egress": 5.768632329915451,
+    "latency": 9.517310031741276,
+    "lagPeak": 340,
+    "dedupe": 8,
+    "dlq": 1,
+    "rateRejections": 2
+  },
+  "expressions": {
+    "connections": "sum(pulsechat_active_connections{service=\"gateway\"})",
+    "ingress": "sum(rate(pulsechat_messages_in_total{service=\"gateway\"}[2m]))",
+    "egress": "sum(rate(pulsechat_messages_out_total{service=\"gateway\"}[2m]))",
+    "latency": "histogram_quantile(0.95,sum by(le)(rate(pulsechat_delivery_latency_seconds_bucket{service=\"processor\"}[5m])))",
+    "lagPeak": "sum(max by(topic,partition)(pulsechat_consumer_lag_peak{service=\"processor\"}))",
+    "dedupe": "sum(pulsechat_dedupe_hits_total{service=\"processor\"})",
+    "dlq": "sum(pulsechat_dlq_total{service=\"processor\"})",
+    "rateRejections": "sum(pulsechat_rate_limit_rejections_total{service=\"gateway\"})"
+  }
+}

@@ -10,6 +10,7 @@ import {
   uuidSchema,
   consumeToken,
   UserRouter,
+  applicationMetrics,
   type ClientFrame,
   type ServerFrame,
   type ServiceContext,
@@ -50,11 +51,13 @@ class GatewayRuntime {
   private readonly routeWork = new Map<string, Promise<void>>();
   private readonly wsServer;
   private readonly router;
+  private readonly metrics;
   private timer: ReturnType<typeof setInterval> | undefined;
   private closing = false;
 
   constructor(private readonly context: ServiceContext) {
     const { config, dependencies, logger } = context;
+    this.metrics = applicationMetrics(context.registry);
     this.auth = new AuthService(dependencies.db, config);
     this.chats = new ChatService(dependencies.db);
     this.router = new UserRouter(
@@ -169,6 +172,7 @@ class GatewayRuntime {
     socket.send(encoded, (err) => {
       if (err) this.context.logger.debug({ err }, 'Socket send failed');
     });
+    if (frame.type === 'message') this.metrics.outgoing.inc();
   }
 
   private trackCleanup(work: Promise<void>) {
@@ -242,6 +246,7 @@ class GatewayRuntime {
       outgoingBytes: 0,
     };
     this.socketState.set(socket, connection);
+    this.metrics.connections.inc();
     const connections = this.sockets.get(userId) ?? new Set<Connection>();
     connections.add(connection);
     this.sockets.set(userId, connections);
@@ -249,6 +254,7 @@ class GatewayRuntime {
       this.context.logger.debug({ err, userId }, 'WebSocket error'),
     );
     socket.once('close', () => {
+      this.metrics.connections.dec();
       connections.delete(connection);
       if (!connections.size) this.sockets.delete(userId);
       this.trackCleanup(this.removeRoute(userId));
@@ -370,6 +376,7 @@ class GatewayRuntime {
     }
     const clientMsgId =
       frame.type === 'message' ? frame.clientMsgId : undefined;
+    if (frame.type === 'message') this.metrics.incoming.inc();
     try {
       if (frame.type === 'heartbeat') {
         await this.refresh(connection);
@@ -380,6 +387,7 @@ class GatewayRuntime {
       const bucket = await admission;
       if (!bucket) throw new Error('Missing rate admission');
       if (!bucket.allowed) {
+        this.metrics.rateRejected.inc();
         this.send(connection.socket, {
           type: 'error',
           code: 'RATE_LIMITED',
@@ -434,6 +442,16 @@ class GatewayRuntime {
           );
         const seq =
           message?.seq ?? (frame.type === 'read' ? frame.lastReadSeq : 0);
+        this.context.logger.info(
+          {
+            messageId: message?.messageId,
+            chatId: frame.chatId,
+            userId: connection.userId,
+            seq,
+            status: frame.type,
+          },
+          'Client receipt accepted',
+        );
         if (seq)
           await this.producer.send({
             topic: 'receipts',
