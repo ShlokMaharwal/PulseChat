@@ -8,12 +8,14 @@ import {
   messageIdFor,
   serverFrameSchema,
   uuidSchema,
+  consumeToken,
+  UserRouter,
   type ClientFrame,
   type ServerFrame,
   type ServiceContext,
   type ServiceRuntime,
 } from '@pulsechat/shared';
-import { AuthService, verifyToken, websocketToken } from './auth.js';
+import { AuthService, verifySession, websocketToken } from './auth.js';
 import { ChatService } from './chats.js';
 import { GatewayHttpApi } from './http.js';
 import { HttpError } from './errors.js';
@@ -21,13 +23,18 @@ import { HttpError } from './errors.js';
 const envelopeSchema = z
   .object({ userId: uuidSchema, payload: serverFrameSchema })
   .strict();
-const REMOVE_ROUTE = `if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) end return 0`;
 
 interface Connection {
   socket: WebSocket;
   userId: string;
   chain: Promise<void>;
   pending: number;
+  expiresAt: number;
+  lastPong: number;
+  control: Promise<void>;
+  ready: boolean;
+  outgoing: ServerFrame[];
+  outgoingBytes: number;
 }
 
 class GatewayRuntime {
@@ -37,16 +44,31 @@ class GatewayRuntime {
   private readonly producer;
   private readonly subscriber;
   private readonly sockets = new Map<string, Set<Connection>>();
+  private readonly socketState = new WeakMap<WebSocket, Connection>();
   private readonly inFlight = new Set<Promise<void>>();
   private readonly cleanup = new Set<Promise<void>>();
+  private readonly routeWork = new Map<string, Promise<void>>();
   private readonly wsServer;
+  private readonly router;
+  private timer: ReturnType<typeof setInterval> | undefined;
   private closing = false;
 
   constructor(private readonly context: ServiceContext) {
     const { config, dependencies, logger } = context;
     this.auth = new AuthService(dependencies.db, config);
     this.chats = new ChatService(dependencies.db);
-    this.http = new GatewayHttpApi(this.auth, this.chats, config, logger);
+    this.router = new UserRouter(
+      dependencies.redis,
+      config.INSTANCE_ID,
+      config.PRESENCE_TTL_SECONDS,
+    );
+    this.http = new GatewayHttpApi(
+      this.auth,
+      this.chats,
+      config,
+      logger,
+      this.router,
+    );
     this.producer = dependencies.kafka.producer({
       idempotent: true,
       maxInFlightRequests: 1,
@@ -98,17 +120,22 @@ class GatewayRuntime {
         this.reject(socket, 404, 'Not Found');
         return;
       }
-      const userId = verifyToken(
+      const { userId, expiresAt } = verifySession(
         websocketToken(request.headers['sec-websocket-protocol']),
         this.context.config,
       );
       await this.auth.user(userId);
-      if (socket.destroyed || this.closing || !this.context.accepting()) {
+      if (
+        socket.destroyed ||
+        this.closing ||
+        !this.context.accepting() ||
+        Date.now() >= expiresAt
+      ) {
         this.reject(socket, 503, 'Service Unavailable');
         return;
       }
       this.wsServer.handleUpgrade(request, socket, head, (client) =>
-        this.connected(client, userId),
+        this.connected(client, userId, expiresAt),
       );
     })().catch((error: unknown) => {
       this.reject(
@@ -122,6 +149,16 @@ class GatewayRuntime {
   private send(socket: WebSocket, frame: ServerFrame) {
     if (socket.readyState !== WebSocket.OPEN) return;
     const encoded = JSON.stringify(frame);
+    const connection = this.socketState.get(socket);
+    if (connection && !connection.ready && frame.type !== 'welcome') {
+      connection.outgoingBytes += Buffer.byteLength(encoded);
+      if (
+        connection.outgoingBytes > this.context.config.MAX_SOCKET_BUFFER_BYTES
+      )
+        socket.close(1013, 'Socket backpressure');
+      else connection.outgoing.push(frame);
+      return;
+    }
     if (
       socket.bufferedAmount + Buffer.byteLength(encoded) >
       this.context.config.MAX_SOCKET_BUFFER_BYTES
@@ -144,22 +181,67 @@ class GatewayRuntime {
   }
 
   private async removeRoute(userId: string) {
-    if (this.sockets.get(userId)?.size) return;
-    await this.context.dependencies.redis.eval(
-      REMOVE_ROUTE,
-      1,
-      `user:${userId}:gateway`,
-      this.context.config.INSTANCE_ID,
+    await this.routeOperation(userId, async () => {
+      if (this.sockets.get(userId)?.size) return;
+      if (await this.router.remove(userId))
+        await this.broadcastPresence(userId, false);
+    });
+  }
+
+  private routeOperation(userId: string, work: () => Promise<void>) {
+    const operation = (this.routeWork.get(userId) ?? Promise.resolve())
+      .catch(() => undefined)
+      .then(work);
+    this.routeWork.set(userId, operation);
+    void operation
+      .finally(() => {
+        if (this.routeWork.get(userId) === operation)
+          this.routeWork.delete(userId);
+      })
+      .catch(() => undefined);
+    return operation;
+  }
+
+  private async broadcastPresence(userId: string, online: boolean) {
+    const peers = await this.chats.peers(userId);
+    await Promise.all(
+      peers.map((id) =>
+        this.router.publish(id, { type: 'presence', userId, online }),
+      ),
     );
   }
 
-  private connected(socket: WebSocket, userId: string) {
+  private async refresh(connection: Connection) {
+    if (Date.now() >= connection.expiresAt) {
+      connection.socket.close(4001, 'Token expired');
+      return;
+    }
+    if (connection.socket.readyState !== WebSocket.OPEN) return;
+    await this.routeOperation(connection.userId, async () => {
+      if (connection.socket.readyState !== WebSocket.OPEN || this.closing)
+        return;
+      if (await this.router.refresh(connection.userId))
+        await this.broadcastPresence(connection.userId, true);
+    });
+    const peers = await this.chats.peers(connection.userId);
+    for (const [userId, online] of await this.router.online(peers))
+      this.send(connection.socket, { type: 'presence', userId, online });
+  }
+
+  private connected(socket: WebSocket, userId: string, expiresAt: number) {
     const connection: Connection = {
       socket,
       userId,
       chain: Promise.resolve(),
       pending: 0,
+      expiresAt,
+      lastPong: Date.now(),
+      control: Promise.resolve(),
+      ready: false,
+      outgoing: [],
+      outgoingBytes: 0,
     };
+    this.socketState.set(socket, connection);
     const connections = this.sockets.get(userId) ?? new Set<Connection>();
     connections.add(connection);
     this.sockets.set(userId, connections);
@@ -171,24 +253,33 @@ class GatewayRuntime {
       if (!connections.size) this.sockets.delete(userId);
       this.trackCleanup(this.removeRoute(userId));
     });
-    connection.chain = this.context.dependencies.redis
-      .set(`user:${userId}:gateway`, this.context.config.INSTANCE_ID)
+    connection.chain = this.refresh(connection)
       .then(async () => {
         if (socket.readyState !== WebSocket.OPEN) {
           await this.removeRoute(userId);
           return;
         }
+        connection.ready = true;
         this.send(socket, {
           type: 'welcome',
           userId,
           gatewayId: this.context.config.INSTANCE_ID,
           heartbeatIntervalMs: this.context.config.HEARTBEAT_INTERVAL_MS,
         });
+        for (const frame of connection.outgoing) this.send(socket, frame);
+        connection.outgoing = [];
+        connection.outgoingBytes = 0;
       })
       .catch((err: unknown) => {
         this.context.logger.warn({ err, userId }, 'Socket registration failed');
         socket.close(1013, 'Routing unavailable');
       });
+    connection.control = connection.chain;
+    this.trackCleanup(connection.chain);
+    socket.on('pong', () => {
+      connection.lastPong = Date.now();
+      this.trackCleanup(this.refresh(connection));
+    });
     socket.on('message', (data, binary) => {
       if (this.closing) {
         this.send(socket, {
@@ -207,8 +298,32 @@ class GatewayRuntime {
         socket.close(1013, 'Too many queued messages');
         return;
       }
-      const operation = connection.chain
-        .then(() => this.frame(connection, data))
+      let control = false;
+      let admission: ReturnType<typeof consumeToken> | undefined;
+      try {
+        const parsed = clientFrameSchema.safeParse(JSON.parse(data.toString()));
+        control = parsed.success && parsed.data.type !== 'message';
+        if (parsed.success && parsed.data.type !== 'heartbeat') {
+          const { config, dependencies } = this.context;
+          admission = consumeToken(
+            dependencies.redis,
+            userId,
+            config.RATE_LIMIT_CAPACITY,
+            config.RATE_LIMIT_REFILL_PER_SECOND,
+            parsed.data.type === 'sync'
+              ? 5
+              : parsed.data.type === 'message'
+                ? 1
+                : 0.2,
+          );
+          // Attach immediately while the operation waits behind earlier work.
+          void admission.catch(() => undefined);
+        }
+      } catch {
+        /* Schema validation reports malformed JSON below. */
+      }
+      const operation = (control ? connection.control : connection.chain)
+        .then(() => this.frame(connection, data, admission))
         .catch((err: unknown) => {
           this.context.logger.error({ err, userId }, 'Socket operation failed');
           this.send(socket, {
@@ -222,12 +337,21 @@ class GatewayRuntime {
           connection.pending--;
           this.inFlight.delete(operation);
         });
-      connection.chain = operation;
+      if (control) connection.control = operation;
+      else connection.chain = operation;
       this.inFlight.add(operation);
     });
   }
 
-  private async frame(connection: Connection, data: RawData) {
+  private async frame(
+    connection: Connection,
+    data: RawData,
+    admission?: ReturnType<typeof consumeToken>,
+  ) {
+    if (Date.now() >= connection.expiresAt) {
+      connection.socket.close(4001, 'Token expired');
+      return;
+    }
     const bytes = Buffer.isBuffer(data)
       ? data
       : Array.isArray(data)
@@ -248,7 +372,23 @@ class GatewayRuntime {
       frame.type === 'message' ? frame.clientMsgId : undefined;
     try {
       if (frame.type === 'heartbeat') {
+        await this.refresh(connection);
         this.send(connection.socket, { type: 'heartbeat' });
+        return;
+      }
+      const { config } = this.context;
+      const bucket = await admission;
+      if (!bucket) throw new Error('Missing rate admission');
+      if (!bucket.allowed) {
+        this.send(connection.socket, {
+          type: 'error',
+          code: 'RATE_LIMITED',
+          message: 'User rate limit exceeded',
+          retryAfterMs: bucket.retryAfterMs,
+          operation: frame.type,
+          chatId: frame.chatId,
+          ...(clientMsgId ? { clientMsgId } : {}),
+        });
         return;
       }
       if (frame.type === 'sync') {
@@ -258,11 +398,61 @@ class GatewayRuntime {
           frame.afterSeq,
           frame.limit,
         );
+        const budget = Math.min(
+          524288,
+          Math.floor(config.MAX_SOCKET_BUFFER_BYTES / 2),
+        );
+        while (
+          page.messages.length > 1 &&
+          Buffer.byteLength(JSON.stringify(page)) > budget
+        ) {
+          page.messages.pop();
+          page.hasMore = true;
+        }
+        page.nextAfterSeq = page.messages.at(-1)?.seq ?? frame.afterSeq;
         this.send(connection.socket, {
           type: 'sync',
           chatId: frame.chatId,
           ...page,
         });
+        return;
+      }
+      if (frame.type === 'delivered' || frame.type === 'read') {
+        const message =
+          frame.type === 'delivered'
+            ? await this.chats.messageForReceipt(
+                frame.chatId,
+                connection.userId,
+                frame.messageId,
+              )
+            : undefined;
+        if (frame.type === 'read')
+          await this.chats.validateRead(
+            frame.chatId,
+            connection.userId,
+            frame.lastReadSeq,
+          );
+        const seq =
+          message?.seq ?? (frame.type === 'read' ? frame.lastReadSeq : 0);
+        if (seq)
+          await this.producer.send({
+            topic: 'receipts',
+            acks: -1,
+            messages: [
+              {
+                key: frame.chatId,
+                value: JSON.stringify({
+                  type: 'receipt_event',
+                  chatId: frame.chatId,
+                  userId: connection.userId,
+                  status: frame.type,
+                  seq,
+                  timestamp: new Date().toISOString(),
+                  ...(message ? { messageCreatedAt: message.createdAt } : {}),
+                }),
+              },
+            ],
+          });
         return;
       }
       if (frame.type !== 'message')
@@ -326,6 +516,9 @@ class GatewayRuntime {
             ? err.message
             : 'Service is temporarily unavailable',
         ...(clientMsgId ? { clientMsgId } : {}),
+        ...(frame.type !== 'heartbeat'
+          ? { chatId: frame.chatId, operation: frame.type }
+          : {}),
       });
     }
   }
@@ -342,10 +535,26 @@ class GatewayRuntime {
     await this.subscriber.subscribe(
       `gateway:${this.context.config.INSTANCE_ID}`,
     );
+    this.timer = setInterval(() => {
+      for (const connections of this.sockets.values())
+        for (const connection of connections) {
+          if (Date.now() >= connection.expiresAt)
+            connection.socket.close(4001, 'Token expired');
+          else if (
+            Date.now() - connection.lastPong >
+            this.context.config.PRESENCE_TTL_SECONDS * 1000
+          )
+            connection.socket.terminate();
+          else if (connection.socket.readyState === WebSocket.OPEN)
+            connection.socket.ping();
+        }
+    }, this.context.config.HEARTBEAT_INTERVAL_MS);
+    this.timer.unref();
   }
 
   beginShutdown = () => {
     this.closing = true;
+    clearInterval(this.timer);
     for (const connections of this.sockets.values())
       for (const { socket } of connections)
         this.send(socket, { type: 'reconnect', retryAfterMs: 500 });
@@ -353,6 +562,7 @@ class GatewayRuntime {
 
   async stop() {
     this.closing = true;
+    clearInterval(this.timer);
     this.context.server.off('upgrade', this.onUpgrade);
     await Promise.allSettled([...this.inFlight]);
     const closed = new Promise<void>((resolve) =>

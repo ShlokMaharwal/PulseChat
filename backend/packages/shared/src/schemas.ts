@@ -76,6 +76,40 @@ export const storedMessageSchema = z
 export const kafkaMessageSchema = storedMessageSchema
   .omit({ seq: true })
   .extend({ recipientIds: z.array(uuidSchema).min(1) });
+export const receiptCursorSchema = z
+  .object({ userId: uuidSchema, deliveredSeq: seqSchema, readSeq: seqSchema })
+  .strict();
+
+export const receiptEventSchema = z
+  .object({
+    type: z.literal('receipt_event'),
+    chatId: uuidSchema,
+    userId: uuidSchema,
+    status: z.enum(['delivered', 'read']),
+    seq: seqSchema,
+    timestamp: z.string().datetime(),
+    messageCreatedAt: z.string().datetime().optional(),
+  })
+  .strict();
+
+export const deadLetterSchema = z
+  .object({
+    originalTopic: z.string(),
+    partition: z.number().int().nonnegative(),
+    offset: z.string().regex(/^\d+$/),
+    encoding: z.literal('base64'),
+    key: z.string().nullable(),
+    value: z.string().nullable(),
+    error: z.object({
+      name: z.string(),
+      message: z.string(),
+      stack: z.string().optional(),
+    }),
+    attempts: z.number().int().positive(),
+    failedAt: z.string().datetime(),
+  })
+  .strict();
+
 export const receiptSchema = z
   .object({
     type: z.literal('receipt'),
@@ -113,6 +147,7 @@ export const serverFrameSchema = z.discriminatedUnion('type', [
       messages: z.array(storedMessageSchema),
       hasMore: z.boolean(),
       nextAfterSeq: seqSchema,
+      receipts: z.array(receiptCursorSchema).default([]),
     })
     .strict(),
   z
@@ -145,9 +180,17 @@ export const serverFrameSchema = z.discriminatedUnion('type', [
       message: z.string(),
       clientMsgId: uuidSchema.optional(),
       retryAfterMs: z.number().int().nonnegative().optional(),
+      chatId: uuidSchema.optional(),
+      operation: z.enum(['message', 'sync', 'delivered', 'read']).optional(),
     })
     .strict(),
 ]);
 export type ClientFrame = z.infer<typeof clientFrameSchema>;
 export type ServerFrame = z.infer<typeof serverFrameSchema>;
 export type StoredMessage = z.infer<typeof storedMessageSchema>;
+export type ReceiptEvent = z.infer<typeof receiptEventSchema>;
+export type ReceiptCursor = z.infer<typeof receiptCursorSchema>;
+export interface ChatReceiptRecord extends ReceiptCursor {
+  chatId: string;
+  updatedAt: string;
+}

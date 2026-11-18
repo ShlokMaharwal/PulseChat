@@ -2,17 +2,25 @@ import {
   kafkaMessageSchema,
   storedMessageSchema,
   SequenceAllocator,
+  receiptEventSchema,
+  deadLetterSchema,
+  UserRouter,
+  type ReceiptEvent,
+  type ChatReceiptRecord,
   type ServiceContext,
   type StoredMessage,
   type ServerFrame,
 } from '@pulsechat/shared';
-import type { Consumer, EachBatchPayload } from 'kafkajs';
+import type { Consumer, EachBatchPayload, KafkaMessage } from 'kafkajs';
+import { setTimeout as delay } from 'node:timers/promises';
 
 type InputMessage = ReturnType<typeof kafkaMessageSchema.parse>;
 
 export class MessageProcessor {
   private readonly consumer: Consumer;
   private readonly allocator;
+  private readonly producer;
+  private readonly router;
   private active = false;
   private stopping = false;
 
@@ -23,6 +31,15 @@ export class MessageProcessor {
       heartbeatInterval: 3000,
     });
     this.allocator = new SequenceAllocator(context.dependencies);
+    this.producer = context.dependencies.kafka.producer({
+      idempotent: true,
+      maxInFlightRequests: 1,
+    });
+    this.router = new UserRouter(
+      context.dependencies.redis,
+      context.config.INSTANCE_ID,
+      context.config.PRESENCE_TTL_SECONDS,
+    );
     this.consumer.on(this.consumer.events.GROUP_JOIN, () => {
       this.active = true;
     });
@@ -37,8 +54,9 @@ export class MessageProcessor {
 
   async start() {
     await this.consumer.connect();
+    await this.producer.connect();
     await this.consumer.subscribe({
-      topics: ['messages'],
+      topics: ['messages', 'receipts'],
       fromBeginning: true,
     });
     await this.consumer.run({
@@ -59,12 +77,14 @@ export class MessageProcessor {
     let nextOffset: string | undefined;
     for (const record of batch.messages) {
       if (!isRunning() || isStale()) break;
-      if (!record.value) throw new Error('Kafka message has no value');
-      const parsed: unknown = JSON.parse(record.value.toString('utf8'));
-      const message = kafkaMessageSchema.parse(parsed);
-      if (record.key?.toString('utf8') !== message.chatId)
-        throw new Error('Kafka partition key does not match chatId');
-      await this.process(message, heartbeat);
+      const completed = await this.retryRecord(
+        batch.topic,
+        batch.partition,
+        record,
+        heartbeat,
+        () => isRunning() && !isStale(),
+      );
+      if (!completed) break;
       resolveOffset(record.offset);
       nextOffset = (BigInt(record.offset) + 1n).toString();
       await heartbeat();
@@ -75,6 +95,123 @@ export class MessageProcessor {
         { topic: batch.topic, partition: batch.partition, offset: nextOffset },
       ]);
     }
+  }
+
+  private async retryRecord(
+    topic: string,
+    partition: number,
+    record: KafkaMessage,
+    heartbeat: () => Promise<void>,
+    running: () => boolean,
+  ) {
+    let failure: unknown;
+    const attempts = this.context.config.PROCESSING_MAX_RETRIES + 1;
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      if (!running()) return false;
+      try {
+        if (!record.value) throw new Error('Kafka record has no value');
+        const parsed: unknown = JSON.parse(record.value.toString('utf8'));
+        const event =
+          topic === 'receipts'
+            ? receiptEventSchema.parse(parsed)
+            : kafkaMessageSchema.parse(parsed);
+        if (record.key?.toString('utf8') !== event.chatId)
+          throw new Error('Kafka partition key does not match chatId');
+        if ('type' in event) await this.receipt(event);
+        else await this.process(event, heartbeat);
+        return true;
+      } catch (error) {
+        failure = error;
+        this.context.logger.warn(
+          {
+            err: error,
+            topic,
+            partition,
+            offset: record.offset,
+            attempt: attempt + 1,
+          },
+          'Record processing failed',
+        );
+        if (attempt + 1 < attempts) {
+          await delay(Math.min(100 * 2 ** attempt, 1600));
+          await heartbeat();
+        }
+      }
+    }
+    const error =
+      failure instanceof Error ? failure : new Error(String(failure));
+    const deadLetter = deadLetterSchema.parse({
+      originalTopic: topic,
+      partition,
+      offset: record.offset,
+      encoding: 'base64',
+      key: record.key?.toString('base64') ?? null,
+      value: record.value?.toString('base64') ?? null,
+      error: { name: error.name, message: error.message, stack: error.stack },
+      attempts,
+      failedAt: new Date().toISOString(),
+    });
+    // Keep ownership and the offset until the DLQ is durably acknowledged.
+    while (running()) {
+      try {
+        await this.producer.send({
+          topic: 'messages.dlq',
+          acks: -1,
+          messages: [{ key: record.key, value: JSON.stringify(deadLetter) }],
+        });
+        return true;
+      } catch (err) {
+        this.context.logger.error(
+          { err, topic, partition, offset: record.offset },
+          'DLQ publish failed; retaining offset',
+        );
+        await delay(1000);
+        await heartbeat();
+      }
+    }
+    return false;
+  }
+
+  private async receipt(event: ReceiptEvent) {
+    const { db } = this.context.dependencies;
+    const chat = await db
+      .collection<{ id: string; memberIds: string[] }>('chats')
+      .findOne({ id: event.chatId, memberIds: event.userId });
+    if (!chat) throw new Error('Receipt user is not a chat member');
+    const collection = db.collection<ChatReceiptRecord>('chat_receipts');
+    const previous = await collection.findOne({
+      chatId: event.chatId,
+      userId: event.userId,
+    });
+    const current =
+      event.status === 'read' ? previous?.readSeq : previous?.deliveredSeq;
+    if ((current ?? 0) >= event.seq) return;
+    await collection.updateOne(
+      { chatId: event.chatId, userId: event.userId },
+      {
+        $max: {
+          deliveredSeq: event.seq,
+          readSeq: event.status === 'read' ? event.seq : 0,
+        },
+        $set: { updatedAt: event.timestamp },
+        $setOnInsert: { chatId: event.chatId, userId: event.userId },
+      },
+      { upsert: true },
+    );
+    for (const userId of chat.memberIds)
+      await this.publish(userId, {
+        type: 'receipt',
+        chatId: event.chatId,
+        userId: event.userId,
+        status: event.status,
+        seq: event.seq,
+        timestamp: event.timestamp,
+      }).catch((err: unknown) =>
+        this.context.logger.warn(
+          { err, chatId: event.chatId, userId },
+          'Receipt live delivery unavailable',
+        ),
+      );
   }
 
   private assertSame(existing: StoredMessage, incoming: InputMessage) {
@@ -89,13 +226,7 @@ export class MessageProcessor {
   }
 
   private async publish(userId: string, payload: ServerFrame) {
-    const { redis } = this.context.dependencies;
-    const gatewayId = await redis.get(`user:${userId}:gateway`);
-    if (gatewayId)
-      await redis.publish(
-        `gateway:${gatewayId}`,
-        JSON.stringify({ userId, payload }),
-      );
+    await this.router.publish(userId, payload);
   }
 
   private async sent(message: StoredMessage) {
@@ -207,5 +338,6 @@ export class MessageProcessor {
     this.active = false;
     await this.consumer.stop();
     await this.consumer.disconnect();
+    await this.producer.disconnect();
   }
 }

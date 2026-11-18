@@ -3,6 +3,7 @@ import {
   storedMessageSchema,
   uuidSchema,
   type StoredMessage,
+  type ChatReceiptRecord,
   type createDependencies,
 } from '@pulsechat/shared';
 import type { UserRecord, PublicUser } from './auth.js';
@@ -20,11 +21,13 @@ export class ChatService {
   private readonly chats;
   private readonly users;
   private readonly messages;
+  private readonly receipts;
 
   constructor(db: Database) {
     this.chats = db.collection<ChatRecord>('chats');
     this.users = db.collection<UserRecord>('users');
     this.messages = db.collection<StoredMessage>('messages');
+    this.receipts = db.collection<ChatReceiptRecord>('chat_receipts');
   }
 
   async initialize() {
@@ -111,10 +114,20 @@ export class ChatService {
           { chatId: chat.id },
           { sort: { seq: -1 }, projection: { _id: 0 } },
         );
+        const receipts = await this.receiptState(chat.id);
+        const ownRead =
+          receipts.find((receipt) => receipt.userId === userId)?.readSeq ?? 0;
+        const unreadCount = await this.messages.countDocuments({
+          chatId: chat.id,
+          senderId: { $ne: userId },
+          seq: { $gt: ownRead },
+        });
         return {
           ...(await this.publicChat(chat)),
           lastMessage: latest ? storedMessageSchema.parse(latest) : null,
           lastSeq: latest?.seq ?? 0,
+          receipts,
+          unreadCount,
           createdAt: chat.createdAt,
         };
       }),
@@ -145,6 +158,71 @@ export class ChatService {
       messages,
       hasMore: records.length > limit,
       nextAfterSeq: messages.at(-1)?.seq ?? afterSeq,
+      receipts: await this.receiptState(chatId),
     };
+  }
+
+  async receiptState(chatId: string) {
+    const records = await this.receipts
+      .find(
+        { chatId },
+        { projection: { _id: 0, userId: 1, deliveredSeq: 1, readSeq: 1 } },
+      )
+      .toArray();
+    return records.map((record) => ({
+      userId: record.userId,
+      deliveredSeq: record.deliveredSeq,
+      readSeq: record.readSeq,
+    }));
+  }
+
+  async peers(userId: string): Promise<string[]> {
+    const records = await this.chats
+      .find({ memberIds: userId }, { projection: { memberIds: 1 } })
+      .toArray();
+    return [
+      ...new Set(
+        records.flatMap((chat) => chat.memberIds).filter((id) => id !== userId),
+      ),
+    ];
+  }
+
+  async shareChat(userId: string, peerId: string): Promise<boolean> {
+    return Boolean(
+      await this.chats.findOne(
+        { memberIds: { $all: [userId, peerId] } },
+        { projection: { id: 1 } },
+      ),
+    );
+  }
+
+  async messageForReceipt(chatId: string, userId: string, messageId: string) {
+    await this.authorize(chatId, userId);
+    const message = await this.messages.findOne(
+      { chatId, messageId },
+      { projection: { _id: 0 } },
+    );
+    if (!message || message.senderId === userId)
+      throw new HttpError(
+        400,
+        'INVALID_REQUEST',
+        'Only a received peer message can be acknowledged',
+      );
+    return storedMessageSchema.parse(message);
+  }
+
+  async validateRead(chatId: string, userId: string, seq: number) {
+    const chat = await this.authorize(chatId, userId);
+    const latest = await this.messages.findOne(
+      { chatId },
+      { sort: { seq: -1 }, projection: { seq: 1 } },
+    );
+    if (seq > (latest?.seq ?? 0))
+      throw new HttpError(
+        400,
+        'INVALID_REQUEST',
+        'Read position exceeds stored history',
+      );
+    return chat;
   }
 }

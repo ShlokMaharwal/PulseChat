@@ -59,6 +59,12 @@ export function createDependencies(
       { key: { messageId: 1 }, unique: true, name: 'messageId_unique' },
       { key: { chatId: 1, seq: 1 }, unique: true, name: 'chatId_seq_unique' },
     ]);
+    await db
+      .collection('chat_receipts')
+      .createIndex(
+        { chatId: 1, userId: 1 },
+        { unique: true, name: 'chatUser_receipt_unique' },
+      );
   }
 
   async function check(): Promise<DependencyHealth> {

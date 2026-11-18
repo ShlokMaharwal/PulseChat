@@ -2,7 +2,7 @@
 
 This document is the sole contract between the independent backend and frontend applications. Backend shared types are not imported into the frontend. JSON uses UTF-8, UUID identifiers, ISO 8601 timestamps, and safe integer sequence numbers. Sequence numbers are scoped to a chat and begin at 1.
 
-Implementation status: health and metrics endpoints passed Phase 1. Authentication, chats, core messaging, and ordered history pagination are implemented and verified in Phase 2. Receipts, TTL presence, and automatic reconnect/gap-recovery clients are Phase 3 work. The frontend follows the backend proof phases.
+Implementation status: Phases 1–2 are verified. Phase 3 implements persisted receipts, expiring presence, multi-gateway sessions, rate limiting, dead letters, and a reconnecting recovery client; verification evidence is recorded separately. The frontend follows the backend proof phases.
 
 ## HTTP
 
@@ -16,8 +16,9 @@ Authenticated REST requests include `Authorization: Bearer <token>`. Tokens are 
 | `POST /api/auth/login` | Same fields | `200`, authentication result |
 | `GET /api/users?query=ali` | Authenticated; username prefix search | `200`, `{ "users": [{ "id": "...", "username": "alice" }] }` |
 | `POST /api/chats` | Authenticated; `{ "userId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" }` | `201` for a new 1:1 chat or `200` for the existing pair; `{ "chat": { "id": "...", "members": [{ "id": "...", "username": "..." }] } }` |
-| `GET /api/chats` | Authenticated | `200`, `{ "chats": [...] }`, each with `id`, `members`, `lastMessage` (message or null), and `lastSeq` |
+| `GET /api/chats` | Authenticated | `200`, `{ "chats": [...] }`, each with `id`, `members`, `lastMessage` (message or null), `lastSeq`, `createdAt`, `unreadCount`, and `receipts` |
 | `GET /api/chats/:chatId/messages?afterSeq=0&limit=100` | Authenticated chat member; ascending history | `200`, `{ "messages": [...], "hasMore": false, "nextAfterSeq": 12 }` |
+| `GET /api/users/:userId/presence` | Authenticated self or chat peer | `200`, `{ "userId": "...", "online": true }` |
 | `GET /api/healthz` | No authentication | `200`, `{ "status": "alive", "service": "gateway", "instanceId": "..." }` |
 | `GET /api/readyz` | No authentication | `200` when ready, otherwise `503`; includes `status`, `service`, `instanceId`, and, after startup, `dependencies: { "redis": true, "mongo": true, "kafka": true }` |
 | `GET /api/metrics` | No authentication; operational endpoint | Prometheus text for the selected gateway |
@@ -40,7 +41,7 @@ new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.ho
 
 The server selects `pulsechat` as the response subprotocol. It does not echo the JWT. Invalid or expired credentials reject the HTTP upgrade with `401`. The connection is authenticated before it can send application messages. Each text frame contains exactly one JSON object. Binary frames are unsupported. The default complete-frame maximum is 16 KiB, including JSON framing; body UTF-8 bytes must fit within that limit.
 
-On acceptance, the server sends `{ "type": "welcome", "userId": "...", "gatewayId": "...", "heartbeatIntervalMs": 15000 }`. Phase 3 adds complete multi-gateway routing for multiple connections per user and refreshes routing/presence by heartbeat with a 30-second TTL.
+On acceptance, the server sends `{ "type": "welcome", "userId": "...", "gatewayId": "...", "heartbeatIntervalMs": 15000 }`. Multiple sessions on different gateways all receive live messages. Routing and presence expire after 30 seconds without a heartbeat or WebSocket pong. An expired JWT closes an existing socket with 4001.
 
 ## Sending messages
 
@@ -78,29 +79,29 @@ After ingesting a message, a client sends `{ "type": "delivered", "chatId": "...
 {"type":"receipt","chatId":"cccccccc-cccc-4ccc-8ccc-cccccccccccc","userId":"bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb","status":"read","seq":12,"timestamp":"2026-11-18T00:00:01.000Z"}
 ```
 
-`status` is `delivered` or `read`. A repeated receipt does not regress stored state. Offline senders recover persisted receipt state through chat/history responses when reliability support is completed.
+`status` is `delivered` or `read`. A repeated receipt does not regress stored state. Chat lists, HTTP history, and WebSocket sync responses include `receipts: [{ "userId": "...", "deliveredSeq": 12, "readSeq": 12 }]`. Both cursors are cumulative and monotonic. Read implies delivered; clients acknowledge delivered only after ordered ingestion. A client can acknowledge only a peer message in an authorized chat. Receipts travel through the `receipts` Kafka topic before MongoDB persistence and fan-out.
 
 ## Sync and gap recovery (Phase 3)
 
 Client: `{ "type": "sync", "chatId": "...", "afterSeq": 12, "limit": 100 }`. `limit` defaults to 100. Response:
 
 ```json
-{"type":"sync","chatId":"cccccccc-cccc-4ccc-8ccc-cccccccccccc","messages":[],"hasMore":false,"nextAfterSeq":12}
+{"type":"sync","chatId":"cccccccc-cccc-4ccc-8ccc-cccccccccccc","messages":[],"hasMore":false,"nextAfterSeq":12,"receipts":[]}
 ```
 
-`messages` contains canonical stored-message objects without a `type` field, sorted ascending, strictly after the requested cursor. Request the next page using `nextAfterSeq` while `hasMore` is true. Empty pages preserve the requested cursor. Sync pages are authoritative over persisted messages: sequence numbers can have a permanent gap after a record goes to the DLQ, so clients must not wait forever for every integer to exist.
+`messages` contains canonical stored-message objects without a `type` field, sorted ascending, strictly after the requested cursor. Request the next page using `nextAfterSeq` while `hasMore` is true. Empty pages preserve the requested cursor. Pages are also bounded by encoded bytes; request another page while `hasMore` is true, even if fewer than `limit` messages arrived. Sync pages are authoritative over persisted messages: sequence numbers can have a permanent gap after a record goes to the DLQ, so clients must not wait forever for every integer to exist.
 
-Clients keep a cursor per user and chat, resync on reconnect and live gaps, deduplicate replayed message IDs, and resend pending sends with the same `clientMsgId`. A `received` acknowledgment can precede a reconnect; retaining a pending send until `sent` is safe because processing is idempotent. A user must still be authorized for every sync request.
+Clients keep a cursor per user and chat, resync on reconnect and live gaps, deduplicate replayed message IDs, and resend pending sends with the same `clientMsgId`. The backend test client resends sends lacking an ACK; after `received`, Kafka owns delivery and sync discovers the persisted result. Retaining a send until `sent` is also safe because processing is idempotent. A periodic 15-second sync discovers lost Pub/Sub tails even without a later live gap. Unsent pending payloads and sequence cursors are scoped to the authenticated user. A user must still be authorized for every sync request.
 
 ## Heartbeat, presence, and shutdown (Phase 3)
 
-Every 15 seconds the client sends `{ "type": "heartbeat" }`; the server responds with the same frame and refreshes presence and routing TTLs. Presence notifications use `{ "type": "presence", "userId": "...", "online": true }`. A routing entry or old connection does not by itself establish online status after the presence TTL expires.
+Every 15 seconds the client sends `{ "type": "heartbeat" }`; the server responds with the same frame and refreshes presence and routing TTLs. Presence notifications use `{ "type": "presence", "userId": "...", "online": true }`. Native WebSocket pings/pongs also refresh presence. Peer snapshots accompany heartbeats, so crashed-peer offline status becomes visible through snapshots or authenticated presence queries after the TTL. A routing entry or old connection does not by itself establish online status after the presence TTL expires.
 
 Before graceful gateway shutdown, the server sends `{ "type": "reconnect", "retryAfterMs": 500 }`, drains accepted work, and closes with `1012`. Clients reconnect with exponential backoff and jitter, resync tracked chats, and retry pending sends.
 
 ## WebSocket errors and close codes
 
-Errors use `{ "type": "error", "code": "RATE_LIMITED", "message": "Too many requests", "clientMsgId": "...", "retryAfterMs": 1000 }`. `clientMsgId` and `retryAfterMs` are optional. Codes are `INVALID_MESSAGE`, `UNAUTHORIZED`, `FORBIDDEN`, `CONFLICT`, `RATE_LIMITED`, `PAYLOAD_TOO_LARGE`, `UNAVAILABLE`, and `INTERNAL_ERROR`. Invalid JSON or unauthorized chat operations do not enter Kafka. Rate-limited clients respect the retry delay and reuse the logical send ID.
+Errors use `{ "type": "error", "code": "RATE_LIMITED", "message": "Too many requests", "clientMsgId": "...", "retryAfterMs": 1000 }`. `clientMsgId`, `retryAfterMs`, `chatId`, and `operation` (`message`, `sync`, `delivered`, or `read`) are optional and correlate retryable operations. The default per-user Redis token bucket has capacity 100 and refills 50 tokens/second across every gateway: send costs 1, sync 5, receipt 0.2, heartbeat is exempt. Admission happens when a frame arrives, before queued persistence work. Each socket permits at most 256 queued operations and 1 MiB buffered output by default. Codes are `INVALID_MESSAGE`, `UNAUTHORIZED`, `FORBIDDEN`, `CONFLICT`, `RATE_LIMITED`, `PAYLOAD_TOO_LARGE`, `UNAVAILABLE`, and `INTERNAL_ERROR`. Invalid JSON or unauthorized chat operations do not enter Kafka. Rate-limited clients respect the retry delay and reuse the logical send ID.
 
 | Close code | Meaning | Client action |
 | --- | --- | --- |

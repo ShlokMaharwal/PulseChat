@@ -20,7 +20,8 @@
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "test:smoke": "node tests/smoke.mjs",
     "dev:gateway": "tsx packages/gateway/src/index.ts",
-    "dev:processor": "tsx packages/processor/src/index.ts"
+    "dev:processor": "tsx packages/processor/src/index.ts",
+    "test:presence": "tsx tests/presence.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

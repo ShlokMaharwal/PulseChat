@@ -47,6 +47,14 @@ const envSchema = z.object({
   PRESENCE_TTL_SECONDS: positiveInteger.default(30),
   SHUTDOWN_TIMEOUT_MS: positiveInteger.default(15000),
   DEPENDENCY_TIMEOUT_MS: positiveInteger.default(3000),
+  RATE_LIMIT_CAPACITY: positiveInteger.max(100000).default(100),
+  RATE_LIMIT_REFILL_PER_SECOND: z.coerce
+    .number()
+    .finite()
+    .min(0.1)
+    .max(100000)
+    .default(50),
+  PROCESSING_MAX_RETRIES: z.coerce.number().int().min(1).max(20).default(5),
 });
 
 export function parseConfig(env: NodeJS.ProcessEnv) {
@@ -57,6 +65,14 @@ export function parseConfig(env: NodeJS.ProcessEnv) {
           code: z.ZodIssueCode.custom,
           path: ['PRESENCE_TTL_SECONDS'],
           message: 'Presence TTL must exceed heartbeat interval',
+        });
+      }
+      if (value.MAX_SOCKET_BUFFER_BYTES < value.MAX_MESSAGE_BYTES * 2) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['MAX_SOCKET_BUFFER_BYTES'],
+          message:
+            'Socket buffer must hold at least two maximum-sized client frames',
         });
       }
     })

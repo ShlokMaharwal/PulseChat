@@ -25,7 +25,10 @@ export interface PublicUser {
   username: string;
 }
 
-export function verifyToken(token: string, config: Config): string {
+export function verifySession(
+  token: string,
+  config: Config,
+): { userId: string; expiresAt: number } {
   try {
     const payload = jwt.verify(token, config.JWT_SECRET, {
       algorithms: ['HS256'],
@@ -34,11 +37,12 @@ export function verifyToken(token: string, config: Config): string {
     });
     if (
       typeof payload === 'string' ||
-      !uuidSchema.safeParse(payload.sub).success
+      !uuidSchema.safeParse(payload.sub).success ||
+      typeof payload.exp !== 'number'
     ) {
       throw new Error('Invalid token subject');
     }
-    return payload.sub as string;
+    return { userId: payload.sub as string, expiresAt: payload.exp * 1000 };
   } catch {
     throw new HttpError(
       401,
@@ -46,6 +50,10 @@ export function verifyToken(token: string, config: Config): string {
       'A valid, unexpired token is required',
     );
   }
+}
+
+export function verifyToken(token: string, config: Config): string {
+  return verifySession(token, config).userId;
 }
 
 export function bearerToken(authorization: string | undefined): string {

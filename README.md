@@ -28,7 +28,7 @@ Only one gateway image and one processor image are built; replicas reuse those i
 | http://localhost:9090 | Prometheus |
 | http://localhost:3000 | Grafana; local defaults `admin` / `pulsechat-local` |
 
-Grafana's Prometheus datasource is provisioned automatically. Backend `/metrics` endpoints export Node process metrics; chat metrics and a dashboard come in Phase 4. Nginx uses `least_conn` and Docker DNS resolution to track recreated gateways. The `/ws` upgrade route is configured; WebSocket authentication and messaging are Phase 2 work.
+Grafana's Prometheus datasource is provisioned automatically. Backend `/metrics` endpoints export Node process metrics; chat metrics and a dashboard come in Phase 4. Nginx uses `least_conn` and Docker DNS resolution to track recreated gateways. The `/ws` route authenticates JWTs and supports messaging, receipts, sync, and presence.
 
 All published ports bind to loopback. The local database and Kafka listeners are unauthenticated. These Compose defaults target a development machine. Copy `.env.example` to `.env` to override the local JWT secret or Grafana password. After Grafana's first start, changing the environment variable alone does not reset its persisted admin password.
 
@@ -44,7 +44,7 @@ npm test
 npm run build
 ```
 
-Unit tests cover configuration rejection, protocol validation, JWT authentication, bounded HTTP input, topic bootstrap, readiness failures and recovery, and HTTP dispatch. The container smoke test verifies all five replicas, all three Kafka topics and their leaders, MongoDB indexes, Redis connectivity, Nginx proxying, Prometheus scrapes, and Grafana's provisioned datasource. It returns a failing exit code if any assertion fails and does not repair missing topics or indexes.
+The 60 unit tests cover configuration, protocol validation, JWT authentication, bounded HTTP input, topic bootstrap, readiness, HTTP dispatch, gap recovery, and reconnect/resend behavior. The container smoke test verifies all five replicas, all three Kafka topics and their leaders, MongoDB indexes, Redis connectivity, Nginx proxying, Prometheus scrapes, and Grafana's provisioned datasource. It returns a failing exit code if any assertion fails and does not repair missing topics or indexes.
 
 Run the real backend integration suite after starting the stack:
 
@@ -52,7 +52,7 @@ Run the real backend integration suite after starting the stack:
 docker compose --parallel 1 run --build --rm integration
 ```
 
-The Phase 2 gate passed all four integration cases: authorization boundaries, 1,000 messages across different gateways in order with matching MongoDB sequences and zero duplicate wire delivery, five duplicate sends producing one stored message, and concurrent counter reseeding. This is correctness evidence, not a load benchmark. See [the protocol](docs/PROTOCOL.md), [the design](docs/DESIGN.md), and [Phase 2 verification](docs/phase-2-verification.md).
+The Phase 2 gate passed all four integration cases: authorization boundaries, 1,000 messages across different gateways in order with matching MongoDB sequences and zero duplicate wire delivery, five duplicate sends producing one stored message, and concurrent counter reseeding. The expanded Phase 3 integration suite passes all 10 cases, including 125 offline messages recovered in order, persisted delivered/read cursors, duplicate sessions across gateways, poison-record DLQ continuation, rate rejection, malformed JSON, binary frames, and oversized payloads. A separate host-run crash check observed presence expiry in about 30 seconds. Run it from `backend/` with `npm run test:presence`; it kills and restores only PulseChat gateway-3. See [Phase 3 verification](docs/phase-3-verification.md). This is correctness evidence, not a load benchmark. See [the protocol](docs/PROTOCOL.md), [the design](docs/DESIGN.md), and [Phase 2 verification](docs/phase-2-verification.md).
 
 To run a backend process on the host, start the dependencies with `docker compose up -d kafka redis mongo`, set the environment variables listed in `backend/.env.example`, and run `npm run dev:gateway` or `npm run dev:processor`. Use a different `PORT` for each process. Host clients use Kafka at `localhost:19092`, Redis at `localhost:16379`, and MongoDB at `localhost:27018`. Containers use their service names and native ports; these host database ports avoid collisions with common local database installations.
 

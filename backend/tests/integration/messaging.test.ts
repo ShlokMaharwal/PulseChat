@@ -1,10 +1,13 @@
 import { randomUUID } from 'node:crypto';
+import { once } from 'node:events';
+import WebSocket from 'ws';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   createDependencies,
   createLogger,
   parseConfig,
   SequenceAllocator,
+  deadLetterSchema,
 } from '@pulsechat/shared';
 import { TestClient } from '../helpers/test-client.js';
 
@@ -166,6 +169,11 @@ describe('Phase 2 live messaging', () => {
       (message) => message.chatId === chat.id,
     );
     expect(delivered).toHaveLength(1000);
+    expect(
+      receiver.frames.filter(
+        (frame) => frame.type === 'message' && frame.chatId === chat.id,
+      ),
+    ).toHaveLength(1000);
     expect(new Set(delivered.map((message) => message.messageId)).size).toBe(
       1000,
     );
@@ -255,5 +263,190 @@ describe('Phase 2 live messaging', () => {
       Array.from({ length: 20 }, (_, index) => index + 2),
     );
     expect(await dependencies.redis.get(`chat:${chatId}:seq`)).toBe('21');
+  });
+
+  it('recovers missed messages in order and persists delivered/read cursors', async () => {
+    const { a, b, chat, sender, receiver } = await usersAndChat();
+    await receiver.close();
+    for (let index = 0; index < 125; index++)
+      await sender.message(chat.id, `offline-${index}`);
+    await sender.waitForSeq(chat.id, 125, 180000);
+    await receiver.connect(gatewayB.replace(/^http/, 'ws') + '/ws', b.token);
+    await receiver.waitForSeq(chat.id, 125, 120000);
+    expect(
+      receiver.messages
+        .filter((message) => message.chatId === chat.id)
+        .map((message) => message.seq),
+    ).toEqual(Array.from({ length: 125 }, (_, i) => i + 1));
+    await sender.waitFor(
+      (frame) =>
+        frame.type === 'receipt' &&
+        frame.chatId === chat.id &&
+        frame.userId === b.user.id &&
+        frame.status === 'delivered' &&
+        frame.seq === 125,
+    );
+    receiver.read(chat.id);
+    await sender.waitFor(
+      (frame) =>
+        frame.type === 'receipt' &&
+        frame.chatId === chat.id &&
+        frame.status === 'read' &&
+        frame.seq === 125,
+    );
+    const cursor = await dependencies.db
+      .collection('chat_receipts')
+      .findOne({ chatId: chat.id, userId: b.user.id });
+    expect(cursor).toMatchObject({ deliveredSeq: 125, readSeq: 125 });
+    receiver.read(chat.id, 1);
+    const summary = await request<{
+      chats: { id: string; unreadCount: number }[];
+    }>(gatewayB, '/chats', undefined, b.token);
+    expect(summary.chats.find((item) => item.id === chat.id)?.unreadCount).toBe(
+      0,
+    );
+    const presence = await request<{ online: boolean }>(
+      gatewayA,
+      `/users/${b.user.id}/presence`,
+      undefined,
+      a.token,
+    );
+    expect(presence.online).toBe(true);
+  });
+
+  it('routes to duplicate user sessions on different gateways', async () => {
+    const { b, chat, sender, receiver } = await usersAndChat();
+    const second = new TestClient();
+    clients.push(second);
+    await second.connect(gatewayA.replace(/^http/, 'ws') + '/ws', b.token);
+    await sender.message(chat.id, 'two sessions');
+    await Promise.all([
+      receiver.waitForSeq(chat.id, 1),
+      second.waitForSeq(chat.id, 1),
+    ]);
+    expect(
+      receiver.messages.filter((message) => message.chatId === chat.id),
+    ).toHaveLength(1);
+    expect(
+      second.messages.filter((message) => message.chatId === chat.id),
+    ).toHaveLength(1);
+    await second.close();
+    await sender.message(chat.id, 'remaining session');
+    await receiver.waitForSeq(chat.id, 2);
+  });
+
+  it('dead-letters a poison record and continues the same chat partition', async () => {
+    const { chat, sender, receiver } = await usersAndChat();
+    const consumer = dependencies.kafka.consumer({
+      groupId: `dlq-test-${randomUUID()}`,
+    });
+    const producer = dependencies.kafka.producer();
+    const poison = `poison-${randomUUID()}`;
+    let found: ReturnType<typeof deadLetterSchema.parse> | undefined;
+    try {
+      await consumer.connect();
+      await producer.connect();
+      await consumer.subscribe({ topic: 'messages.dlq', fromBeginning: true });
+      await consumer.run({
+        eachMessage: async ({ message }) => {
+          const parsed = deadLetterSchema.safeParse(
+            JSON.parse(message.value!.toString()),
+          );
+          if (
+            parsed.success &&
+            parsed.data.value &&
+            Buffer.from(parsed.data.value, 'base64').toString() === poison
+          )
+            found = parsed.data;
+        },
+      });
+      await producer.send({
+        topic: 'messages',
+        acks: -1,
+        messages: [{ key: chat.id, value: poison }],
+      });
+      await sender.message(chat.id, 'after poison');
+      await receiver.waitForSeq(chat.id, 1, 120000);
+      await expect.poll(() => found, { timeout: 60000 }).toBeDefined();
+      expect(found).toMatchObject({
+        originalTopic: 'messages',
+        attempts: config.PROCESSING_MAX_RETRIES + 1,
+        encoding: 'base64',
+      });
+    } finally {
+      await consumer.disconnect();
+      await producer.disconnect();
+    }
+  });
+
+  it('rejects a user burst with an atomic shared rate bucket', async () => {
+    const { chat, sender, a } = await usersAndChat();
+    // Exhaust the bucket using server time, then exercise rejection through the socket.
+    await dependencies.redis.hset(
+      `rate:${a.user.id}`,
+      'tokens',
+      0,
+      'updated',
+      Date.now() + 60000,
+    );
+    const clientMsgId = randomUUID();
+    sender.send({
+      type: 'message',
+      chatId: chat.id,
+      body: 'rate limited',
+      clientMsgId,
+    });
+    await sender.waitFor(
+      (frame) =>
+        frame.type === 'error' &&
+        frame.clientMsgId === clientMsgId &&
+        frame.code === 'RATE_LIMITED',
+    );
+    expect(
+      await dependencies.db
+        .collection('messages')
+        .countDocuments({ chatId: chat.id }),
+    ).toBe(0);
+    await dependencies.redis.del(`rate:${a.user.id}`);
+    await sender.message(chat.id, 'after refill');
+  });
+
+  it('rejects malformed JSON without closing a healthy text connection', async () => {
+    const { chat, sender, receiver } = await usersAndChat();
+    sender.sendRaw('{broken');
+    await sender.waitFor(
+      (frame) => frame.type === 'error' && frame.code === 'INVALID_MESSAGE',
+    );
+    await sender.message(chat.id, 'valid after malformed');
+    await receiver.waitForSeq(chat.id, 1);
+    expect(
+      await dependencies.db
+        .collection('messages')
+        .countDocuments({ chatId: chat.id }),
+    ).toBe(1);
+  });
+
+  it('closes binary and oversized sockets with the documented codes', async () => {
+    const { a } = await usersAndChat();
+    for (const [payload, code] of [
+      [Buffer.from('binary'), 1003],
+      ['x'.repeat(config.MAX_MESSAGE_BYTES + 1), 1009],
+    ] as const) {
+      const socket = new WebSocket(gatewayA.replace(/^http/, 'ws') + '/ws', [
+        'pulsechat',
+        `jwt.${a.token}`,
+      ]);
+      socket.on('error', () => undefined);
+      try {
+        await once(socket, 'open');
+        const closed = new Promise<number>((resolve) =>
+          socket.once('close', (closeCode) => resolve(closeCode)),
+        );
+        socket.send(payload);
+        expect(await closed).toBe(code);
+      } finally {
+        socket.terminate();
+      }
+    }
   });
 });

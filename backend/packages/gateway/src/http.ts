@@ -1,7 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import type { Logger } from 'pino';
 import { z } from 'zod';
-import { uuidSchema, type Config } from '@pulsechat/shared';
+import { uuidSchema, type Config, type UserRouter } from '@pulsechat/shared';
 import { AuthService, bearerToken, verifyToken } from './auth.js';
 import { ChatService } from './chats.js';
 import { HttpError } from './errors.js';
@@ -91,6 +91,7 @@ export class GatewayHttpApi {
     private readonly chats: ChatService,
     private readonly config: Config,
     private readonly logger: Logger,
+    private readonly router: UserRouter,
   ) {}
 
   async handle(
@@ -102,7 +103,8 @@ export class GatewayHttpApi {
       !['/auth/register', '/auth/login', '/users', '/chats'].includes(
         url.pathname,
       ) &&
-      !url.pathname.startsWith('/chats/')
+      !url.pathname.startsWith('/chats/') &&
+      !url.pathname.startsWith('/users/')
     )
       return false;
     try {
@@ -128,7 +130,31 @@ export class GatewayHttpApi {
           this.config,
         );
         await this.auth.user(userId);
-        if (request.method === 'GET' && url.pathname === '/users') {
+        const presence = url.pathname.match(/^\/users\/([^/]+)\/presence$/);
+        if (request.method === 'GET' && presence?.[1]) {
+          const peerId = uuidSchema.safeParse(presence[1]);
+          if (!peerId.success)
+            throw new HttpError(
+              400,
+              'INVALID_REQUEST',
+              'Invalid user identifier',
+            );
+          if (
+            peerId.data !== userId &&
+            !(await this.chats.shareChat(userId, peerId.data))
+          )
+            throw new HttpError(
+              403,
+              'FORBIDDEN',
+              'Presence is restricted to chat peers',
+            );
+          sendJson(response, 200, {
+            userId: peerId.data,
+            online:
+              (await this.router.online([peerId.data])).get(peerId.data) ??
+              false,
+          });
+        } else if (request.method === 'GET' && url.pathname === '/users') {
           sendJson(response, 200, {
             users: await this.auth.search(
               url.searchParams.get('query') ?? '',
