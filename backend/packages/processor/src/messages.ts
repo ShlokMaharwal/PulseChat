@@ -14,6 +14,7 @@ import {
 } from '@pulsechat/shared';
 import type { Consumer, EachBatchPayload, KafkaMessage } from 'kafkajs';
 import { setTimeout as delay } from 'node:timers/promises';
+import { retryOperation } from './retry.js';
 
 type InputMessage = ReturnType<typeof kafkaMessageSchema.parse>;
 
@@ -168,11 +169,16 @@ export class MessageProcessor {
     heartbeat: () => Promise<void>,
     running: () => boolean,
   ) {
-    let failure: unknown;
     const attempts = this.context.config.PROCESSING_MAX_RETRIES + 1;
-    for (let attempt = 0; attempt < attempts; attempt++) {
-      if (!running()) return false;
-      try {
+    const result = await retryOperation({
+      maxAttempts: attempts,
+      running: () => running() && !this.stopping,
+      heartbeat,
+      healthy: async () => {
+        const health = await this.context.dependencies.check();
+        return health.redis && health.mongo && health.kafka;
+      },
+      operation: async () => {
         if (!record.value) throw new Error('Kafka record has no value');
         const parsed: unknown = JSON.parse(record.value.toString('utf8'));
         const event =
@@ -183,25 +189,23 @@ export class MessageProcessor {
           throw new Error('Kafka partition key does not match chatId');
         if ('type' in event) await this.receipt(event);
         else await this.process(event, heartbeat);
-        return true;
-      } catch (error) {
-        failure = error;
+      },
+      failed: (error, attempt) => {
         this.context.logger.warn(
           {
             err: error,
             topic,
             partition,
             offset: record.offset,
-            attempt: attempt + 1,
+            attempt,
           },
           'Record processing failed',
         );
-        if (attempt + 1 < attempts) {
-          await delay(Math.min(100 * 2 ** attempt, 1600));
-          await heartbeat();
-        }
-      }
-    }
+      },
+    });
+    if (result.status === 'complete') return true;
+    if (result.status === 'stopped') return false;
+    const failure = result.error;
     const error =
       failure instanceof Error ? failure : new Error(String(failure));
     const deadLetter = deadLetterSchema.parse({

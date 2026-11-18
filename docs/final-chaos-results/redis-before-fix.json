@@ -1,0 +1,14 @@
+{
+  "scenario": "redis",
+  "result": "FAIL",
+  "sent": 120,
+  "stored": 117,
+  "received": 117,
+  "duplicated": 0,
+  "wireDuplicates": 0,
+  "lost": 3,
+  "outOfOrder": 0,
+  "durationMs": 197001,
+  "faultEvidence": {},
+  "error": "Missing seq 120; current 117"
+}

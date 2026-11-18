@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "capturedAt": "2026-11-18T19:56:27.745Z",
+  "origin": "http://127.0.0.1:5173",
+  "proxiedLogin": true,
+  "proxiedHistoryMessages": 8,
+  "proxiedWebSocketWelcome": true
+}

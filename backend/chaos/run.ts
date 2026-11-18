@@ -198,7 +198,12 @@ export async function runScenario(scenario: Scenario) {
         };
       } else if (scenario === 'redis') {
         restore = () => docker('start', 'redis');
-        interrupt = docker('restart', 'redis');
+        interrupt = (async () => {
+          await docker('stop', 'redis');
+          await delay(12000);
+          await docker('start', 'redis');
+        })();
+        faultEvidence = { outageMs: 12000 };
       } else {
         restore = async () => {
           const state = await exec('docker', [

@@ -2,7 +2,7 @@
 
 This document is the sole contract between the independent backend and frontend applications. Backend shared types are not imported into the frontend. JSON uses UTF-8, UUID identifiers, ISO 8601 timestamps, and safe integer sequence numbers. Sequence numbers are scoped to a chat and begin at 1.
 
-Implementation status: Phases 1–2 are verified. Phase 3 implements persisted receipts, expiring presence, multi-gateway sessions, rate limiting, dead letters, and a reconnecting recovery client; verification evidence is recorded separately. The frontend follows the backend proof phases.
+Implementation status: backend Phases 1â€“5 and the independent React frontend implement this contract. The browser SDK handles reconnect, persisted cursors, ordered sync, offline queuing, and cumulative receipts. Phase verification documents record the tests and measured limitations.
 
 ## HTTP
 

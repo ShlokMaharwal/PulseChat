@@ -1,0 +1,28 @@
+{
+  "result": "PASS",
+  "capturedAt": "2026-11-18T19:55:24.780Z",
+  "accounts": 2,
+  "loginAndRegistration": true,
+  "initiallyDifferentGateways": true,
+  "canonicalMessages": 8,
+  "unreadBadge": true,
+  "readReceipts": true,
+  "presence": true,
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "themePersisted": true,
+  "offlineMessagesRecovered": 3,
+  "unackedResentSameId": true,
+  "persistedCursor": 8,
+  "afterReloadMessages": 8,
+  "mobileViewport": 390,
+  "contrastResults": {
+    "darkSecondary": 4.77460201898009,
+    "lightSecondary": 5.0241242052229405,
+    "accentButton": 9.216147598515207
+  },
+  "crashedService": "gateway-1",
+  "frontendErrors": []
+}

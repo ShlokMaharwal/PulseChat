@@ -4,7 +4,7 @@
 
 A distributed real-time chat system built with TypeScript, WebSockets, Kafka, Redis, and MongoDB. The backend is replicated across three gateways and two processors. Correctness, replay, failure recovery, and measured limits are documented alongside the implementation.
 
-Backend Phases 1–4 are verified. Phase 5 adds passing local chaos proofs, real load measurements, and the CI workflow; its remote run is checked before frontend work begins. The independent React frontend is Phase 6. This revision provides authenticated chat APIs and a Node recovery client, without a browser chat UI.
+The independent React 18 frontend provides login, registration, conversations, unread badges, presence, delivery/read receipts, and recovery after connection failures. Both applications have their own dependencies, types, tests, and builds. The backend proof phases passed before frontend implementation began; verification evidence and the measured capacity limits are linked below.
 
 ```mermaid
 flowchart LR
@@ -25,7 +25,7 @@ flowchart LR
 
 ## Quick start
 
-Use Docker Desktop with Linux containers and Docker Compose v2. Allow around 4 GiB of Docker memory as a starting point; the recorded tests used 2.77 GiB and encountered limits. Node.js 20+ and npm are needed for host-run checks.
+Use Docker Desktop with Linux containers and Docker Compose v2. Allow around 4 GiB of Docker memory as a starting point; the recorded tests used 2.77 GiB and encountered limits. Host checks need Node.js 20+ for the backend and Node.js 22.13+ for the frontend tooling, plus npm. Containers use Node.js 22.
 
 ```sh
 docker compose --parallel 1 up --build -d --wait --wait-timeout 600
@@ -36,6 +36,7 @@ docker compose run --rm --no-deps smoke
 
 | URL | Purpose |
 | --- | --- |
+| `http://localhost:8080` | Chat application; create two accounts in separate browser sessions |
 | `http://localhost:8080/api/auth/register` | Registration endpoint |
 | `http://localhost:8080/ws` | Authenticated WebSocket upgrade |
 | `http://localhost:8080/healthz` | Nginx liveness |
@@ -52,6 +53,20 @@ docker compose --parallel 1 up --build -d --wait kafka redis mongo gateway-1 gat
 ```
 
 The integration runner reaches those gateways directly on the Compose network. For host development, start `kafka redis mongo`, set a JWT secret of at least 32 characters, then run `npm ci` and `npm run dev:gateway` or `npm run dev:processor` in `backend/`. Host defaults use Kafka `19092`, Redis `16379`, and MongoDB `27018`. The gateway's direct REST paths omit `/api`.
+
+For frontend development, keep the Compose stack running, then:
+
+```sh
+cd frontend
+npm ci
+npm run dev
+```
+
+Open `http://127.0.0.1:5173`. Vite proxies REST and WebSocket requests to the running stack at port 8080. Direct-gateway proxy settings and browser storage behavior are documented in [frontend/README.md](frontend/README.md).
+
+![PulseChat dark theme](docs/img/chat-dark.png)
+
+The dark theme uses true black and neutral gray surfaces, with emerald accents. Themes follow the system preference until a saved toggle choice overrides it. See the [light theme](docs/img/chat-light.png) and [mobile view](docs/img/chat-mobile.png).
 
 ## Behavior and guarantees
 
@@ -83,15 +98,24 @@ npm run test:presence
 npm run test:chaos
 npm run test:load -- 200
 npm run test:load -- 2000
+cd ../frontend
+npm ci
+npm run lint
+npm run format:check
+npm run typecheck
+npm test
+npm run build
 ```
 
-The 60 unit tests cover configuration, protocol/auth boundaries, bounded HTTP input, readiness, and recovery-client behavior. The 10 integration cases verify 1,000 cross-gateway messages in order with matching MongoDB sequences and zero duplicate wire deliveries, retry dedupe, authorization, 125 offline messages, receipts, duplicate sessions, DLQ continuation, and invalid/limited frames.
+The 63 unit tests cover configuration, protocol/auth boundaries, bounded HTTP input, readiness, dependency-aware processing retries, and recovery-client behavior. The 10 integration cases verify 1,000 cross-gateway messages in order with matching MongoDB sequences and zero duplicate wire deliveries, retry dedupe, authorization, 125 offline messages, receipts, duplicate sessions, DLQ continuation, and invalid/limited frames.
 
 The four chaos scripts are independently runnable with `npm exec -- tsx chaos/gateway.ts` (or `processor.ts`, `redis.ts`, `kafka.ts`) from `backend/`. They restore interrupted containers and print PASS/FAIL counts. The recorded runs covered 485 logical sends with zero lost messages, duplicates, or order violations. The processor kill interrupted a partial batch with 79 messages remaining. [Raw chaos summaries](docs/chaos-results/) are committed.
 
 The actual load result is constrained: **200 observed baseline sockets; 533 observed peak during a failed 2,000-socket attempt**. The baseline confirmed 3.64 messages/second with p50/p95/p99 of 3,820.50/11,082.25/17,758.11 ms. The stress attempt confirmed 6.80 messages/second with substantial errors and 17 issued sends absent from MongoDB at the later observation. It did not meet the requested connection target. Both runs reused 32 users across 16 chats. See [all measurements, raw data, and limitations](docs/benchmarks.md).
 
-GitHub Actions runs backend lint, formatting, types, unit tests, build, real Compose integration/smoke, and all four chaos scenarios. A separate frontend job activates when Phase 6 adds its lockfile. No frontend result is claimed before that application exists.
+The nine frontend SDK tests cover authentication, ordered gap recovery, deduplication, paginated history across sequence gaps, offline queuing, reconnect identity, persisted cursors, receipts, retry delays, and shutdown. Two real browser sessions additionally verify the full chat flow, themes, and recovery after killing their gateway; see [frontend verification](docs/phase-6-verification.md).
+
+GitHub Actions runs backend lint, formatting, types, unit tests, build, real Compose integration/smoke, and all four chaos scenarios. A separate frontend job runs its own lint, formatting, types, SDK tests, and production build.
 
 ## Operations dashboard
 
@@ -111,10 +135,18 @@ backend/
   tests/                Unit, integration, recovery client, host probes
   chaos/                Asserted failure scenarios
   loadtest/             k6 adapter, runner, and persistence analysis
+frontend/
+  src/sdk/              Independent reconnecting browser client and REST adapter
+  src/components/       Shared interface components
+  src/pages/            Authentication and conversation views
+  src/hooks/            Session-scoped data and connection lifecycle
+  src/styles/           Plain CSS and neutral theme tokens
+  src/types/            Types written from the protocol document
+  tests/                Mock-WebSocket SDK verification
 infra/
   nginx/ prometheus/ grafana/
 docs/                   Protocol, design, proof, measurements, screenshot
 .github/workflows/      Independent application CI jobs
 ```
 
-Verification evidence: [Phase 1](docs/phase-1-verification.md), [Phase 2](docs/phase-2-verification.md), [Phase 3](docs/phase-3-verification.md), [Phase 4](docs/phase-4-verification.md), and [backend proof](docs/phase-5-verification.md). [Resume bullets](docs/resume-bullets.md) use recorded numbers only.
+Verification evidence: [Phase 1](docs/phase-1-verification.md), [Phase 2](docs/phase-2-verification.md), [Phase 3](docs/phase-3-verification.md), [Phase 4](docs/phase-4-verification.md), [backend proof](docs/phase-5-verification.md), and [frontend verification](docs/phase-6-verification.md). [Resume bullets](docs/resume-bullets.md) use recorded numbers only.
