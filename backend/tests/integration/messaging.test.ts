@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { once } from 'node:events';
+import { setTimeout as delay } from 'node:timers/promises';
 import WebSocket from 'ws';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
@@ -157,6 +158,9 @@ describe('Phase 2 live messaging', () => {
           sender.message(chat.id, `message-${start + index}`),
         ),
       );
+      // This case proves send order below the admission limit. Rejected sends
+      // are retried separately and have a later Kafka append order.
+      await delay(500);
     }
     await receiver.waitFor(
       (frame) =>
@@ -169,6 +173,11 @@ describe('Phase 2 live messaging', () => {
       (message) => message.chatId === chat.id,
     );
     expect(delivered).toHaveLength(1000);
+    expect(
+      sender.frames.some(
+        (frame) => frame.type === 'error' && frame.code === 'RATE_LIMITED',
+      ),
+    ).toBe(false);
     expect(
       receiver.frames.filter(
         (frame) => frame.type === 'message' && frame.chatId === chat.id,

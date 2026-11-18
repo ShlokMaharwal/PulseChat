@@ -51,3 +51,5 @@ The runner uses the reconnecting Node client for a fixture preflight and k6's se
 Committed evidence: [baseline measurements](load-results/baseline-200.json), [baseline k6 summary](load-results/baseline-200-k6.json), [stress measurements](load-results/stress-2000.json), and [stress k6 summary](load-results/stress-2000-k6.json). The capture timestamps are in those files.
 
 The load adapter uses the official [k6 WebSocket API](https://grafana.com/docs/k6/latest/javascript-api/k6-websockets/) and [custom summary API](https://grafana.com/docs/k6/latest/results-output/end-of-test/custom-summary/). Correctness under process failures is separately established by the automatically asserted chaos tests, rather than inferred from this failed stress attempt.
+
+Version scope: the recorded load runtime was the Phase 4 implementation at `566823a`, with the verification tooling later committed in `74becd2`. The subsequent Zod security update was not re-benchmarked; no new performance number is inferred for that dependency change.

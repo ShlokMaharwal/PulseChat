@@ -13,6 +13,12 @@ Local correctness and chaos checks passed. The load test was measured honestly: 
 
 All four scripts ended in PASS and restored affected services. Their raw summaries are committed under `chaos-results/`. The baseline and failed stress results, including unconfirmed/absent sends, are in `benchmarks.md` and `load-results/`.
 
-The final local backend source checks passed TypeScript, ESLint, Prettier, and 60 unit tests. The ten real integration cases and eleven infrastructure/monitoring smoke checks passed on the preceding unchanged backend runtime. Phase 5 adds verification tooling and documentation without modifying that runtime.
+The final local backend source checks passed TypeScript, ESLint, Prettier, and 60 unit tests. The ten real integration cases and eleven infrastructure/monitoring smoke checks passed on the preceding unchanged backend runtime. Phase 5 adds verification tooling and documentation. Subsequent CI hardening updates Zod to the patched 4.6.7 release; its runtime compatibility is rechecked by the full integration workflow.
 
 CI has separate backend and frontend jobs. The backend job runs all source checks, integration/smoke, and the four chaos scenarios on a clean runner. The frontend job explicitly reports the backend-first phase boundary until its independent lockfile exists, then runs its own lint, types, unit tests, and production build. A skipped pre-Phase-6 application is not described as a tested frontend.
+
+## CI hardening
+
+The [first remote run](https://github.com/ShlokMaharwal/PulseChat/actions/runs/44271786542) passed source checks and stack startup but failed the message-body call-order assertion: the faster runner exhausted admission tokens and retries appended in a later order. The sequence, duplicate, and MongoDB assertions were retained. The test now offers at most 20 messages per 500 ms and explicitly asserts no rate rejection in that ordering workload; the dedicated rate-rejection case remains separate.
+
+The production audit identified [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5). Zod was upgraded to 4.6.7 and declared directly by the gateway that imports it. A fresh TypeScript rebuild and all 60 unit tests passed, and `npm audit --omit=dev` subsequently reported zero production advisories. This audit result does not claim that development dependencies are advisory-free.
