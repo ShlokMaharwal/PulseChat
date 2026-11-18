@@ -1,5 +1,13 @@
 {
   "extends": "./tsconfig.base.json",
-  "compilerOptions": { "composite": false, "declaration": false },
-  "include": ["tests/**/*.ts", "vitest*.config.ts"]
+  "compilerOptions": {
+    "composite": false,
+    "declaration": false
+  },
+  "include": [
+    "tests/**/*.ts",
+    "vitest*.config.ts",
+    "chaos/**/*.ts",
+    "loadtest/**/*.ts"
+  ]
 }

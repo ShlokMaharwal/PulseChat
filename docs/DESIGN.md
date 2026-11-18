@@ -30,7 +30,7 @@ Storage is effectively once for a logical message under the documented retry and
 
 Compose has three gateway instances and two processors, built from one image per role. Kafka has a single KRaft broker with replication factor one; Redis and MongoDB are also single instances. This demonstrates application replication and recovery behavior, rather than infrastructure high availability. Kafka's broker heap is limited to 512 MiB and MongoDB's WiredTiger cache to 0.25 GiB to fit local verification. Functional readiness checks contact the dependencies and verify topic leaders; inexpensive container TCP probes avoid repeatedly starting diagnostic runtimes.
 
-Kafka versus Redis Streams, the complete failure-mode table, chaos evidence, delivery receipt details, benchmark limits, and future work are documented as their corresponding backend phases are completed. No unmeasured availability or throughput claim is made.
+The local broker, Redis, and MongoDB are single points of infrastructure failure. Application replicas tolerate process failures within the tested model; the Compose stack does not claim multi-host high availability.
 
 ## Reliability and failure boundaries
 
@@ -41,3 +41,35 @@ Redis routing uses the required `user:{id}:gateway` hint plus a TTL member key f
 Rate admission uses Redis TIME inside one Lua token-bucket operation per user. Requests are charged on arrival before the per-socket send queue. Separate message and control queues preserve send ordering while allowing heartbeats and sync during Kafka delays. Incoming frame size, queue length, paginated response size, and buffered output are bounded. JWT expiry is checked after upgrade and during the connection lifetime.
 
 The test client tracks an ordered cursor, buffers live gaps, and paginates authoritative MongoDB history. It accepts gaps in authoritative pages because a DLQ record may own a sequence permanently. Reconnect uses capped exponential backoff with jitter. Sends without an ACK retain their original ID; a received ACK transfers responsibility to Kafka. Periodic discovery/sync repairs a missed final Pub/Sub message, and reconnect discovers chats created while offline. Receipt cursors replay after reconnect or on heartbeat, so a lost receipt notification is recoverable.
+
+## Kafka, Streams, and Pub/Sub trade-offs
+
+Kafka gives the message pipeline durable partition logs, explicit offset ownership, consumer-group rebalancing, and independent receipt/DLQ streams. Redis Streams could simplify deployment and offer consumer groups, but would put ephemeral routing, rate limiting, sequence state, and the durable event log in one operational failure domain. This project accepts Kafka's higher local memory and operational cost to demonstrate partition ownership and replay. A single broker still has no replicated-disk protection.
+
+Redis Pub/Sub is a low-latency delivery hint. It has neither replay nor an acknowledgment proving that a browser received an envelope. MongoDB remains the durable query source: reconnect, detected numeric gaps, and periodic tail sync repair missed notifications. A gateway dying after a Kafka ACK or a processor dying after insertion can therefore be recovered without pretending Pub/Sub is durable. The cost is an additional database, recovery traffic, and bounded recovery delay.
+
+## Failure modes
+
+| Component or boundary | Impact | Recovery |
+| --- | --- | --- |
+| Gateway hard crash | Its sockets close; live envelopes to those sockets can be missed | Reconnect through another gateway, reuse unacked IDs, sync from the cursor; presence/routing expire after 30 seconds |
+| Gateway SIGTERM | New upgrades rejected while accepted work drains | Reconnect hint, bounded drain, 1012 close, compare-and-remove routing cleanup |
+| Processor dies before insert | Kafka offset remains unresolved | New owner replays the record; Lua mapping reuses its sequence |
+| Processor dies after insert, before commit or publish | A replay or lost live notification is possible | Unique message ID and canonical-record validation dedupe storage; sync repairs missing delivery |
+| Consumer-group rebalance | Partitions change owners; an old batch can become stale | Sequential processing within each owned partition, stale-batch checks, manual commits, and idempotent replay |
+| Redis restart | Routing, sequence access, admission, and Pub/Sub are temporarily unavailable | Reconnect subscriptions, heartbeat refresh, retryable gateway errors, MongoDB sync, and lease-guarded sequence reseeding if counters are absent |
+| Kafka briefly paused | Producers/consumers wait and readiness fails while liveness remains available | Broker resumes, request retries finish, and committed-offset replay continues |
+| MongoDB unavailable | Persistence cannot finish; accepted records remain in Kafka until processed or dead-lettered | Bounded record retries and durable DLQ publication; operational repair and explicit replay may be required |
+| Poison or permanently failing record | Its chat partition waits through the retry budget | Durable DLQ envelope permits advancing the source offset; assigned sequence gaps remain visible to sync |
+| Pub/Sub notification lost | A live message or receipt update can be missing | Periodic and reconnect sync read canonical messages and receipt cursors |
+| Slow socket or abusive input | Memory and event-loop pressure | Bounded input, arrival-time token bucket, capped queues/output, 1009/1013 closes |
+
+## Guarantees and limits
+
+Storage is effectively once for the same sender/client ID under the tested crash/retry model, rather than an end-to-end distributed exactly-once transaction. Kafka append order defines a chat's processing order. Multiple senders, multiple gateways, and concurrent retries can choose a different append order than UI wall-clock or application call order. Clients display canonical sequence order and suppress replayed callbacks. Independent chats can interleave freely across partitions.
+
+A terminal DLQ record is an operator-visible failure, not a silently successful chat delivery. An outage exceeding retry deadlines can exhaust a record's budget; this prototype does not promise zero loss to the normal message collection during indefinitely unavailable dependencies. Manual DLQ replay below a client's saved cursor needs a full-history reload. Redis sequence mappings grow without a retention policy. JWTs have fixed expiry without refresh/revocation; HTTP authentication lacks a separate IP-based abuse policy. Chat discovery/history fan out several MongoDB queries, and this implementation has only 1:1 chats.
+
+The local k6 fixture uses repeated sessions across 32 users and 16 chats, so its socket-concurrency results are not a benchmark of that many distinct users. Load-generator and application containers share the same constrained host. Results include the measured target, observed connection count, confirmed-message rate, latency distribution, and unconfirmed sends at shutdown. Capacity, availability, and latency beyond the recorded runs are not claimed.
+
+Future work includes multi-broker replication, MongoDB replica sets and stronger durability settings, managed Redis failover, fenced ownership for prolonged split-brain cases, bounded sequence-map retention with a replay contract, cursor repair tooling for DLQ backfills, optimized chat queries, distinct-user load profiles, token refresh/revocation, and production TLS/secret management.

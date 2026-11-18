@@ -1,0 +1,209 @@
+{
+  "metrics": {
+    "duplicate_wire_frames": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      }
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 200,
+        "fails": 0
+      },
+      "thresholds": {
+        "rate>0.99": {
+          "ok": true
+        }
+      }
+    },
+    "ws_msgs_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1408,
+        "rate": 12.685831621235943
+      }
+    },
+    "ordering_violations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      }
+    },
+    "data_received": {
+      "contains": "data",
+      "values": {
+        "count": 2121422,
+        "rate": 19113.637989762497
+      },
+      "type": "counter"
+    },
+    "rate_rejections": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "connections_opened": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 1.80196471892556,
+        "count": 200
+      }
+    },
+    "ws_msgs_received": {
+      "contains": "default",
+      "values": {
+        "rate": 87.10697451286158,
+        "count": 9668
+      },
+      "type": "counter"
+    },
+    "ws_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "max": 8978.041778,
+        "p(50)": 2603.161776,
+        "p(95)": 8624.911179149998,
+        "p(99)": 8837.04415481,
+        "avg": 3023.101020749999,
+        "min": 72.573363,
+        "med": 2603.161776
+      }
+    },
+    "messages_confirmed": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 404,
+        "rate": 3.6399687322296317
+      },
+      "thresholds": {
+        "count>0": {
+          "ok": true
+        }
+      }
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "rate": 1819.9303071732481,
+        "count": 201994
+      }
+    },
+    "socket_errors": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0,
+        "count": 0
+      }
+    },
+    "messages_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 458,
+        "rate": 4.126499206339533
+      }
+    },
+    "vus": {
+      "values": {
+        "value": 3,
+        "min": 0,
+        "max": 4
+      },
+      "type": "gauge",
+      "contains": "default"
+    },
+    "ws_sessions": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 200,
+        "rate": 1.80196471892556
+      }
+    },
+    "delivery_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 4852.101485148515,
+        "min": 139,
+        "med": 3820.5,
+        "max": 25537,
+        "p(50)": 3820.5,
+        "p(95)": 11082.249999999998,
+        "p(99)": 17758.109999999975
+      }
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 4,
+        "min": 4,
+        "max": 4
+      }
+    }
+  },
+  "setup_data": {
+    "endsAt": 1794991173565
+  },
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [],
+    "checks": [
+        {
+          "id": "acc38c4c49a80f473d780744905f2986",
+          "passes": 200,
+          "fails": 0,
+          "name": "WebSocket upgrade succeeded",
+          "path": "::WebSocket upgrade succeeded"
+        }
+      ]
+  },
+  "options": {
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(50)",
+      "p(95)",
+      "p(99)"
+    ],
+    "summaryTimeUnit": "",
+    "noColor": false
+  },
+  "state": {
+    "isStdOutTTY": false,
+    "isStdErrTTY": false,
+    "testRunDurationMs": 110989.964398
+  }
+}

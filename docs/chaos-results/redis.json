@@ -1,0 +1,16 @@
+{
+  "scenario": "redis",
+  "result": "PASS",
+  "sent": 125,
+  "stored": 125,
+  "received": 125,
+  "duplicated": 0,
+  "wireDuplicates": 0,
+  "lost": 0,
+  "outOfOrder": 0,
+  "durationMs": 16492,
+  "faultEvidence": {
+    "simulatedCounterLoss": true,
+    "reseededCounter": "125"
+  }
+}

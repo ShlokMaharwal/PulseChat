@@ -1,0 +1,243 @@
+{
+  "state": {
+    "testRunDurationMs": 100761.907572,
+    "isStdOutTTY": false,
+    "isStdErrTTY": false
+  },
+  "metrics": {
+    "ws_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 20543.510716,
+        "max": 52358.367658,
+        "p(50)": 20543.510716,
+        "p(95)": 49409.58136699999,
+        "p(99)": 51310.52339114,
+        "avg": 24180.437159102377,
+        "min": 14.029423
+      }
+    },
+    "connections_opened": {
+      "values": {
+        "count": 895,
+        "rate": 8.882324894062497
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "iterations": {
+      "contains": "default",
+      "values": {
+        "count": 60,
+        "rate": 0.5954631213896646
+      },
+      "type": "counter"
+    },
+    "ws_session_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "max": 83067.826263,
+        "p(50)": 56084.170469,
+        "p(95)": 81966.17995,
+        "p(99)": 82813.26528984,
+        "avg": 59580.54773359747,
+        "min": 32273.523688,
+        "med": 56084.170469
+      }
+    },
+    "duplicate_wire_frames": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "data_received": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 8459569,
+        "rate": 83956.02270585406
+      }
+    },
+    "vus": {
+      "values": {
+        "value": 8,
+        "min": 0,
+        "max": 40
+      },
+      "type": "gauge",
+      "contains": "default"
+    },
+    "ws_sessions": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1787,
+        "rate": 17.73487663205551
+      }
+    },
+    "messages_confirmed": {
+      "thresholds": {
+        "count>0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 685,
+        "rate": 6.798203969198671
+      }
+    },
+    "ws_msgs_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 35340,
+        "rate": 350.72777849851246
+      }
+    },
+    "delivery_latency_ms": {
+      "values": {
+        "p(95)": 40213.19999999999,
+        "p(99)": 42484.27999999999,
+        "avg": 10100.313868613139,
+        "min": 25,
+        "med": 1595,
+        "max": 46114,
+        "p(50)": 1595
+      },
+      "type": "trend",
+      "contains": "time"
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 0.5036578503095104,
+        "passes": 895,
+        "fails": 882
+      },
+      "thresholds": {
+        "rate>0.99": {
+          "ok": false
+        }
+      }
+    },
+    "vus_max": {
+      "values": {
+        "value": 40,
+        "min": 40,
+        "max": 40
+      },
+      "type": "gauge",
+      "contains": "default"
+    },
+    "ws_msgs_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 3407,
+        "rate": 33.812380909576454
+      }
+    },
+    "iteration_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 25128.264283783326,
+        "min": 1000.160855,
+        "med": 2310.862188,
+        "max": 83126.991517,
+        "p(50)": 2310.862188,
+        "p(95)": 71160.27557979999,
+        "p(99)": 79400.74848790998
+      }
+    },
+    "ordering_violations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      }
+    },
+    "rate_rejections": {
+      "values": {
+        "rate": 0,
+        "count": 0
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 1168229,
+        "rate": 11593.954780632108
+      }
+    },
+    "messages_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 992,
+        "rate": 9.844990273642455
+      }
+    },
+    "socket_errors": {
+      "contains": "default",
+      "values": {
+        "count": 933,
+        "rate": 9.259451537609285
+      },
+      "type": "counter"
+    }
+  },
+  "setup_data": {
+    "endsAt": 1794991800560
+  },
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [],
+    "checks": [
+        {
+          "passes": 895,
+          "fails": 882,
+          "name": "WebSocket upgrade succeeded",
+          "path": "::WebSocket upgrade succeeded",
+          "id": "acc38c4c49a80f473d780744905f2986"
+        }
+      ]
+  },
+  "options": {
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(50)",
+      "p(95)",
+      "p(99)"
+    ],
+    "summaryTimeUnit": "",
+    "noColor": false
+  }
+}

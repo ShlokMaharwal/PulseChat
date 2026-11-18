@@ -14,4 +14,10 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   { languageOptions: { globals: globals.node } },
+  {
+    files: ['loadtest/*.js'],
+    languageOptions: {
+      globals: { __ENV: 'readonly', __VU: 'readonly', open: 'readonly' },
+    },
+  },
 );

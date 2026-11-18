@@ -22,7 +22,9 @@
     "dev:gateway": "tsx packages/gateway/src/index.ts",
     "dev:processor": "tsx packages/processor/src/index.ts",
     "test:presence": "tsx tests/presence.ts",
-    "test:observability": "tsx tests/observability.ts"
+    "test:observability": "tsx tests/observability.ts",
+    "test:chaos": "tsx chaos/run.ts all",
+    "test:load": "tsx loadtest/run.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
