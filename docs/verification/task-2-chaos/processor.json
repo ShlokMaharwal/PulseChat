@@ -1,0 +1,18 @@
+{
+  "scenario": "processor",
+  "result": "PASS",
+  "sent": 120,
+  "stored": 120,
+  "received": 120,
+  "duplicated": 0,
+  "wireDuplicates": 0,
+  "lost": 0,
+  "outOfOrder": 0,
+  "durationMs": 74681,
+  "faultEvidence": {
+    "service": "processor-2",
+    "partition": 4,
+    "storedAtCrash": 102,
+    "queuedAtCrash": 18
+  }
+}

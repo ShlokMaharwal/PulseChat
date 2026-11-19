@@ -75,7 +75,11 @@ The next run used 500 distinct users in 250 chats with the same timing, interval
 
 ## Historical repeated-session measurements
 
-The following records describe the older adapter and workload, not the distinct-user comparison above. Their original stored-count observation is retained; Task 2 investigates the 17 absent sends separately. The old reproduction commands below refer to the historical tooling revision, not the current adapter.
+### Resolution of the 17-attempt difference
+
+A complete retained Kafka/DLQ scan found 975 distinct source messages for the historical stress chats, all persisted, and no matching DLQ records. All retained partition low offsets were zero. The difference from 992 issued attempts therefore occurred before durable Kafka append. The old adapter did not retain attempted UUIDs or acceptance ACKs, so individual identities and ACK status cannot be reconstructed. The new overload runs classify every issued UUID after zero lag: 225 issued / 73 received-ACKed / 223 Kafka accepted / 223 stored / two failed before acceptance, and 2,233 issued / 625 received-ACKed / 2,233 Kafka accepted / 2,233 stored. Both had zero accepted-but-unpersisted messages. [Full investigation and reproducible audit](verification/task-2.md).
+
+The following records describe the older adapter and workload, not the distinct-user comparison above. Their original stored-count observation is retained; the investigation above explains its limits. The old reproduction commands below refer to the historical tooling revision, not the current adapter.
 
 
 
