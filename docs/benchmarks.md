@@ -133,7 +133,7 @@ npm run test:load -- 2000
 
 The runner uses the reconnecting Node client for a fixture preflight and k6's separate asynchronous WebSocket adapter for load. It creates isolated accounts, checks the public protocol, runs the pinned `grafana/k6:2.3.0` image, and saves the raw summary, sampled Prometheus series, and post-run MongoDB observation under ignored `.cache/loadtest/`. Authentication fixtures remain ignored and are not copied into documentation. Run `npm exec -- tsx loadtest/analyze.ts <run-directory>` to repeat the storage observation.
 
-Committed evidence: [baseline measurements](load-results/baseline-200.json), [baseline k6 summary](load-results/baseline-200-k6.json), [stress measurements](load-results/stress-2000.json), and [stress k6 summary](load-results/stress-2000-k6.json). The capture timestamps are in those files.
+Committed evidence: [baseline measurements](verification/load-results/baseline-200.json), [baseline k6 summary](verification/load-results/baseline-200-k6.json), [stress measurements](verification/load-results/stress-2000.json), and [stress k6 summary](verification/load-results/stress-2000-k6.json). The capture timestamps are in those files.
 
 The load adapter uses the official [k6 WebSocket API](https://grafana.com/docs/k6/latest/javascript-api/k6-websockets/) and [custom summary API](https://grafana.com/docs/k6/latest/results-output/end-of-test/custom-summary/). Correctness under process failures is separately established by the automatically asserted chaos tests, rather than inferred from this failed stress attempt.
 
