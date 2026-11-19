@@ -76,6 +76,29 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe('independent browser recovery SDK', () => {
+  it('retries a failed send with the original ID and exposes reconnect timing', () => {
+    const { client, sockets } = setup();
+    client.start();
+    sockets[0]!.welcome();
+    const id = client.sendMessage(chat, 'Retry this once');
+    sockets[0]!.frame({
+      type: 'error',
+      code: 'FORBIDDEN',
+      message: 'Access denied',
+      clientMsgId: id,
+    });
+    expect(client.pending.get(id)?.failure).toBe('Access denied');
+    client.retryMessage(id);
+    expect(client.pending.size).toBe(1);
+    expect(
+      sockets[0]!.sent.filter(
+        (frame) => frame.type === 'message' && frame.clientMsgId === id,
+      ),
+    ).toHaveLength(2);
+    expect(client.pending.get(id)?.failure).toBeUndefined();
+    sockets[0]!.close(1006);
+    expect(client.nextRetryAt).toBeGreaterThan(Date.now());
+  });
   it('marks an unavailable initial connection as degraded until welcome', () => {
     const { client, sockets } = setup();
     client.start();

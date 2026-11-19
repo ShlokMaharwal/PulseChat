@@ -40,6 +40,12 @@ The load runner uses distinct users and 1:1 chats, classifies acceptance after v
 
 If port 8080 is occupied, set `PULSECHAT_PORT=8081` for Compose and `TEST_HTTP_URL=http://127.0.0.1:8081` for host tests. When using the performance override, set `COMPOSE_FILE` to both Compose files for host chaos commands so restart operations use the same project configuration; the separator is `:` on Unix and `;` on Windows. Do not overlap load profiles with other verification traffic.
 
+## Browser tests and demo recording
+
+From `frontend/`, install dependencies, run `npx playwright install chromium`, then `npm run test:e2e`. Set `TEST_HTTP_URL` to the running stack URL; the browser suite defaults to port 8081. CI uses port 8080. An installed Edge browser can be selected with `PLAYWRIGHT_CHANNEL=msedge`.
+
+To record the real two-session chat/reconnect GIF, install `tools/requirements-demo.txt` into Python, set `PYTHON_BIN` if needed, then run `npm run demo` from `frontend/`. The script performs a real gateway kill and restores that gateway. Run browser fault tests separately from load and chaos traffic. See [browser verification](verification/task-6.md).
+
 ## Development
 
 For host backend development, first run `node tools/init-env.mjs`, start `kafka redis mongo` through Compose, export the generated `JWT_SECRET` from your private environment, then run `npm run dev:gateway` or `npm run dev:processor` in `backend/`. Host defaults are Kafka port 19092, Redis 16379, MongoDB 27018; direct-gateway REST paths omit `/api`. See [optional authenticated database setup](verification/task-4.md#optional-authenticated-databases).

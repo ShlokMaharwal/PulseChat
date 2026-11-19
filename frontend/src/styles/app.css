@@ -1109,3 +1109,12 @@ button {
   z-index: 100;
   max-width: calc(100% - 2rem);
 }
+.connection-banner {
+  flex-shrink: 0;
+}
+.unread-divider {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--secondary);
+  font-size: 0.75rem;
+}

@@ -1,0 +1,62 @@
+{
+  "stats": {
+    "startTime": "2026-11-19T17:31:09.821Z",
+    "duration": 53432.851,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "tests": [
+    {
+      "title": "registration, login, theme, and keyboard navigation",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 17948
+        }
+      ]
+    },
+    {
+      "title": "sending, escaped text, receipts, days, and unread navigation",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 9412
+        }
+      ]
+    },
+    {
+      "title": "offline queuing preserves IDs and recovers ordered messages",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1694
+        }
+      ]
+    },
+    {
+      "title": "gateway SIGKILL reconnects to a healthy replica and recovers",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 11439
+        }
+      ]
+    },
+    {
+      "title": "silent renewal and server-confirmed logout revoke the refresh family",
+      "status": "expected",
+      "results": [
+        {
+          "status": "passed",
+          "durationMs": 1880
+        }
+      ]
+    }
+  ]
+}

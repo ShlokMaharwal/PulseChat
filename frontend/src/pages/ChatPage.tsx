@@ -34,6 +34,11 @@ export function ChatPage({
   const [filter, setFilter] = useState('');
   const [draft, setDraft] = useState('');
   const [sendError, setSendError] = useState('');
+  const [, setNow] = useState(Date.now());
+  const [firstUnread, setFirstUnread] = useState<string | null>(null);
+  const unreadScroll = useRef(false);
+  const pinned = useRef(true);
+  const scroll = useRef<HTMLDivElement>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const firstSelection = useRef(false);
@@ -44,19 +49,53 @@ export function ChatPage({
     (item) => item.chatId === selected,
   );
   const lastSeq = selected ? (client.cursors.get(selected) ?? 0) : 0;
+  const selectChat = useCallback(
+    (id: string) => {
+      const read = client.receipts.get(id)?.get(account.user.id)?.readSeq ?? 0;
+      const unread = client.messages
+        .get(id)
+        ?.find(
+          (message) =>
+            message.senderId !== account.user.id && message.seq > read,
+        );
+      setFirstUnread(unread?.messageId ?? null);
+      unreadScroll.current = true;
+      pinned.current = true;
+      setSelected(id);
+    },
+    [client, account.user.id],
+  );
+  useEffect(() => {
+    if (client.status === 'connected' && !client.degraded) return;
+    const timer = setInterval(() => setNow(Date.now()), 250);
+    return () => clearInterval(timer);
+  }, [client, client.status, client.degraded]);
   useEffect(() => {
     if (!loading && !firstSelection.current) {
       firstSelection.current = true;
-      if (chats[0]) setSelected(chats[0].id);
+      if (chats[0]) selectChat(chats[0].id);
     }
-  }, [loading, chats]);
+  }, [loading, chats, selectChat]);
   useEffect(() => {
     setDraft('');
     setSendError('');
     if (selected) client.sync(selected);
   }, [selected, client]);
   useEffect(() => {
-    bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    if (unreadScroll.current && firstUnread) {
+      const target = scroll.current?.querySelector<HTMLElement>(
+        `[data-message-id="${firstUnread}"]`,
+      );
+      if (target) {
+        target.scrollIntoView({ block: 'center' });
+        unreadScroll.current = false;
+        pinned.current = false;
+        return;
+      }
+    }
+    if (pinned.current)
+      bottom.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    unreadScroll.current = false;
   }, [messages.length, pending.length, selected]);
   useEffect(() => {
     const mark = () => {
@@ -91,6 +130,7 @@ export function ChatPage({
     if (!selected || !draft.trim()) return;
     try {
       client.sendMessage(selected, draft.trim());
+      pinned.current = true;
       setDraft('');
       setSendError('');
       textarea.current?.focus();
@@ -166,7 +206,7 @@ export function ChatPage({
                   <button
                     key={chat.id}
                     className={`chat-row ${selected === chat.id ? 'selected' : ''}`}
-                    onClick={() => setSelected(chat.id)}
+                    onClick={() => selectChat(chat.id)}
                     aria-current={selected === chat.id ? 'page' : undefined}
                   >
                     <span className="avatar-wrap">
@@ -250,10 +290,36 @@ export function ChatPage({
         </footer>
       </aside>
       <section className="conversation" aria-label="Conversation">
-        {client.degraded && (
-          <div className="notice" role="status" aria-live="polite">
-            Chat services are temporarily unavailable. Your queued messages will
-            retry.
+        {(client.status !== 'connected' || client.degraded) && (
+          <div
+            className="notice connection-banner"
+            role="status"
+            aria-live="polite"
+          >
+            <span>
+              {client.status === 'offline'
+                ? 'You are offline. Messages will send when you reconnect.'
+                : client.status === 'expired'
+                  ? 'Your session expired. Sign in again.'
+                  : client.status === 'connecting'
+                    ? 'Connecting…'
+                    : client.status === 'reconnecting'
+                      ? `Connection interrupted. Retrying${client.nextRetryAt ? ` in ${Math.max(0, Math.ceil((client.nextRetryAt - Date.now()) / 1000))}s` : '…'}`
+                      : 'Chat services are temporarily unavailable. Your queued messages will retry.'}
+            </span>
+            {client.status === 'reconnecting' && (
+              <button
+                className="text-button"
+                onClick={() => client.retryConnection()}
+              >
+                Retry now
+              </button>
+            )}
+            {client.status === 'expired' && (
+              <button className="text-button" onClick={logout}>
+                Sign in again
+              </button>
+            )}
           </div>
         )}
         {active ? (
@@ -280,7 +346,7 @@ export function ChatPage({
               </div>
               <span className="conversation-label">JUST THE TWO OF YOU</span>
             </header>
-            {(error || client.error) && (
+            {(error || (client.error && !client.degraded)) && (
               <div className="notice" role="alert">
                 {error || client.error}
                 {client.status === 'expired' ? (
@@ -300,7 +366,16 @@ export function ChatPage({
                 )}
               </div>
             )}
-            <div className="message-scroll">
+            <div
+              className="message-scroll"
+              ref={scroll}
+              onScroll={() => {
+                const box = scroll.current;
+                if (box)
+                  pinned.current =
+                    box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+              }}
+            >
               <div className="conversation-start">
                 <Avatar name={peer(active, account.user.id).username} />
                 <h3>
@@ -342,6 +417,11 @@ export function ChatPage({
                         className={`message ${mine ? 'own' : 'other'}`}
                         data-message-id={message.messageId}
                       >
+                        {message.messageId === firstUnread && (
+                          <span className="unread-divider">
+                            Unread messages
+                          </span>
+                        )}
                         <p>{message.body}</p>
                         <footer>
                           <time dateTime={message.createdAt}>
@@ -373,10 +453,10 @@ export function ChatPage({
                       <time>{time(message.createdAt)}</time>
                       <span>
                         {message.failure
-                          ? 'Not sent'
+                          ? 'Failed'
                           : message.seq
                             ? 'Sent'
-                            : message.received
+                            : message.received || client.status !== 'connected'
                               ? 'Queued'
                               : 'Sending…'}
                       </span>
@@ -384,6 +464,14 @@ export function ChatPage({
                     {message.failure && (
                       <div className="send-failure" role="alert">
                         {message.failure}
+                        <button
+                          onClick={() =>
+                            client.retryMessage(message.clientMsgId)
+                          }
+                          aria-label="Retry message"
+                        >
+                          Retry
+                        </button>
                         <button
                           onClick={() => client.dismiss(message.clientMsgId)}
                         >

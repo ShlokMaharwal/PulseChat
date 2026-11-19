@@ -2,6 +2,10 @@
 
 [![CI](https://github.com/ShlokMaharwal/PulseChat/actions/workflows/ci.yml/badge.svg)](https://github.com/ShlokMaharwal/PulseChat/actions/workflows/ci.yml)
 
+![Two real PulseChat browser sessions chatting and recovering after a gateway kill](docs/img/pulsechat-demo.gif)
+
+[Reproduce the recorded demo](docs/verification/task-6.md) · [Actual recording proof](docs/verification/demo-proof.json)
+
 Real-time 1:1 chat with three WebSocket gateways, two Kafka processors, Redis routing, and MongoDB persistence. An independent React frontend provides conversations, presence, unread counts, receipts, offline queuing, and light/dark themes.
 
 ```mermaid
@@ -56,9 +60,10 @@ Details: [protocol](docs/PROTOCOL.md), [design and failure boundaries](docs/DESI
 
 | Check | Recorded result | Evidence |
 | --- | --- | --- |
-| Source checks | 76 backend and nine frontend unit tests; lint, format, types, builds passed | [Task 1 verification](docs/verification/task-1.md) |
-| Integration / smoke | Ten integration cases, including 1,000 ordered messages; eleven smoke checks | [Verification](docs/verification/task-1.md) |
-| Crash / outage recovery | Four scenarios, 485 sends, zero loss, logical duplicates, or order errors | [Actual summaries](docs/verification/task-1-chaos/) |
+| Source checks | 82 backend and 15 frontend unit tests; lint, format, types, builds passed | [Security verification](docs/verification/task-4.md), [browser verification](docs/verification/task-6.md) |
+| Integration / smoke | Thirteen integration cases, including 1,000 ordered messages; eleven smoke checks | [Reliability verification](docs/verification/task-5.md) |
+| Crash / outage recovery | Six default-stack scenarios, 725 sends, zero loss, logical/wire duplicates, or order errors | [Actual summaries](docs/verification/task-5-chaos/) |
+| Browser recovery | Five real browser tests passed, including offline recovery, gateway SIGKILL, and token renewal/logout | [Browser verification](docs/verification/task-6.md) |
 | Configured 200-user load | Steady peer delivery 4.87 → 11.50 messages/s; all 1,367 optimized sends persisted and reached peers | [Measured comparison and caveats](docs/benchmarks.md) |
 | Overload / acceptance | All 2,233 Kafka-accepted sends persisted in the 500-target overload run | [Classification and historical 17-attempt investigation](docs/verification/task-2.md) |
 
@@ -66,6 +71,6 @@ Latency remains high. The 500-user run overloaded the system, and independent se
 
 ## Known limitations
 
-The default stack has one Kafka broker, one MongoDB instance, and one Redis instance. Redis Pub/Sub is best effort; sync is required to recover missed live events. A terminal DLQ failure after sequence allocation can leave a sequence gap. Infrastructure high availability is not established by the default stack's process-failure tests. Groups and typing indicators are not implemented.
+The default stack has one Kafka broker, one MongoDB instance, and one Redis instance. Redis Pub/Sub is best effort; sync is required to recover missed live events. A terminal DLQ failure after sequence allocation can leave a sequence gap. The optional [three-broker Kafka profile](docs/verification/task-5.md) has separate verification; the default stack's process-failure tests do not establish infrastructure high availability. Groups and typing indicators are not implemented.
 
 [Testing and reproduction](docs/TESTING.md) · [Verification archive](docs/verification/) · [Evidence-backed resume bullets](docs/resume-bullets.md)

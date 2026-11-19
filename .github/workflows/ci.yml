@@ -46,6 +46,15 @@ jobs:
         run: npm run test:chaos
       - name: Verify optional database authentication
         run: node tools/prove-database-auth.mjs
+      - name: Real browser chat and recovery tests
+        working-directory: frontend
+        env:
+          TEST_HTTP_URL: http://127.0.0.1:8080
+          COMPOSE_FILE: docker-compose.yml
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+          npm run test:e2e
       - name: Save service logs
         if: always()
         run: |
@@ -59,6 +68,8 @@ jobs:
             backend/.cache/compose.log
             backend/.cache/chaos/*.json
             backend/.cache/secure-proof-result.json
+            backend/.cache/e2e-results.json
+            backend/.cache/playwright/
       - name: Stop test services
         if: always()
         run: docker compose down
@@ -96,6 +107,7 @@ jobs:
           node tools/init-env.mjs
           cd backend
           npm ci
+          npm run build
       - name: Build and start three Kafka brokers
         run: |
           docker compose --parallel 1 build gateway-1 processor-1 frontend

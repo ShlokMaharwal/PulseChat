@@ -36,6 +36,7 @@ export class PulseClient {
   status: ConnectionStatus = 'offline';
   error = '';
   degraded = false;
+  nextRetryAt = 0;
   gatewayId = '';
   readonly messages = new Map<string, Message[]>();
   readonly pending = new Map<string, PendingMessage>();
@@ -174,6 +175,7 @@ export class PulseClient {
       return;
     }
     this.status = this.attempt ? 'reconnecting' : 'connecting';
+    this.nextRetryAt = 0;
     this.changed();
     const socket = (
       this.options.socketFactory ??
@@ -227,6 +229,7 @@ export class PulseClient {
           backoff * (0.75 + (this.options.random ?? Math.random)() * 0.5),
         );
         this.hint = 0;
+        this.nextRetryAt = Date.now() + delay;
         this.reconnectTimer = setTimeout(() => this.open(), delay);
       }
       this.changed();
@@ -235,6 +238,9 @@ export class PulseClient {
   private async renew() {
     if (this.renewing || this.stopped) return;
     this.renewing = true;
+    this.status = 'connecting';
+    this.nextRetryAt = 0;
+    this.changed();
     try {
       this.token = await this.options.renewSession!();
       this.renewing = false;
@@ -253,12 +259,11 @@ export class PulseClient {
       } else {
         this.status = 'reconnecting';
         this.error = 'Session renewal is temporarily unavailable. Retrying…';
-        this.reconnectTimer = setTimeout(
-          () => {
-            void this.renew();
-          },
-          Math.min(30000, 1000 * 2 ** Math.min(this.attempt++, 5)),
-        );
+        const delay = Math.min(30000, 1000 * 2 ** Math.min(this.attempt++, 5));
+        this.nextRetryAt = Date.now() + delay;
+        this.reconnectTimer = setTimeout(() => {
+          void this.renew();
+        }, delay);
       }
       this.changed();
     } finally {
@@ -279,6 +284,7 @@ export class PulseClient {
         return;
       }
       this.status = 'connected';
+      this.nextRetryAt = 0;
       this.error = '';
       this.gatewayId = frame.gatewayId;
       this.attempt = 0;
@@ -518,6 +524,29 @@ export class PulseClient {
     this.pending.delete(clientMsgId);
     this.persist();
     this.changed();
+  }
+  retryMessage(clientMsgId: string) {
+    const message = this.pending.get(clientMsgId);
+    if (!message?.failure) return;
+    delete message.failure;
+    message.received = false;
+    this.persist();
+    this.transmit({
+      type: 'message',
+      clientMsgId,
+      chatId: message.chatId,
+      body: message.body,
+    });
+    this.changed();
+  }
+  retryConnection() {
+    if (this.stopped || !this.online || this.status === 'connected') return;
+    clearTimeout(this.reconnectTimer);
+    const previous = this.socket;
+    this.socket = undefined;
+    previous?.close(1000, 'Retry connection');
+    this.nextRetryAt = 0;
+    this.open();
   }
   private transmit(frame: ClientFrame) {
     if (

@@ -18,6 +18,7 @@ export function NewChat({
   const input = useRef<HTMLInputElement>(null);
   const dialog = useRef<HTMLElement>(null);
   useEffect(() => {
+    const previousFocus = document.activeElement as HTMLElement | null;
     input.current?.focus();
     const escape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') close();
@@ -38,7 +39,10 @@ export function NewChat({
       }
     };
     document.addEventListener('keydown', escape);
-    return () => document.removeEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('keydown', escape);
+      previousFocus?.focus();
+    };
   }, [close]);
   useEffect(() => {
     const controller = new AbortController();

@@ -33,6 +33,7 @@ npm run format:check
 npm run typecheck
 npm test
 npm run build
+npm run test:e2e
 ```
 
 The Vitest suite uses mock WebSockets to verify authentication protocols, ordered gap recovery, duplicate suppression, authoritative pagination across DLQ sequence gaps, reconnect/resend identity, persisted cursors, user isolation, receipt monotonicity, reconnect hints, deliberate shutdown, rate retry, and storage failure.
