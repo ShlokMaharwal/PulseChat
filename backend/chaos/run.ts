@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { setTimeout as delay } from 'node:timers/promises';
 import { pathToFileURL } from 'node:url';
-import { Partitioners, AssignerProtocol } from 'kafkajs';
+import kafkaJS, { Partitioners, AssignerProtocol } from 'kafkajs';
 import {
   createDependencies,
   createLogger,
@@ -13,7 +13,8 @@ import {
 } from '@pulsechat/shared';
 import { TestClient } from '../tests/helpers/test-client.js';
 
-export type Scenario = 'gateway' | 'processor' | 'redis' | 'kafka';
+export type Scenario =
+  'gateway' | 'processor' | 'redis' | 'kafka' | 'mongo' | 'redis-partition';
 const exec = promisify(execFile);
 const base = process.env.TEST_HTTP_URL ?? 'http://localhost:8080';
 async function docker(...args: string[]) {
@@ -22,6 +23,25 @@ async function docker(...args: string[]) {
     timeout: 180000,
     maxBuffer: 1024 * 1024,
   });
+}
+async function gatewayService(gatewayId: string) {
+  const result = await exec('docker', [
+    'inspect',
+    '--format',
+    '{{.Config.Hostname}} {{index .Config.Labels "com.docker.compose.service"}}',
+    ...['gateway-1', 'gateway-2', 'gateway-3'].map(
+      (name) => 'pulsechat-' + name + '-1',
+    ),
+  ]);
+  const service = result.stdout
+    .trim()
+    .split(/\r?\n/)
+    .map((line) => line.split(' '))
+    .find(([id]) => id === gatewayId)?.[1];
+  assert.ok(
+    service && ['gateway-1', 'gateway-2', 'gateway-3'].includes(service),
+  );
+  return service;
 }
 async function request<T>(
   path: string,
@@ -76,7 +96,12 @@ export async function runScenario(scenario: Scenario) {
     const id = randomUUID();
     const body = `${scenario}-${index}`;
     issued.set(id, body);
-    return sender.message(chatId, body, id);
+    return sender.message(
+      chatId,
+      body,
+      id,
+      config.KAFKA_REPLICATION_FACTOR === 3 ? 180000 : 60000,
+    );
   };
   try {
     await dependencies.connect();
@@ -200,10 +225,233 @@ export async function runScenario(scenario: Scenario) {
         restore = () => docker('start', 'redis');
         interrupt = (async () => {
           await docker('stop', 'redis');
+          const first = receiver.frames.length,
+            unavailableAt = Date.now();
+          receiver.send({ type: 'heartbeat' });
+          const error = await receiver.waitFor(
+            (frame) =>
+              receiver.frames.indexOf(frame) >= first &&
+              frame.type === 'error' &&
+              frame.code === 'UNAVAILABLE',
+            config.DEPENDENCY_TIMEOUT_MS + 15000,
+          );
+          assert.ok(
+            error.type === 'error' && /unavailable|retry/i.test(error.message),
+          );
+          faultEvidence = {
+            ...faultEvidence,
+            degradedError: error.code,
+            degradedResponseMs: Date.now() - unavailableAt,
+          };
           await delay(12000);
           await docker('start', 'redis');
         })();
-        faultEvidence = { outageMs: 12000 };
+        faultEvidence = { minimumOutageMs: 12000 };
+      } else if (scenario === 'mongo') {
+        restore = () => docker('start', 'mongo');
+        interrupt = (async () => {
+          await docker('stop', 'mongo');
+          await delay(8000);
+          await docker('start', 'mongo');
+        })();
+        faultEvidence = { minimumOutageMs: 8000 };
+      } else if (scenario === 'redis-partition') {
+        assert.ok(welcome.type === 'welcome');
+        const service = await gatewayService(welcome.gatewayId);
+        const container = 'pulsechat-' + service + '-1';
+        const redisNetworks = JSON.parse(
+          (
+            await exec('docker', [
+              'inspect',
+              '--format',
+              '{{json .NetworkSettings.Networks}}',
+              'pulsechat-redis-1',
+            ])
+          ).stdout,
+        ) as Record<string, unknown>;
+        const network = Object.keys(redisNetworks)[0];
+        assert.ok(
+          network && Object.keys(redisNetworks).length === 1,
+          'Redis must have its dedicated network',
+        );
+        const before = JSON.parse(
+          (
+            await exec('docker', [
+              'inspect',
+              '--format',
+              '{{json .NetworkSettings.Networks}}',
+              container,
+            ])
+          ).stdout,
+        ) as Record<string, unknown>;
+        assert.ok(
+          before[network] && Object.keys(before).length > 1,
+          'Gateway must retain its Kafka/Mongo network',
+        );
+        restore = async () => {
+          const networks = JSON.parse(
+            (
+              await exec('docker', [
+                'inspect',
+                '--format',
+                '{{json .NetworkSettings.Networks}}',
+                container,
+              ])
+            ).stdout,
+          ) as Record<string, unknown>;
+          if (!networks[network])
+            await exec('docker', ['network', 'connect', network, container]);
+        };
+        interrupt = (async () => {
+          await exec('docker', ['network', 'disconnect', network, container]);
+          await delay(12000);
+          let dependenciesDuringPartition: unknown;
+          await until(
+            async () => {
+              const result = await exec('docker', [
+                'exec',
+                container,
+                'node',
+                '-e',
+                "fetch('http://127.0.0.1:8080/readyz').then(r=>r.json()).then(v=>console.log(JSON.stringify(v)))",
+              ]);
+              const health = JSON.parse(result.stdout) as {
+                dependencies?: {
+                  redis: boolean;
+                  mongo: boolean;
+                  kafka: boolean;
+                };
+              };
+              dependenciesDuringPartition = health.dependencies;
+              return (
+                health.dependencies?.redis === false &&
+                health.dependencies.mongo &&
+                health.dependencies.kafka
+              );
+            },
+            'only Redis becomes unavailable on the partitioned gateway',
+            60000,
+          );
+          faultEvidence = { ...faultEvidence, dependenciesDuringPartition };
+          await restore!();
+        })();
+        faultEvidence = {
+          service,
+          network,
+          minimumPartitionMs: 12000,
+          otherNetworkRetained: true,
+        };
+      } else if (config.KAFKA_REPLICATION_FACTOR === 3) {
+        const metadata = await dependencies.admin.fetchTopicMetadata({
+          topics: ['messages', 'receipts', 'messages.dlq'],
+        });
+        assert.ok(
+          metadata.topics.every((topic) =>
+            topic.partitions.every(
+              (partition) =>
+                partition.replicas.length === 3 && partition.isr.length === 3,
+            ),
+          ),
+          'All replicas must be in sync before the fault',
+        );
+        const topic = metadata.topics.find(
+          (value) => value.name === 'messages',
+        )!;
+        const partition = Partitioners.DefaultPartitioner()({
+          topic: 'messages',
+          partitionMetadata: topic.partitions,
+          message: { key: chatId, value: '' },
+        });
+        const leader = topic.partitions.find(
+          (value) => value.partitionId === partition,
+        )!.leader;
+        const service = leader === 1 ? 'kafka' : 'kafka-' + leader;
+        assert.ok([1, 2, 3].includes(leader));
+        const configs = await dependencies.admin.describeConfigs({
+          includeSynonyms: false,
+          resources: [
+            {
+              type: kafkaJS.ConfigResourceTypes.TOPIC,
+              name: 'messages',
+              configNames: ['min.insync.replicas'],
+            },
+          ],
+        });
+        assert.equal(
+          configs.resources[0]?.configEntries.find(
+            (value) => value.configName === 'min.insync.replicas',
+          )?.configValue,
+          '2',
+        );
+        const container = 'pulsechat-' + service + '-1';
+        const policy = (
+          await exec('docker', [
+            'inspect',
+            '--format',
+            '{{.HostConfig.RestartPolicy.Name}}',
+            container,
+          ])
+        ).stdout.trim();
+        restore = async () => {
+          try {
+            await docker('start', service);
+          } finally {
+            await exec('docker', ['update', '--restart=' + policy, container]);
+          }
+        };
+        interrupt = (async () => {
+          await exec('docker', ['update', '--restart=no', container]);
+          await docker('kill', '-s', 'SIGKILL', service);
+          assert.equal(
+            (
+              await exec('docker', [
+                'inspect',
+                '--format',
+                '{{.State.Running}}',
+                container,
+              ])
+            ).stdout.trim(),
+            'false',
+          );
+          const killedAt = Date.now();
+          await delay(8000);
+          await until(
+            async () => {
+              const current = (
+                await dependencies.admin.fetchTopicMetadata({
+                  topics: ['messages'],
+                })
+              ).topics[0]!.partitions.find(
+                (value) => value.partitionId === partition,
+              )!;
+              if (
+                current.leader < 0 ||
+                current.leader === leader ||
+                current.isr.length < 2
+              )
+                return false;
+              faultEvidence = {
+                ...faultEvidence,
+                newLeader: current.leader,
+                inSyncReplicasDuringFault: current.isr,
+                heldDeadMs: Date.now() - killedAt,
+              };
+              return true;
+            },
+            'HA partition elects a new leader with two in-sync replicas',
+            120000,
+          );
+          await restore!();
+        })();
+        faultEvidence = {
+          mode: 'ha',
+          replicationFactor: 3,
+          minInSyncReplicas: 2,
+          partition,
+          previousLeader: leader,
+          killedService: service,
+          signal: 'SIGKILL',
+        };
       } else {
         restore = async () => {
           const state = await exec('docker', [
@@ -224,9 +472,28 @@ export async function runScenario(scenario: Scenario) {
       const sends = Promise.all(
         Array.from({ length: 100 }, (_, i) => send(i + 20)),
       );
-      await Promise.all([interrupt, sends]);
+      const outcomes = await Promise.allSettled([interrupt, sends]);
+      const rejected = outcomes.find(
+        (outcome) => outcome.status === 'rejected',
+      );
+      if (rejected?.status === 'rejected') throw rejected.reason;
     }
     await receiver.waitForSeq(chatId, 120, 180000);
+    if (scenario === 'kafka' && config.KAFKA_REPLICATION_FACTOR === 3) {
+      await until(
+        async () => {
+          const metadata = await dependencies.admin.fetchTopicMetadata({
+            topics: ['messages', 'receipts', 'messages.dlq'],
+          });
+          return metadata.topics.every((topic) =>
+            topic.partitions.every((partition) => partition.isr.length === 3),
+          );
+        },
+        'all three replicas catch up after broker restart',
+        180000,
+      );
+      faultEvidence = { ...faultEvidence, allReplicasRestored: true };
+    }
     if (scenario === 'redis') {
       await dependencies.redis.del(
         `chat:${chatId}:seq`,
@@ -334,7 +601,14 @@ if (
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   const selected = process.argv[2] ?? 'all';
-  const scenarios: Scenario[] = ['gateway', 'processor', 'redis', 'kafka'];
+  const scenarios: Scenario[] = [
+    'gateway',
+    'processor',
+    'redis',
+    'kafka',
+    'mongo',
+    'redis-partition',
+  ];
   if (selected !== 'all' && !scenarios.includes(selected as Scenario))
     throw new Error(`Unknown scenario: ${selected}`);
   for (const scenario of selected === 'all'

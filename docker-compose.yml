@@ -21,6 +21,7 @@ x-backend-environment: &backend-environment
   CPU_PROFILE_DIR: ${CPU_PROFILE_DIR:-}
 
 x-backend: &backend
+  networks: [default, redis-link]
   restart: unless-stopped
   init: true
   environment: *backend-environment
@@ -84,6 +85,7 @@ services:
       retries: 18
 
   redis:
+    networks: [redis-link]
     image: redis:7.4-alpine
     restart: unless-stopped
     command: [redis-server, --appendonly, 'yes', --appendfsync, everysec]
@@ -202,6 +204,7 @@ services:
       retries: 12
 
   smoke:
+    networks: [default, redis-link]
     image: pulsechat-gateway:local
     profiles: [test]
     environment:
@@ -219,6 +222,7 @@ services:
         condition: service_healthy
 
   integration:
+    networks: [default, redis-link]
     image: pulsechat-integration:local
     profiles: [test]
     build:
@@ -240,6 +244,10 @@ services:
         condition: service_healthy
       processor-2:
         condition: service_healthy
+
+networks:
+  default:
+  redis-link:
 
 volumes:
   kafka-data:

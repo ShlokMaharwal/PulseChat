@@ -1,0 +1,78 @@
+# Enable with both files and --profile ha. The original single-broker log volume
+# is preserved; this cluster uses three separate HA log volumes.
+x-ha-kafka-environment: &ha-kafka-environment
+  CLUSTER_ID: Nq9qvQbqTpKJk3YJUVsB5g
+  KAFKA_PROCESS_ROLES: broker,controller
+  KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:19092,CONTROLLER://:9093
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093,2@kafka-2:9093,3@kafka-3:9093
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+  KAFKA_MIN_INSYNC_REPLICAS: 2
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+  KAFKA_NUM_PARTITIONS: 6
+  KAFKA_LOG_DIRS: /var/lib/kafka/data
+  KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+  KAFKA_INITIAL_BROKER_REGISTRATION_TIMEOUT_MS: 180000
+  KAFKA_BROKER_SESSION_TIMEOUT_MS: ${KAFKA_BROKER_SESSION_TIMEOUT_MS:-9000}
+
+x-ha-backend: &ha-backend
+  environment:
+    KAFKA_BROKERS: kafka:9092,kafka-2:9092,kafka-3:9092
+    KAFKA_REPLICATION_FACTOR: 3
+  depends_on:
+    kafka-2:
+      condition: service_healthy
+    kafka-3:
+      condition: service_healthy
+
+services:
+  kafka:
+    environment:
+      <<: *ha-kafka-environment
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:19092
+    volumes:
+      - kafka-ha-1-data:/var/lib/kafka/data
+  kafka-2: &extra-broker
+    profiles: [ha]
+    image: apache/kafka:3.9.1
+    restart: unless-stopped
+    ports: [127.0.0.1:19093:19092]
+    environment:
+      <<: *ha-kafka-environment
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:9092,EXTERNAL://localhost:19093
+    volumes:
+      - kafka-ha-2-data:/var/lib/kafka/data
+    healthcheck:
+      test: [CMD, bash, -ec, 'exec 3<>/dev/tcp/127.0.0.1/9092']
+      interval: 10s
+      timeout: 5s
+      start_period: 180s
+      retries: 18
+  kafka-3:
+    <<: *extra-broker
+    ports: [127.0.0.1:19094:19092]
+    environment:
+      <<: *ha-kafka-environment
+      KAFKA_NODE_ID: 3
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:9092,EXTERNAL://localhost:19094
+    volumes:
+      - kafka-ha-3-data:/var/lib/kafka/data
+  gateway-1: *ha-backend
+  gateway-2: *ha-backend
+  gateway-3: *ha-backend
+  processor-1: *ha-backend
+  processor-2: *ha-backend
+  integration: *ha-backend
+  smoke: *ha-backend
+
+volumes:
+  kafka-ha-1-data:
+  kafka-ha-2-data:
+  kafka-ha-3-data:

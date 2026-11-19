@@ -250,6 +250,12 @@ export function ChatPage({
         </footer>
       </aside>
       <section className="conversation" aria-label="Conversation">
+        {client.degraded && (
+          <div className="notice" role="status" aria-live="polite">
+            Chat services are temporarily unavailable. Your queued messages will
+            retry.
+          </div>
+        )}
         {active ? (
           <>
             <header className="conversation-header">

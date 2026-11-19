@@ -1,0 +1,22 @@
+{
+  "scenario": "kafka",
+  "result": "FAIL",
+  "sent": 120,
+  "stored": 28,
+  "received": 28,
+  "duplicated": 0,
+  "wireDuplicates": 0,
+  "lost": 92,
+  "outOfOrder": 0,
+  "durationMs": 80133,
+  "faultEvidence": {
+    "mode": "ha",
+    "replicationFactor": 3,
+    "minInSyncReplicas": 2,
+    "partition": 2,
+    "previousLeader": 3,
+    "killedService": "kafka-3",
+    "signal": "SIGKILL"
+  },
+  "error": "Timed out waiting for WebSocket frame"
+}

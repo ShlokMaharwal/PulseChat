@@ -1,0 +1,16 @@
+{
+  "scenario": "gateway",
+  "result": "PASS",
+  "sent": 120,
+  "stored": 120,
+  "received": 120,
+  "duplicated": 0,
+  "wireDuplicates": 0,
+  "lost": 0,
+  "outOfOrder": 0,
+  "durationMs": 22704,
+  "faultEvidence": {
+    "service": "gateway-1",
+    "gatewayId": "b11601ec1364"
+  }
+}

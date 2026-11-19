@@ -76,6 +76,29 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe('independent browser recovery SDK', () => {
+  it('marks an unavailable initial connection as degraded until welcome', () => {
+    const { client, sockets } = setup();
+    client.start();
+    sockets[0]!.onerror?.();
+    expect(client.degraded).toBe(true);
+    sockets[0]!.welcome();
+    expect(client.degraded).toBe(false);
+  });
+  it('shows dependency degradation and clears it after a successful recovery response', () => {
+    const { client, sockets } = setup();
+    client.start();
+    sockets[0]!.welcome();
+    sockets[0]!.frame({
+      type: 'error',
+      code: 'UNAVAILABLE',
+      message: 'Service is temporarily unavailable',
+    });
+    expect(client.degraded).toBe(true);
+    expect(client.error).toContain('temporarily unavailable');
+    sockets[0]!.frame({ type: 'heartbeat' });
+    expect(client.degraded).toBe(false);
+    expect(client.error).toBe('');
+  });
   it('opens one socket when coming online during silent token renewal', async () => {
     let finish: ((value: string) => void) | undefined;
     const renewal = new Promise<string>((resolve) => {

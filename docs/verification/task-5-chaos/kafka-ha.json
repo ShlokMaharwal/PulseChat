@@ -1,0 +1,13 @@
+{
+  "lost": 0,
+  "topology": "ha",
+  "stored": 0,
+  "note": "The three-broker stack did not reach the message-test phase.",
+  "scenario": "kafka",
+  "outOfOrder": 0,
+  "received": 0,
+  "result": "FAIL",
+  "phase": "startup",
+  "sent": 0,
+  "duplicated": 0
+}

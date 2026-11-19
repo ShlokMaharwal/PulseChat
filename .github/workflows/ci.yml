@@ -40,7 +40,7 @@ jobs:
         run: |
           docker compose run --rm --no-deps smoke
           docker compose --profile test run --rm --no-deps integration
-      - name: Verify all four failure scenarios
+      - name: Verify all six failure scenarios
         # The default and optional authenticated databases are separate projects.
         working-directory: backend
         run: npm run test:chaos
@@ -81,3 +81,46 @@ jobs:
           npm run typecheck
           npm test
           npm run build
+  kafka-ha:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - name: Prepare HA verification
+        run: |
+          node tools/init-env.mjs
+          cd backend
+          npm ci
+      - name: Build and start three Kafka brokers
+        run: |
+          docker compose --parallel 1 build gateway-1 processor-1 frontend
+          docker compose -f docker-compose.yml -f docker-compose.ha.yml --profile ha --parallel 1 up -d --wait --wait-timeout 600 frontend kafka kafka-2 kafka-3 redis mongo gateway-1 gateway-2 gateway-3 processor-1 processor-2 nginx
+      - name: Kill the active partition leader and verify recovery
+        working-directory: backend
+        env:
+          COMPOSE_FILE: docker-compose.yml:docker-compose.ha.yml
+          COMPOSE_PROFILES: ha
+          KAFKA_BROKERS: localhost:19092,localhost:19093,localhost:19094
+          KAFKA_REPLICATION_FACTOR: "3"
+          DEPENDENCY_TIMEOUT_MS: "10000"
+        run: npx tsx chaos/run.ts kafka
+      - name: Save HA logs
+        if: always()
+        run: |
+          mkdir -p backend/.cache
+          docker compose -f docker-compose.yml -f docker-compose.ha.yml --profile ha logs --no-color > backend/.cache/ha-compose.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: kafka-ha-verification
+          path: |
+            backend/.cache/chaos/kafka.json
+            backend/.cache/ha-compose.log
+      - name: Stop HA services
+        if: always()
+        run: docker compose -f docker-compose.yml -f docker-compose.ha.yml --profile ha down

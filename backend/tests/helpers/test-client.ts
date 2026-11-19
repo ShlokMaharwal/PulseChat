@@ -323,7 +323,12 @@ export class TestClient extends EventEmitter {
       throw new Error('Client is disconnected');
     this.socket.send(text);
   }
-  async message(chatId: string, body: string, clientMsgId = randomUUID()) {
+  async message(
+    chatId: string,
+    body: string,
+    clientMsgId = randomUUID(),
+    timeout = 60000,
+  ) {
     const frame: Extract<ClientFrame, { type: 'message' }> = {
       type: 'message',
       chatId,
@@ -337,6 +342,7 @@ export class TestClient extends EventEmitter {
           (item.type === 'error' &&
             !['RATE_LIMITED', 'UNAVAILABLE'].includes(item.code))) &&
         item.clientMsgId === clientMsgId,
+      timeout,
     );
     this.sendIfOpen(frame);
     const result = await accepted;

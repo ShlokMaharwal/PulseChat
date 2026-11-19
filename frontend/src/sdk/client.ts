@@ -35,6 +35,7 @@ const validMessage = (m: Message) =>
 export class PulseClient {
   status: ConnectionStatus = 'offline';
   error = '';
+  degraded = false;
   gatewayId = '';
   readonly messages = new Map<string, Message[]>();
   readonly pending = new Map<string, PendingMessage>();
@@ -198,6 +199,9 @@ export class PulseClient {
     socket.onerror = () => {
       if (!this.stopped) {
         this.status = 'reconnecting';
+        this.degraded = true;
+        this.error =
+          'Chat services are temporarily unavailable. Queued messages will retry.';
         this.changed();
       }
     };
@@ -262,6 +266,13 @@ export class PulseClient {
     }
   }
   private receive(frame: ServerFrame) {
+    if (
+      this.degraded &&
+      ['welcome', 'sync', 'heartbeat'].includes(frame.type)
+    ) {
+      this.degraded = false;
+      this.error = '';
+    }
     if (frame.type === 'welcome') {
       if (frame.userId !== this.userId) {
         this.socket?.close(4001, 'Session mismatch');
@@ -329,6 +340,11 @@ export class PulseClient {
       this.hint = frame.retryAfterMs;
       this.socket?.close(1000, 'Reconnect requested');
     } else if (frame.type === 'error') {
+      if (frame.code === 'UNAVAILABLE') {
+        this.degraded = true;
+        this.error =
+          'Chat services are temporarily unavailable. Queued messages will retry.';
+      }
       if (frame.operation === 'sync' && frame.chatId) {
         clearTimeout(this.syncing.get(frame.chatId));
         this.syncing.delete(frame.chatId);
