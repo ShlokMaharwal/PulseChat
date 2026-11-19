@@ -2,13 +2,14 @@
 
 [![CI](https://github.com/ShlokMaharwal/PulseChat/actions/workflows/ci.yml/badge.svg)](https://github.com/ShlokMaharwal/PulseChat/actions/workflows/ci.yml)
 
-A distributed real-time chat system built with TypeScript, WebSockets, Kafka, Redis, and MongoDB. The backend is replicated across three gateways and two processors. Correctness, replay, failure recovery, and measured limits are documented alongside the implementation.
+A real-time chat application with an independent React 18 frontend and a distributed TypeScript backend built with WebSockets, Kafka, Redis, and MongoDB. Three gateways and two processors handle live delivery, ordered persistence, and recovery after failures.
 
-The independent React 18 frontend provides login, registration, conversations, unread badges, presence, delivery/read receipts, and recovery after connection failures. Both applications have their own dependencies, types, tests, and builds. The backend proof phases passed before frontend implementation began; verification evidence and the measured capacity limits are linked below.
+The interface includes login, registration, conversations, unread badges, presence, delivery/read receipts, and persistent light and dark themes. Both applications have their own dependencies, types, tests, and builds. Verification evidence includes real browser sessions, replicated integration tests, fault injection, and measured load results.
 
 ```mermaid
 flowchart LR
     C[Chat clients] <-->|WebSocket / REST| N[Nginx least_conn]
+    N -->|/ static assets| F[React frontend static server]
     N <--> G[3 Gateway replicas]
     G -->|chatId key / acks=-1| K[Kafka · 6 partitions]
     K --> P[2 Processor replicas]
@@ -25,24 +26,50 @@ flowchart LR
 
 ## Quick start
 
-Use Docker Desktop with Linux containers and Docker Compose v2. Allow around 4 GiB of Docker memory as a starting point; the recorded tests used 2.77 GiB and encountered limits. Host checks need Node.js 20+ for the backend and Node.js 22.13+ for the frontend tooling, plus npm. Containers use Node.js 22.
+Use Docker Desktop with Linux containers and Docker Compose v2. Run the following commands from the repository root. Host checks need Node.js 20+ for the backend and Node.js 22.13+ for the frontend tooling, plus npm. Containers use Node.js 22.
 
 ```sh
 docker compose --parallel 1 up --build -d --wait --wait-timeout 600
 docker compose run --rm --no-deps smoke
 ```
 
-`docker compose up --build` also starts the stack in the foreground. Backend replicas create/verify the required topics and indexes on startup. Kafka uses KRaft and one broker. Redis has AOF persistence. MongoDB's WiredTiger cache is capped at 0.25 GiB, and Kafka's heap at 512 MiB for local development. Lightweight container TCP probes are supplemented by actual dependency commands in backend readiness and smoke checks.
+`docker compose up --build` also starts the stack in the foreground. Backend replicas create/verify the required topics and indexes on startup. Kafka uses KRaft and one broker, and Redis has AOF persistence. Lightweight container TCP probes are supplemented by actual dependency commands in backend readiness and smoke checks.
 
-| URL | Purpose |
-| --- | --- |
-| `http://localhost:8080` | Chat application; create two accounts in separate browser sessions |
-| `http://localhost:8080/api/auth/register` | Registration endpoint |
-| `http://localhost:8080/ws` | Authenticated WebSocket upgrade |
-| `http://localhost:8080/healthz` | Nginx liveness |
-| `http://localhost:8080/readyz` | Proxied gateway readiness |
-| `http://localhost:9090` | Prometheus |
-| `http://localhost:3000/d/pulsechat-overview` | Provisioned Grafana dashboard |
+To resume an existing build:
+
+```sh
+docker compose --parallel 1 up -d --wait --wait-timeout 600
+```
+
+To stop the stack:
+
+```sh
+docker compose stop
+```
+
+Named volumes preserve accounts, message history, and receipts between stops.
+
+| URL                                                             | Purpose                          |
+| --------------------------------------------------------------- | -------------------------------- |
+| [localhost:8080](http://localhost:8080)                         | Chat application                 |
+| `http://localhost:8080/api/auth/register`                       | Registration endpoint            |
+| `http://localhost:8080/ws`                                      | Authenticated WebSocket upgrade  |
+| `http://localhost:8080/healthz`                                 | Nginx liveness                   |
+| `http://localhost:8080/readyz`                                  | Proxied gateway readiness        |
+| [localhost:9090](http://localhost:9090)                         | Prometheus                       |
+| [Grafana dashboard](http://localhost:3000/d/pulsechat-overview) | Provisioned operations dashboard |
+
+## Try the demo
+
+1. Open [localhost:8080](http://localhost:8080) in two separate browser profiles, or use a normal window and a private window.
+2. Register a different account in each session. On the first account, choose **New conversation**, search for the other username, and start a conversation.
+3. Send a message, then open the conversation in the other session. Check the unread badge, online presence, and sent/delivered/read status as both accounts exchange messages.
+4. Toggle between light and dark themes, then reload to check that the selected theme and conversation history return.
+5. For offline recovery, take one browser offline through its developer tools. Send messages from the other account and queue a message in the offline browser, then restore its connection. Both views recover the ordered conversation.
+
+The [browser verification record](docs/phase-6-browser.json) also covers killing the connected gateway, reconnecting through another replica, replaying missed messages, and retaining the queued send's original ID. Automated failure checks are described under [Tests and proof](#tests-and-proof).
+
+## Development
 
 Grafana local defaults are `admin` / `pulsechat-local`. Copy `.env.example` to `.env` to change the development JWT secret or Grafana password. Changing the password environment variable does not reset Grafana's already-persisted admin account. All published ports bind to loopback; the unauthenticated local Kafka, MongoDB, and Redis listeners and the single-node data services are development defaults.
 
@@ -76,11 +103,26 @@ The dark theme uses true black and neutral gray surfaces, with emerald accents. 
 - Ordered, paginated sync and periodic tail recovery; reconnect with exponential backoff/jitter and reuse of unacked IDs.
 - Persisted cumulative delivered/read cursors, unread counts, TTL presence, and concurrent sessions across gateways.
 - Arrival-time per-user token buckets, bounded frame size, bounded queues/output, and graceful service shutdown.
-- Manual Kafka offsets, bounded record retries, durable DLQ envelopes, structured correlation logs, and application telemetry.
+- Manual Kafka offsets and dependency-aware retries that retain records during infrastructure outages; bounded poison-record retries and durable DLQ envelopes.
+- Structured correlation logs, Prometheus metrics, and a provisioned Grafana dashboard.
 
 Storage is effectively once under the tested crash/retry model. Pub/Sub is best effort, and sync is required for recovery. A terminal DLQ record is a visible delivery failure. This local single-broker/single-database stack does not provide infrastructure high availability. See [the protocol](docs/PROTOCOL.md) and [design and failure boundaries](docs/DESIGN.md).
 
 ## Tests and proof
+
+The implementation at `199d616` passed both application jobs in [GitHub Actions](https://github.com/ShlokMaharwal/PulseChat/actions/runs/44386776771). The recorded local verification was completed on 19 November 2026:
+
+| Check                        | Result                                                                         | Evidence                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| Backend unit tests           | 63 passed                                                                      | [Final verification](docs/phase-6-verification.md)       |
+| Frontend SDK unit tests      | 9 passed                                                                       | [SDK tests](frontend/tests/client.test.ts)               |
+| Replicated integration tests | 10 passed, including 1,000 ordered cross-gateway messages                      | [Final verification](docs/phase-6-verification.md)       |
+| Smoke checks                 | 11 passed                                                                      | [Final verification](docs/phase-6-verification.md)       |
+| Chaos scenarios              | Four passed across 485 logical sends                                           | [Final chaos results](docs/final-chaos-results/)         |
+| Real browser sessions        | Chat, themes, receipts, presence, offline queuing, and gateway recovery passed | [Browser proof](docs/phase-6-browser.json)               |
+| Vite development proxy       | Login, history, and WebSocket welcome passed                                   | [Development proxy proof](docs/phase-6-dev-browser.json) |
+
+Run the source checks, integration tests, chaos scenarios, and load profiles:
 
 ```sh
 cd backend
@@ -109,7 +151,7 @@ npm run build
 
 The 63 unit tests cover configuration, protocol/auth boundaries, bounded HTTP input, readiness, dependency-aware processing retries, and recovery-client behavior. The 10 integration cases verify 1,000 cross-gateway messages in order with matching MongoDB sequences and zero duplicate wire deliveries, retry dedupe, authorization, 125 offline messages, receipts, duplicate sessions, DLQ continuation, and invalid/limited frames.
 
-The four chaos scripts are independently runnable with `npm exec -- tsx chaos/gateway.ts` (or `processor.ts`, `redis.ts`, `kafka.ts`) from `backend/`. They restore interrupted containers and print PASS/FAIL counts. The recorded runs covered 485 logical sends with zero lost messages, duplicates, or order violations. The processor kill interrupted a partial batch with 79 messages remaining. [Raw chaos summaries](docs/chaos-results/) are committed.
+The four chaos scripts are independently runnable with `npm exec -- tsx chaos/gateway.ts` (or `processor.ts`, `redis.ts`, `kafka.ts`) from `backend/`. They restore interrupted containers and print PASS/FAIL counts. The final passing runs covered 485 logical sends with zero lost messages, duplicates, or order violations. The processor was killed with 85 messages persisted and 35 still queued. The Redis case includes a twelve-second outage and reseeding through sequence 125; the Kafka case pauses the broker for eight seconds. [Final summaries and the preserved pre-fix Redis failure](docs/final-chaos-results/) and [earlier Phase 5 summaries](docs/chaos-results/) are committed.
 
 The actual load result is constrained: **200 observed baseline sockets; 533 observed peak during a failed 2,000-socket attempt**. The baseline confirmed 3.64 messages/second with p50/p95/p99 of 3,820.50/11,082.25/17,758.11 ms. The stress attempt confirmed 6.80 messages/second with substantial errors and 17 issued sends absent from MongoDB at the later observation. It did not meet the requested connection target. Both runs reused 32 users across 16 chats. See [all measurements, raw data, and limitations](docs/benchmarks.md).
 
