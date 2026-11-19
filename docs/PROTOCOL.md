@@ -8,12 +8,14 @@ Implementation status: backend Phases 1–5 and the independent React frontend i
 
 Production requests use the same origin. Nginx routes `/api/*` to gateways and `/ws` to WebSocket gateways. Direct gateway requests omit the `/api` prefix. Successful JSON responses use `Content-Type: application/json`. Failures use `{ "error": { "code": "FORBIDDEN", "message": "Access denied" } }`; operational health endpoints use their documented bodies below.
 
-Authenticated REST requests include `Authorization: Bearer <token>`. Tokens are signed with HS256, have a fixed expiry, and are never passed in URL query parameters. Registration and login return `{ "token": "<jwt>", "expiresIn": 86400, "user": { "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "username": "alice" } }`.
+Authenticated REST requests include `Authorization: Bearer <token>`. HS256 access tokens expire after at most 900 seconds and are never passed in URL query parameters. Registration and login return `{ "token": "<jwt>", "refreshToken": "<opaque-secret>", "expiresIn": 900, "user": { "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa", "username": "alice" } }`. Refresh secrets have an absolute seven-day expiry by default. Each use rotates the secret atomically; reuse of a spent secret revokes its family. Logout revokes the family. Existing access JWTs remain valid until their short expiry; immediate access-token revocation is not claimed. Browser credentials stay in tab-scoped session storage, and silent renewal is shared across concurrent HTTP requests.
 
 | Method and external path | Request | Response |
 | --- | --- | --- |
 | `POST /api/auth/register` | `{ "username": "alice", "password": "a-long-password" }` | `201`, authentication result |
 | `POST /api/auth/login` | Same fields | `200`, authentication result |
+| `POST /api/auth/refresh` | `{ "refreshToken": "<opaque-secret>" }` | `200`, a new authentication result; old refresh secret is spent |
+| `POST /api/auth/logout` | Same refresh field | `200`, `{ "revoked": true }`; clears the browser session after confirmation |
 | `GET /api/users?query=ali` | Authenticated; username prefix search | `200`, `{ "users": [{ "id": "...", "username": "alice" }] }` |
 | `POST /api/chats` | Authenticated; `{ "userId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" }` | `201` for a new 1:1 chat or `200` for the existing pair; `{ "chat": { "id": "...", "members": [{ "id": "...", "username": "..." }] } }` |
 | `GET /api/chats` | Authenticated | `200`, `{ "chats": [...] }`, each with `id`, `members`, `lastMessage` (message or null), `lastSeq`, `createdAt`, `unreadCount`, and `receipts` |
@@ -29,11 +31,13 @@ Processors expose direct `/healthz`, `/readyz`, and `/metrics` on internal port 
 
 Usernames contain 3–32 ASCII letters, digits, or underscores, and are normalized for uniqueness and login. Registration passwords have at least 10 characters and at most 72 UTF-8 bytes, the bcrypt input limit. Login enforces the same byte ceiling. A user cannot create a chat with themselves or an unknown user. A pair has at most one 1:1 chat. History pagination accepts `afterSeq >= 0` and `1 <= limit <= 100`.
 
+Authentication endpoints share a Redis IP window (120 requests/minute by default). Login/register additionally share normalized username windows (ten attempts/minute). Credential failures apply exponential username backoff and a fifteen-minute lock after five failures. A `429` includes `Retry-After` seconds and `error.retryAfterMs`. Production rejects default/weak startup secrets. See [security setup and limits](verification/task-4.md).
+
 HTTP application error codes: `INVALID_REQUEST` (400), `UNAUTHORIZED` (401), `FORBIDDEN` (403), `NOT_FOUND` (404), `CONFLICT` (409), `PAYLOAD_TOO_LARGE` (413), `RATE_LIMITED` (429), `UNAVAILABLE` (503), and `INTERNAL_ERROR` (500). Credentials are not echoed in errors. Chat non-members receive `FORBIDDEN` without message contents.
 
 ## WebSocket authentication
 
-Open `/ws` with subprotocols `pulsechat` and `jwt.<token>`, for example:
+Open `/ws` with subprotocols `pulsechat` and `jwt.<token>`, and an exact allowlisted HTTP(S) `Origin`. Missing and unapproved origins receive `403`, including native clients; configure `WS_ALLOWED_ORIGINS` and send that header explicitly. Browsers supply it automatically. For example:
 
 ```js
 new WebSocket(`${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`, ['pulsechat', `jwt.${token}`]);

@@ -20,14 +20,15 @@ flowchart LR
 
 ## Quick start
 
-Use Docker Desktop with Linux containers and Compose v2. Run from the repository root:
+Use Docker Desktop with Linux containers, Compose v2, and Node.js 22.13+ for setup and host tooling. Run from the repository root:
 
 ```sh
+node tools/init-env.mjs
 docker compose --parallel 1 up --build -d --wait --wait-timeout 600
 docker compose run --rm --no-deps smoke
 ```
 
-Open [PulseChat](http://localhost:8080), [Prometheus](http://localhost:9090), or the [Grafana dashboard](http://localhost:3000/d/pulsechat-overview). Grafana's local credentials are `admin` / `pulsechat-local`. Copy `.env.example` to `.env` to customize local settings. If port 8080 is occupied, set `PULSECHAT_PORT=8081`.
+Open [PulseChat](http://localhost:8080), [Prometheus](http://localhost:9090), or the [Grafana dashboard](http://localhost:3000/d/pulsechat-overview). The initializer generates JWT and optional database secrets in ignored `.env`. Grafana's local credentials default to `admin` / `pulsechat-local`; an existing volume retains its previous password. If port 8080 is occupied, set `PULSECHAT_PORT=8081`.
 
 `docker compose stop` stops services; `docker compose up -d --wait` resumes them. Named volumes retain accounts, history, and receipts. See [development and test commands](docs/TESTING.md).
 

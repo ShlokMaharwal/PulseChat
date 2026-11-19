@@ -509,10 +509,11 @@ describe('Phase 2 live messaging', () => {
       [Buffer.from('binary'), 1003],
       ['x'.repeat(config.MAX_MESSAGE_BYTES + 1), 1009],
     ] as const) {
-      const socket = new WebSocket(gatewayA.replace(/^http/, 'ws') + '/ws', [
-        'pulsechat',
-        `jwt.${a.token}`,
-      ]);
+      const socket = new WebSocket(
+        gatewayA.replace(/^http/, 'ws') + '/ws',
+        ['pulsechat', `jwt.${a.token}`],
+        { origin: 'http://localhost:8080' },
+      );
       socket.on('error', () => undefined);
       try {
         await once(socket, 'open');

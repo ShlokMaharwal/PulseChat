@@ -1,0 +1,10 @@
+{
+  "project": "pulsechat-secure-proof-mwnm6pxc",
+  "at": "2026-11-19T13:57:21.380Z",
+  "mongoUnauthRejected": false,
+  "mongoAuthAccepted": false,
+  "redisUnauthRejected": false,
+  "redisAuthAccepted": false,
+  "result": "FAIL",
+  "error": "Command failed: docker exec pulsechat-secure-proof-mwnm6pxc-mongo-1 sh -ec mongosh --quiet --username \"$MONGO_INITDB_ROOT_USERNAME\" --password \"$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin --eval 'db.getSiblingDB(\"admin\").getCollection(\"system.users\").countDocuments({})'"
+}

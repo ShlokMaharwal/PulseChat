@@ -1,0 +1,6 @@
+{
+  "project": "pulsechat-secure-proof-mwnmh9ca",
+  "result": "INCOMPLETE",
+  "reason": "Docker cleanup exceeded the command timeout before the final authentication summary was written. No authentication outcome is inferred from this attempt. The test containers were subsequently confirmed absent.",
+  "note": "The preceding isolated authentication run is recorded separately. The committed proof writes its summary before cleanup and reports cleanup failure explicitly."
+}

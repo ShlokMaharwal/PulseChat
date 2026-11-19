@@ -76,6 +76,30 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe('independent browser recovery SDK', () => {
+  it('opens one socket when coming online during silent token renewal', async () => {
+    let finish: ((value: string) => void) | undefined;
+    const renewal = new Promise<string>((resolve) => {
+      finish = resolve;
+    });
+    const renewSession = vi.fn(() => renewal);
+    const socketFactory = vi.fn(() => new MockSocket() as unknown as WebSocket);
+    const expired = 'x.' + btoa(JSON.stringify({ exp: 1 })) + '.x';
+    const fresh =
+      'x.' + btoa(JSON.stringify({ exp: Date.now() / 1000 + 900 })) + '.x';
+    const client = new PulseClient(own, expired, 'ws://localhost/ws', {
+      storage: new MemoryStorage(),
+      socketFactory,
+      renewSession,
+    });
+    clients.push(client);
+    client.start();
+    client.setOnline(false);
+    client.setOnline(true);
+    expect(renewSession).toHaveBeenCalledTimes(1);
+    finish!(fresh);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(socketFactory).toHaveBeenCalledTimes(1);
+  });
   it('queues while the browser is offline and resumes with the original ID', () => {
     const { client, sockets } = setup();
     client.start();

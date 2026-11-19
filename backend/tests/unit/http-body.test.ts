@@ -35,6 +35,15 @@ afterEach(async () => {
 });
 
 describe('bounded HTTP JSON input', () => {
+  it('rejects malformed UTF-8 instead of replacing invalid bytes', async () => {
+    const base = await server();
+    const response = await fetch(base, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: Buffer.from([123, 34, 120, 34, 58, 34, 0xff, 34, 125]),
+    });
+    expect(response.status).toBe(400);
+  });
   it('parses a valid UTF-8 JSON body', async () => {
     const base = await server();
     const response = await fetch(base, {

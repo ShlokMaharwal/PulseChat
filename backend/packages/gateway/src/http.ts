@@ -5,6 +5,7 @@ import { uuidSchema, type Config, type UserRouter } from '@pulsechat/shared';
 import { AuthService, bearerToken, verifyToken } from './auth.js';
 import { ChatService } from './chats.js';
 import { HttpError } from './errors.js';
+import { AuthThrottle, clientIp } from './security.js';
 
 export function sendJson(
   response: ServerResponse,
@@ -68,7 +69,9 @@ export function readJson(
       if (settled) return;
       try {
         const result: unknown = JSON.parse(
-          Buffer.concat(chunks).toString('utf8'),
+          new TextDecoder('utf-8', { fatal: true }).decode(
+            Buffer.concat(chunks),
+          ),
         );
         settled = true;
         resolve(result);
@@ -92,6 +95,7 @@ export class GatewayHttpApi {
     private readonly config: Config,
     private readonly logger: Logger,
     private readonly router: UserRouter,
+    private readonly throttle: AuthThrottle,
   ) {}
 
   async handle(
@@ -100,31 +104,68 @@ export class GatewayHttpApi {
   ): Promise<boolean> {
     const url = new URL(request.url ?? '/', 'http://gateway');
     if (
-      !['/auth/register', '/auth/login', '/users', '/chats'].includes(
-        url.pathname,
-      ) &&
+      ![
+        '/auth/register',
+        '/auth/login',
+        '/auth/refresh',
+        '/auth/logout',
+        '/users',
+        '/chats',
+      ].includes(url.pathname) &&
       !url.pathname.startsWith('/chats/') &&
       !url.pathname.startsWith('/users/')
     )
       return false;
     try {
-      if (request.method === 'POST' && url.pathname === '/auth/register') {
-        sendJson(
-          response,
-          201,
-          await this.auth.register(
-            await readJson(request, this.config.MAX_MESSAGE_BYTES),
-          ),
-        );
-      } else if (request.method === 'POST' && url.pathname === '/auth/login') {
-        sendJson(
-          response,
-          200,
-          await this.auth.login(
-            await readJson(request, this.config.MAX_MESSAGE_BYTES),
-          ),
-        );
-      } else {
+      if (request.method === 'POST' && url.pathname.startsWith('/auth/')) {
+        await this.throttle.ip(await clientIp(request, this.config));
+        const input = await readJson(request, this.config.MAX_MESSAGE_BYTES);
+        if (
+          url.pathname === '/auth/refresh' ||
+          url.pathname === '/auth/logout'
+        ) {
+          const parsed = z
+            .object({ refreshToken: z.string().max(200) })
+            .strict()
+            .safeParse(input);
+          if (!parsed.success)
+            throw new HttpError(
+              400,
+              'INVALID_REQUEST',
+              'A refresh token is required',
+            );
+          if (url.pathname === '/auth/refresh')
+            sendJson(
+              response,
+              200,
+              await this.auth.refresh(parsed.data.refreshToken),
+            );
+          else {
+            await this.auth.logout(parsed.data.refreshToken);
+            sendJson(response, 200, { revoked: true });
+          }
+          return true;
+        }
+        const username =
+          input && typeof input === 'object' && 'username' in input
+            ? input.username
+            : undefined;
+        const key = await this.throttle.username(username);
+        try {
+          const registration = url.pathname === '/auth/register';
+          const result = registration
+            ? await this.auth.register(input)
+            : await this.auth.login(input);
+          await this.throttle.success(key);
+          sendJson(response, registration ? 201 : 200, result);
+        } catch (error) {
+          if (error instanceof HttpError && [401, 409].includes(error.status))
+            await this.throttle.failure(key);
+          throw error;
+        }
+        return true;
+      }
+      {
         const userId = verifyToken(
           bearerToken(request.headers.authorization),
           this.config,
@@ -203,8 +244,17 @@ export class GatewayHttpApi {
       }
     } catch (error) {
       if (error instanceof HttpError) {
+        if (error.retryAfterMs)
+          response.setHeader(
+            'retry-after',
+            Math.ceil(error.retryAfterMs / 1000),
+          );
         sendJson(response, error.status, {
-          error: { code: error.code, message: error.message },
+          error: {
+            code: error.code,
+            message: error.message,
+            ...(error.retryAfterMs ? { retryAfterMs: error.retryAfterMs } : {}),
+          },
         });
       } else {
         this.logger.error({ err: error }, 'HTTP API request failed');

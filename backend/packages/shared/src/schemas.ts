@@ -51,6 +51,13 @@ export const clientFrameSchema = z.discriminatedUnion('type', [
         .string()
         .min(1)
         .max(16384)
+        .refine(
+          (body) =>
+            Buffer.byteLength(body, 'utf8') <= 16384 &&
+            Buffer.from(body, 'utf8').toString('utf8') === body &&
+            !body.includes('\u0000'),
+          'Message must be bounded, well-formed UTF-8 without NUL',
+        )
         .refine((body) => body.trim().length > 0, 'Message cannot be blank'),
     })
     .strict(),

@@ -1,0 +1,6 @@
+{
+  "result": "PASS",
+  "at": "2026-11-19T14:40:07.695Z",
+  "checks": 11,
+  "note": "Actual HTTP proxy headers and external theme asset verified. The TLS-terminator header branch was exercised; this is not a real TLS connection test."
+}

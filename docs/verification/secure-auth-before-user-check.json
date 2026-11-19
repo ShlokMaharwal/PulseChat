@@ -1,0 +1,9 @@
+{
+  "project": "pulsechat-secure-proof-mwnmcrv4",
+  "at": "2026-11-19T14:01:58.948Z",
+  "mongoUnauthRejected": true,
+  "mongoAuthAccepted": true,
+  "redisUnauthRejected": true,
+  "redisAuthAccepted": true,
+  "result": "PASS"
+}

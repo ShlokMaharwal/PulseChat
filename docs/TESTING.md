@@ -8,6 +8,7 @@ Run in both `backend/` and `frontend/`:
 
 ```sh
 npm ci
+npm audit --audit-level=high
 npm run lint
 npm run format:check
 npm run typecheck
@@ -41,7 +42,7 @@ If port 8080 is occupied, set `PULSECHAT_PORT=8081` for Compose and `TEST_HTTP_U
 
 ## Development
 
-For host backend development, start `kafka redis mongo` through Compose, set `JWT_SECRET` to at least 32 characters, then run `npm run dev:gateway` or `npm run dev:processor` in `backend/`. Host defaults are Kafka port 19092, Redis 16379, MongoDB 27018; direct-gateway REST paths omit `/api`.
+For host backend development, first run `node tools/init-env.mjs`, start `kafka redis mongo` through Compose, export the generated `JWT_SECRET` from your private environment, then run `npm run dev:gateway` or `npm run dev:processor` in `backend/`. Host defaults are Kafka port 19092, Redis 16379, MongoDB 27018; direct-gateway REST paths omit `/api`. See [optional authenticated database setup](verification/task-4.md#optional-authenticated-databases).
 
 For the frontend, keep Compose running and run `npm run dev` in `frontend/`. Open `http://127.0.0.1:5173`; Vite proxies REST/WebSocket requests to port 8080. See [frontend documentation](../frontend/README.md) for proxy overrides and session storage behavior.
 

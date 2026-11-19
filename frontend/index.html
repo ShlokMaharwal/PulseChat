@@ -9,17 +9,7 @@
       content="PulseChat — a simple place for your conversations."
     />
     <title>PulseChat</title>
-    <script>
-      try {
-        document.documentElement.dataset.theme =
-          localStorage.getItem('pulsechat.theme') ||
-          (matchMedia('(prefers-color-scheme: dark)').matches
-            ? 'dark'
-            : 'light');
-      } catch {
-        document.documentElement.dataset.theme = 'dark';
-      }
-    </script>
+    <script src="/theme.js"></script>
   </head>
   <body>
     <div id="root"></div>

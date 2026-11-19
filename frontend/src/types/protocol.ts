@@ -7,6 +7,7 @@ export interface Account {
   user: User;
   token: string;
   expiresIn: number;
+  refreshToken?: string;
 }
 export interface Message {
   messageId: string;

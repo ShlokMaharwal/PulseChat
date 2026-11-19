@@ -48,7 +48,9 @@ export class TestClient extends EventEmitter {
     );
   }
   private open() {
-    const socket = new WebSocket(this.url, ['pulsechat', `jwt.${this.token}`]);
+    const socket = new WebSocket(this.url, ['pulsechat', `jwt.${this.token}`], {
+      origin: 'http://localhost:8080',
+    });
     this.socket = socket;
     let welcomed = false;
     socket.on('unexpected-response', (_, response) => {

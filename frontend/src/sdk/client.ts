@@ -20,6 +20,7 @@ interface Options {
   socketFactory?: (url: string, protocols: string[]) => WebSocket;
   random?: () => number;
   onDiscover?: () => void;
+  renewSession?: () => Promise<string>;
 }
 const validMessage = (m: Message) =>
   m &&
@@ -44,6 +45,7 @@ export class PulseClient {
   private stopped = true;
   private online = true;
   private attempt = 0;
+  private renewing = false;
   private hint = 0;
   private readonly listeners = new Set<() => void>();
   private readonly tracked = new Set<string>();
@@ -58,7 +60,7 @@ export class PulseClient {
   private readonly storage;
   constructor(
     readonly userId: string,
-    private readonly token: string,
+    private token: string,
     private readonly url: string,
     private readonly options: Options = {},
   ) {
@@ -160,6 +162,10 @@ export class PulseClient {
   private open() {
     if (this.stopped || !this.online) return;
     if (this.expired()) {
+      if (this.options.renewSession) {
+        void this.renew();
+        return;
+      }
       this.status = 'expired';
       this.error = 'Your session expired. Sign in again.';
       this.stopped = true;
@@ -202,6 +208,10 @@ export class PulseClient {
       this.syncing.clear();
       if (this.stopped) return;
       if (event.code === 4001) {
+        if (this.options.renewSession) {
+          void this.renew();
+          return;
+        }
         this.stopped = true;
         this.status = 'expired';
         this.error = 'Your session expired. Sign in again.';
@@ -217,6 +227,39 @@ export class PulseClient {
       }
       this.changed();
     };
+  }
+  private async renew() {
+    if (this.renewing || this.stopped) return;
+    this.renewing = true;
+    try {
+      this.token = await this.options.renewSession!();
+      this.renewing = false;
+      if (!this.stopped) this.open();
+    } catch (error) {
+      if (this.stopped) return;
+      if (
+        error &&
+        typeof error === 'object' &&
+        'status' in error &&
+        error.status === 401
+      ) {
+        this.stopped = true;
+        this.status = 'expired';
+        this.error = 'Your session expired. Sign in again.';
+      } else {
+        this.status = 'reconnecting';
+        this.error = 'Session renewal is temporarily unavailable. Retrying…';
+        this.reconnectTimer = setTimeout(
+          () => {
+            void this.renew();
+          },
+          Math.min(30000, 1000 * 2 ** Math.min(this.attempt++, 5)),
+        );
+      }
+      this.changed();
+    } finally {
+      this.renewing = false;
+    }
   }
   private receive(frame: ServerFrame) {
     if (frame.type === 'welcome') {

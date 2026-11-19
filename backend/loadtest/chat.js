@@ -211,6 +211,7 @@ export default function (timing) {
       syncing = false;
       const current = new WebSocket(__ENV.WS_URL ?? 'ws://nginx/ws', null, {
         headers: {
+          Origin: 'http://localhost:8080',
           'Sec-WebSocket-Protocol': 'pulsechat, jwt.' + account.token,
         },
         tags: { name: 'PulseChat WebSocket' },

@@ -1101,3 +1101,11 @@ button {
     transition: none !important;
   }
 }
+.signout-notice {
+  position: fixed;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  max-width: calc(100% - 2rem);
+}

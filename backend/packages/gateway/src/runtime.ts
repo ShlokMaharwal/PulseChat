@@ -23,6 +23,7 @@ import { AuthService, verifySession, websocketToken } from './auth.js';
 import { ChatService } from './chats.js';
 import { GatewayHttpApi } from './http.js';
 import { HttpError } from './errors.js';
+import { AuthThrottle, originAllowed } from './security.js';
 
 const envelopeSchema = z
   .object({ userId: uuidSchema, payload: serverFrameSchema })
@@ -76,6 +77,7 @@ class GatewayRuntime {
       config,
       logger,
       this.router,
+      new AuthThrottle(dependencies.redis, config),
     );
     this.producer = dependencies.kafka.producer({
       idempotent: true,
@@ -131,6 +133,10 @@ class GatewayRuntime {
         return;
       }
       const url = new URL(request.url ?? '/', 'http://gateway');
+      if (!originAllowed(request.headers.origin, this.context.config)) {
+        this.reject(socket, 403, 'Forbidden');
+        return;
+      }
       if (url.pathname !== '/ws' || url.searchParams.has('token')) {
         this.reject(socket, 404, 'Not Found');
         return;

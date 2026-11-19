@@ -9,6 +9,7 @@ import {
 import { PulseClient } from '../sdk/client';
 import { ApiError, getPresence, history, listChats } from '../sdk/api';
 import type { Account, Chat } from '../types/protocol';
+import { sessionToken } from '../sdk/session';
 export function useChat(account: Account, onExpired: () => void) {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +22,10 @@ export function useChat(account: Account, onExpired: () => void) {
         account.user.id,
         account.token,
         `${location.protocol === 'https:' ? 'wss:' : 'ws:'}//${location.host}/ws`,
-        { onDiscover: () => refreshRef.current() },
+        {
+          onDiscover: () => refreshRef.current(),
+          renewSession: () => sessionToken(account.user.id, true),
+        },
       ),
     [account],
   );

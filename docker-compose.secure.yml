@@ -1,0 +1,29 @@
+# Use with the default file and fresh named data volumes, or provision users first
+# when migrating existing databases. Never remove existing data to enable auth.
+x-secure-environment: &secure-environment
+  NODE_ENV: production
+  JWT_SECRET: ${JWT_SECRET:?Run node tools/init-env.mjs first}
+  MONGO_URL: mongodb://pulsechat:${MONGO_PASSWORD:?Generate a URL-safe Mongo password}@mongo:27017/pulsechat?authSource=admin
+  REDIS_URL: redis://:${REDIS_PASSWORD:?Generate a URL-safe Redis password}@redis:6379
+
+services:
+  mongo:
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: pulsechat
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:?Generate a Mongo password}
+    command: [mongod, --auth, --wiredTigerCacheSizeGB, '0.25']
+  redis:
+    user: redis
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?Generate a Redis password}
+    command: [sh, -ec, 'exec redis-server --appendonly yes --appendfsync everysec --requirepass "$$REDIS_PASSWORD"']
+    healthcheck:
+      test: [CMD-SHELL, 'REDISCLI_AUTH="$$REDIS_PASSWORD" redis-cli ping']
+  gateway-1: &secure-backend
+    environment: *secure-environment
+  gateway-2: *secure-backend
+  gateway-3: *secure-backend
+  processor-1: *secure-backend
+  processor-2: *secure-backend
+  integration: *secure-backend
+  smoke: *secure-backend

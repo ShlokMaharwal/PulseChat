@@ -9,6 +9,7 @@ import {
   type createDependencies,
 } from '@pulsechat/shared';
 import { HttpError } from './errors.js';
+import { RefreshSessions } from './sessions.js';
 
 type Database = ReturnType<typeof createDependencies>['db'];
 
@@ -95,15 +96,18 @@ export function websocketToken(
 export class AuthService {
   private readonly users;
   private dummyHash: string | undefined;
+  private readonly sessions;
 
   constructor(
     db: Database,
     private readonly config: Config,
   ) {
     this.users = db.collection<UserRecord>('users');
+    this.sessions = new RefreshSessions(db, config);
   }
 
   async initialize() {
+    await this.sessions.initialize();
     await this.users.createIndexes([
       { key: { id: 1 }, unique: true, name: 'userId_unique' },
       { key: { usernameLower: 1 }, unique: true, name: 'username_unique' },
@@ -112,8 +116,9 @@ export class AuthService {
     this.dummyHash = await bcrypt.hash(randomUUID(), 12);
   }
 
-  private result(user: PublicUser) {
+  private async result(user: PublicUser, refreshToken?: string) {
     return {
+      refreshToken: refreshToken ?? (await this.sessions.create(user.id)),
       token: jwt.sign({}, this.config.JWT_SECRET, {
         algorithm: 'HS256',
         subject: user.id,
@@ -124,6 +129,14 @@ export class AuthService {
       expiresIn: this.config.JWT_EXPIRES_IN_SECONDS,
       user: { id: user.id, username: user.username },
     };
+  }
+
+  async refresh(input: unknown) {
+    const session = await this.sessions.rotate(input);
+    return this.result(await this.user(session.userId), session.refreshToken);
+  }
+  async logout(input: unknown) {
+    await this.sessions.revoke(input);
   }
 
   async register(input: unknown) {

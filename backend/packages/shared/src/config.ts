@@ -48,7 +48,28 @@ const envSchema = z.object({
     .regex(/^[a-zA-Z0-9_-]+$/)
     .default('pulsechat'),
   JWT_SECRET: z.string().min(32),
-  JWT_EXPIRES_IN_SECONDS: positiveInteger.default(86400),
+  JWT_EXPIRES_IN_SECONDS: positiveInteger.max(900).default(900),
+  REFRESH_EXPIRES_IN_SECONDS: positiveInteger.max(2592000).default(604800),
+  WS_ALLOWED_ORIGINS: z
+    .string()
+    .default(
+      'http://localhost:8080,http://127.0.0.1:8080,http://localhost:8081,http://127.0.0.1:8081,http://127.0.0.1:5173,http://localhost:5173',
+    )
+    .transform((value) =>
+      value.split(',').map((v) => new URL(v.trim()).origin),
+    ),
+  TRUSTED_PROXY_HOSTS: z
+    .string()
+    .default('')
+    .transform((v) =>
+      v
+        .split(',')
+        .map((host) => host.trim())
+        .filter(Boolean),
+    ),
+  AUTH_IP_LIMIT: positiveInteger.max(10000).default(120),
+  AUTH_USERNAME_LIMIT: positiveInteger.max(100).default(10),
+  AUTH_WINDOW_MS: positiveInteger.default(60000),
   MAX_MESSAGE_BYTES: positiveInteger.max(65536).default(16384),
   MAX_SOCKET_BUFFER_BYTES: positiveInteger.default(1048576),
   HEARTBEAT_INTERVAL_MS: positiveInteger.default(15000),
@@ -68,6 +89,19 @@ const envSchema = z.object({
 export function parseConfig(env: NodeJS.ProcessEnv) {
   return envSchema
     .superRefine((value, context) => {
+      if (
+        value.NODE_ENV === 'production' &&
+        (/pulsechat-local|change|default|example|test-secret/i.test(
+          value.JWT_SECRET,
+        ) ||
+          new Set(value.JWT_SECRET).size < 12)
+      ) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['JWT_SECRET'],
+          message: 'Production requires a strong, non-default JWT secret',
+        });
+      }
       if (value.PRESENCE_TTL_SECONDS * 1000 <= value.HEARTBEAT_INTERVAL_MS) {
         context.addIssue({
           code: z.ZodIssueCode.custom,

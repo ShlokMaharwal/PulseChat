@@ -3,6 +3,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { TestClient } from '../tests/helpers/test-client.js';
 import { seedFixture } from './seed.js';
 import { MongoClient } from 'mongodb';
+import { setTimeout as pause } from 'node:timers/promises';
 
 export interface LoadAccount {
   token: string;
@@ -27,6 +28,7 @@ export async function loadFixture(
     path: string,
     body: unknown,
     token?: string,
+    attempt = 0,
   ): Promise<T> {
     const response = await fetch(base + '/api' + path, {
       method: 'POST',
@@ -37,6 +39,12 @@ export async function loadFixture(
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(60000),
     });
+    if (response.status === 429 && attempt < 5) {
+      const seconds = Number(response.headers.get('retry-after') ?? '60');
+      await response.body?.cancel();
+      await pause(Math.max(1000, Math.min(60000, seconds * 1000)));
+      return request<T>(path, body, token, attempt + 1);
+    }
     if (!response.ok)
       throw new Error('Fixture HTTP ' + response.status + ': ' + path);
     return (await response.json()) as T;

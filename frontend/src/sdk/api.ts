@@ -1,4 +1,5 @@
 import type { Account, Chat, HistoryPage, User } from '../types/protocol';
+import { savedAccount, sessionToken, subject, SessionError } from './session';
 export class ApiError extends Error {
   constructor(
     public readonly status: number,
@@ -13,15 +14,45 @@ export async function api<T>(
   body?: unknown,
   signal?: AbortSignal,
 ): Promise<T> {
-  const response = await fetch('/api' + path, {
-    method: body === undefined ? 'GET' : 'POST',
-    headers: {
-      ...(body === undefined ? {} : { 'content-type': 'application/json' }),
-      ...(token ? { authorization: `Bearer ${token}` } : {}),
-    },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    signal: signal ?? AbortSignal.timeout(20000),
-  });
+  const userId = token ? subject(token)?.sub : undefined;
+  const managed = userId && savedAccount()?.user.id === userId;
+  let actualToken = token;
+  if (managed) {
+    try {
+      actualToken = await sessionToken(userId);
+    } catch (error) {
+      throw new ApiError(
+        error instanceof SessionError ? error.status : 503,
+        error instanceof Error
+          ? error.message
+          : 'Session renewal is temporarily unavailable.',
+      );
+    }
+  }
+  const perform = () =>
+    fetch('/api' + path, {
+      method: body === undefined ? 'GET' : 'POST',
+      headers: {
+        ...(body === undefined ? {} : { 'content-type': 'application/json' }),
+        ...(actualToken ? { authorization: `Bearer ${actualToken}` } : {}),
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+      signal: signal ?? AbortSignal.timeout(20000),
+    });
+  let response = await perform();
+  if (response.status === 401 && managed) {
+    try {
+      actualToken = await sessionToken(userId, true);
+      response = await perform();
+    } catch (error) {
+      throw new ApiError(
+        error instanceof SessionError ? error.status : 503,
+        error instanceof Error
+          ? error.message
+          : 'Session renewal is temporarily unavailable.',
+      );
+    }
+  }
   const result = await response.json().catch(() => null);
   if (!response.ok)
     throw new ApiError(

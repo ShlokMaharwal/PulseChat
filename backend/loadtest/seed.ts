@@ -63,7 +63,7 @@ export async function seedFixture(target: number): Promise<LoadFixture> {
             subject: user.id,
             issuer: 'pulsechat',
             audience: 'pulsechat',
-            expiresIn: 86400,
+            expiresIn: 900,
           }),
         });
     }

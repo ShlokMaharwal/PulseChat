@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Account } from './types/protocol';
 import { AuthPage } from './pages/AuthPage';
 import { ChatPage } from './pages/ChatPage';
+import { revokeSession, saveAccount } from './sdk/session';
 export default function App() {
   const [account, setAccount] = useState<Account | null>(() => {
     try {
@@ -16,6 +17,7 @@ export default function App() {
   const [theme, setTheme] = useState(() =>
     document.documentElement.dataset.theme === 'light' ? 'light' : 'dark',
   );
+  const [signoutError, setSignoutError] = useState('');
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
     document.documentElement.style.colorScheme = theme;
@@ -35,22 +37,42 @@ export default function App() {
     setTheme(next);
   };
   const logout = useCallback(() => {
-    sessionStorage.removeItem('pulsechat.account');
-    setAccount(null);
+    void revokeSession()
+      .then(() => {
+        setAccount(null);
+        setSignoutError('');
+      })
+      .catch((error) =>
+        setSignoutError(
+          error instanceof Error ? error.message : 'Please retry sign out.',
+        ),
+      );
   }, []);
   const login = (value: Account) => {
-    sessionStorage.setItem('pulsechat.account', JSON.stringify(value));
+    saveAccount(value);
     setAccount(value);
   };
-  return account ? (
-    <ChatPage
-      key={account.user.id}
-      account={account}
-      logout={logout}
-      theme={theme}
-      toggleTheme={toggleTheme}
-    />
-  ) : (
-    <AuthPage onLogin={login} theme={theme} toggleTheme={toggleTheme} />
+  return (
+    <>
+      {signoutError && (
+        <div className="notice signout-notice" role="alert">
+          {signoutError}
+          <button className="text-button" onClick={logout}>
+            Retry sign out
+          </button>
+        </div>
+      )}
+      {account ? (
+        <ChatPage
+          key={account.user.id}
+          account={account}
+          logout={logout}
+          theme={theme}
+          toggleTheme={toggleTheme}
+        />
+      ) : (
+        <AuthPage onLogin={login} theme={theme} toggleTheme={toggleTheme} />
+      )}
+    </>
   );
 }
