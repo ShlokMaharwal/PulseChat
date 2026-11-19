@@ -35,6 +35,8 @@ HTTP fixture creation is the default. `LOAD_FIXTURE_MODE=seed` and the stack's `
 
 The performance override uses a 60-second Kafka broker lease because this host recorded scheduling delays beyond the default nine-second lease. The default Compose stack retains Kafka's normal lease. This local mitigation is separate from software improvements; no Docker resource limits were added. Set `KAFKA_BROKER_SESSION_TIMEOUT_MS=9000` to reproduce the unmitigated case.
 
+The local override also allows 180 seconds for initial broker registration. During final service restoration, the previous 60-second startup deadline repeatedly expired while a prior 60-second broker lease was still active, producing `DUPLICATE_BROKER_REGISTRATION` and restarts. The startup allowance now exceeds that lease; this is separate from message processing and was added after the recorded load runs. [Kafka configuration reference](https://kafka.apache.org/39/configuration/broker-configs/).
+
 If port 8080 is occupied, set `PULSECHAT_PORT=8081` for Compose and `TEST_HTTP_URL=http://127.0.0.1:8081` for the runner. The load container reaches Nginx through the Compose network.
 
 Set `PROFILE_CPU=true` for a separate diagnostic. Profiling uses a local inspector session at a ten-millisecond interval: `SIGUSR2` starts it and `SIGURG` stops it. No debugger network listener opens.

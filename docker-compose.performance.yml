@@ -4,6 +4,8 @@ services:
       # This local diagnostic override tolerates observed host scheduling stalls.
       # The default Compose stack keeps its normal lease.
       KAFKA_BROKER_SESSION_TIMEOUT_MS: ${KAFKA_BROKER_SESSION_TIMEOUT_MS:-60000}
+      # Allow an old 60-second lease to expire before startup gives up.
+      KAFKA_INITIAL_BROKER_REGISTRATION_TIMEOUT_MS: 180000
   gateway-1: &instrumented
     environment:
       TRACE_MESSAGES: "true"
