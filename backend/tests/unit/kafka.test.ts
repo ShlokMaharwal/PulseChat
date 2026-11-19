@@ -21,6 +21,27 @@ function fakeAdmin(partitions = 6, leader = 1) {
   };
 }
 describe('topic bootstrap', () => {
+  it.each(['createTopics', 'fetchTopicMetadata'] as const)(
+    'retries transient %s failures during cluster convergence',
+    async (operation) => {
+      const admin = fakeAdmin();
+      admin[operation].mockRejectedValueOnce(
+        Object.assign(new Error('Metadata is propagating'), {
+          retriable: true,
+        }),
+      );
+      await ensureTopics(admin as unknown as Admin, config);
+      expect(admin[operation]).toHaveBeenCalledTimes(2);
+    },
+  );
+  it('does not retry a non-transient bootstrap failure', async () => {
+    const admin = fakeAdmin();
+    admin.createTopics.mockRejectedValueOnce(new Error('Access denied'));
+    await expect(
+      ensureTopics(admin as unknown as Admin, config),
+    ).rejects.toThrow('Access denied');
+    expect(admin.createTopics).toHaveBeenCalledOnce();
+  });
   it('requests all six-partition topics and verifies existing topics', async () => {
     const admin = fakeAdmin();
     await ensureTopics(admin as unknown as Admin, config);

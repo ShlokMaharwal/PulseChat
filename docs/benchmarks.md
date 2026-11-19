@@ -73,6 +73,16 @@ The next run used 500 distinct users in 250 chats with the same timing, interval
 
 [500-user measurements](verification/performance/2026-11-19-capacity-500/measured.json), [raw evidence](verification/performance/2026-11-19-capacity-500/raw-evidence.zip), [source snapshot](verification/performance/2026-11-19-capacity-500/source-snapshot.json.gz).
 
+## Final verification run
+
+A fresh run on the security-hardened runtime at commit `6bda72a` used 200 distinct users / 100 chats and the same 10-second ramp, 30-second warmup, 30-second steady interval, five-second per-socket send interval, and 60-second drain. All **1,384 issued sends** received acceptance ACKs, appeared independently in Kafka, persisted, and reached peers; accepted-but-unpersisted and unresolved counts were zero. Processor message/receipt lag and audit lag reached zero, and all three gateways reported fresh zero in-flight samples. Ledgers and resource sampling passed.
+
+Steady peer delivery was **11.17 messages/s**; all 1,184 steady-cohort sends delivered, with p50/p95/p99 **44,146 / 54,422.55 / 56,837.40 ms**. The client ledger again recorded 200 welcomed sockets, while independent Prometheus samples dipped to 66 during the observation. This remains a configured-load correctness check with high latency, not continuously sustained server capacity. This fresh fixture has different chat keys and partition placement, so it is not substituted into the controlled before/after comparison. The later startup-only fix retries Kafka-declared transient topic-bootstrap errors; no processing-path changes followed this run.
+
+[Final measurements, including stage breakdown](verification/performance/2026-11-19-final-200/measured.json), [hardware/settings](verification/performance/2026-11-19-final-200/hardware.json), [exact run configuration](verification/performance/2026-11-19-final-200/run.json), [raw ledgers and resource samples](verification/performance/2026-11-19-final-200/raw-evidence.zip), [source snapshot](verification/performance/2026-11-19-final-200/source-snapshot.json.gz).
+
+The earlier 500-user overload profile is retained as the capacity boundary. It was not repeated during final checks because no processing-path changes followed the measured optimization.
+
 ## Historical repeated-session measurements
 
 ### Resolution of the 17-attempt difference

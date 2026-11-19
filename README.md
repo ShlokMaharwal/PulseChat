@@ -60,12 +60,13 @@ Details: [protocol](docs/PROTOCOL.md), [design and failure boundaries](docs/DESI
 
 | Check | Recorded result | Evidence |
 | --- | --- | --- |
-| Source checks | 82 backend and 15 frontend unit tests; lint, format, types, builds passed | [Security verification](docs/verification/task-4.md), [browser verification](docs/verification/task-6.md) |
+| Source checks | 85 backend and 15 frontend unit tests; lint, format, types, builds passed | [Final verification](docs/verification/task-7.md) |
 | Integration / smoke | Thirteen integration cases, including 1,000 ordered messages; eleven smoke checks | [Reliability verification](docs/verification/task-5.md) |
 | Crash / outage recovery | Six default-stack scenarios, 725 sends, zero loss, logical/wire duplicates, or order errors | [Actual summaries](docs/verification/task-5-chaos/) |
 | Browser recovery | Five real browser tests passed, including offline recovery, gateway SIGKILL, and token renewal/logout | [Browser verification](docs/verification/task-6.md) |
 | Configured 200-user load | Steady peer delivery 4.87 → 11.50 messages/s; all 1,367 optimized sends persisted and reached peers | [Measured comparison and caveats](docs/benchmarks.md) |
 | Overload / acceptance | All 2,233 Kafka-accepted sends persisted in the 500-target overload run | [Classification and historical 17-attempt investigation](docs/verification/task-2.md) |
+| Final configured 200-user check | All 1,384 issued messages ACKed, persisted, and peer delivered after verified drain | [Final measurements and caveats](docs/benchmarks.md#final-verification-run) |
 
 Latency remains high. The 500-user run overloaded the system, and independent server connection measurements dipped even at the configured 200-user load. No production capacity or low-latency guarantee is claimed. [Raw evidence and exact percentiles](docs/benchmarks.md).
 
@@ -73,4 +74,4 @@ Latency remains high. The 500-user run overloaded the system, and independent se
 
 The default stack has one Kafka broker, one MongoDB instance, and one Redis instance. Redis Pub/Sub is best effort; sync is required to recover missed live events. A terminal DLQ failure after sequence allocation can leave a sequence gap. The optional [three-broker Kafka profile](docs/verification/task-5.md) has separate verification; the default stack's process-failure tests do not establish infrastructure high availability. Groups and typing indicators are not implemented.
 
-[Testing and reproduction](docs/TESTING.md) · [Verification archive](docs/verification/) · [Evidence-backed resume bullets](docs/resume-bullets.md)
+[Testing and reproduction](docs/TESTING.md) · [What changed and remaining limits](docs/CHANGES.md) · [Evidence-backed resume bullets](docs/resume-bullets.md)

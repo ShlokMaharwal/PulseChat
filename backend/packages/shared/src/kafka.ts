@@ -1,5 +1,6 @@
 import { Kafka, logLevel, type Admin } from 'kafkajs';
 import type { Config } from './config.js';
+import { setTimeout as pause } from 'node:timers/promises';
 
 export const TOPICS = ['messages', 'receipts', 'messages.dlq'] as const;
 
@@ -15,6 +16,27 @@ export function createKafka(config: Config, service: string) {
 }
 
 export async function ensureTopics(admin: Admin, config: Config) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      await bootstrapTopics(admin, config);
+      return;
+    } catch (error) {
+      // A new KRaft topic can exist before every broker serves its metadata.
+      // Retry only Kafka-declared transient failures; invalid topology is fatal.
+      if (
+        attempt >= 9 ||
+        !error ||
+        typeof error !== 'object' ||
+        !('retriable' in error) ||
+        error.retriable !== true
+      )
+        throw error;
+      await pause(500);
+    }
+  }
+}
+
+async function bootstrapTopics(admin: Admin, config: Config) {
   // createTopics is safe when another starting replica created the topics first.
   await admin.createTopics({
     waitForLeaders: true,

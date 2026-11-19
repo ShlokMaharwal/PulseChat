@@ -1,8 +1,11 @@
 # Resume bullets backed by recorded results
 
-- Built a replicated TypeScript chat pipeline with 3 WebSocket gateways, 2 Kafka processors, and 6 partitions per topic, using MongoDB unique indexes and atomic Redis Lua assignment for effectively-once storage under the tested retry model.
-- Verified 1,000 cross-gateway messages in canonical sequence order with matching MongoDB records and zero duplicate wire deliveries; five repeated logical sends produced one stored message.
-- Automated four failure scenarios covering 485 logical sends with zero lost messages, duplicate logical deliveries, or ordering violations, including recovery after a processor was killed with 85 messages persisted and 35 still queued.
-- Provisioned a 10-panel Grafana dashboard and verified real message, receipt, lag, dedupe, DLQ, and rate-rejection telemetry; measured crashed-user presence expiry in 30.36 seconds.
+- Increased steady peer delivery from 4.87 to 11.50 messages/s (2.36×) in the configured 200-user comparison using bounded Kafka batching, concurrent partitions, and fewer Redis/Mongo round trips; all 1,367 optimized sends persisted and reached peers.
+- Reconciled the historical 992-attempt stress run against retained Kafka offsets and MongoDB: all 975 distinct accepted records persisted; the remaining 17 attempts never reached the durable source log. Original per-attempt ACK identities were unavailable.
+- Automated six default-stack failure scenarios covering 725 sends with zero lost messages, logical/wire duplicates, or ordering violations, including MongoDB restart and a gateway-to-Redis network partition; verified a Redis outage returned UNAVAILABLE in 32 ms.
+- Hardened authentication with Redis throttling, validated WebSocket origins, 15-minute access tokens, rotating and revocable refresh sessions, and optional authenticated MongoDB/Redis; verified 85 backend unit tests, 13 integration cases, and eleven smoke checks.
+- Verified 15 frontend unit tests and five real browser scenarios covering login, escaped messages, receipts, offline queuing, gateway SIGKILL recovery, silent token renewal, and logout revocation.
 
-Evidence: [final historical chaos results](verification/final-chaos-results/), [verification archive](verification/), and [benchmarks](benchmarks.md). The older 79-queued case is a different run, explained in [TESTING](TESTING.md). The 2,000-connection stress target was not achieved; do not claim a successful 2,000–5,000-user benchmark or subsecond latency.
+Evidence: [measured comparison](benchmarks.md), [17-attempt investigation](verification/task-2.md), [security verification](verification/task-4.md), [six failure summaries](verification/task-5-chaos/), and [browser verification](verification/task-6.md).
+
+The configured 200-user comparison had independent server connection dips and a right-censored baseline; it does not prove continuously sustained 200-user capacity or an unconditional latency improvement. The 500-user profile overloaded the host. Do not claim successful 2,000–5,000-user capacity, subsecond latency, or production infrastructure high availability.
