@@ -71,6 +71,38 @@ Recipients receive a canonical message:
 
 `messageId` is server-controlled and stable for a sender's `clientMsgId`. `seq` is assigned idempotently by the processor. Clients merge retries by message ID and display stored messages in sequence order. Kafka offsets are committed manually after successful persistence. Redis Pub/Sub provides live delivery; MongoDB history is the source for recovery.
 
+Gateways may coalesce message and receipt records into bounded Kafka batches.
+Every `received` ACK still waits for its batch's `acks=-1` result. A failed or
+uncertain batch rejects its waiting operations; retrying the same logical ID is
+safe. The gateway preserves each socket's operation chain, and every message
+retains its chat partition key. Batch size does not change canonical storage or
+sequence assignment.
+
+### Optional diagnostic traces
+
+With `TRACE_MESSAGES=true`, received ACKs and live message frames may contain a
+server-generated `trace` object. Its values are epoch milliseconds. Diagnostic
+fields do not appear in canonical stored messages or history/sync results. Client
+frames cannot supply a trace object.
+
+| Field | Observation |
+| --- | --- |
+| `gatewayReceivedAt` | Origin gateway receives the frame |
+| `produceStartedAt` | Validated operation enters the durable publishing path |
+| `kafkaAcknowledgedAt` | Batch is acknowledged; carried on the received ACK |
+| `processorConsumedAt` | Consumer enters the fetched batch |
+| `processorStartedAt` | Processing starts for this record |
+| `sequenceStartedAt`, `sequenceAssignedAt` | Sequence allocation boundaries |
+| `mongoPersistStartedAt`, `mongoPersistedAt` | Canonical insert boundaries |
+| `redisPublishStartedAt` | Live publication begins for this recipient |
+| `gatewayPushedAt` | Recipient gateway submits the frame to its socket |
+
+Producer acknowledgement and processor consumption can overlap. Clock changes
+can invalidate cross-process spans. The benchmark reports omitted negative
+samples and the number of live traces behind each stage percentile; sync-based
+recovery can deliver a message without a live trace. See
+[performance measurement](PERFORMANCE.md) for timing and completeness rules.
+
 ## Receipts and read position (Phase 3)
 
 After ingesting a message, a client sends `{ "type": "delivered", "chatId": "...", "messageId": "..." }`. When the user reads through a position, it sends `{ "type": "read", "chatId": "...", "lastReadSeq": 12 }`. Read positions are monotonic and cannot exceed the chat's stored messages. Receipt updates are persisted and delivered to the original sender:

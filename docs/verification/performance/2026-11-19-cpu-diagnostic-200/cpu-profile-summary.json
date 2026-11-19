@@ -1,0 +1,637 @@
+[
+  {
+    "role": "gateway-1",
+    "file": "gateway-e6f35cd25d7e-1795085721003.cpuprofile",
+    "sampledMicroseconds": 356376122,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 116724218
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 50765210
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 26111150
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 12266013
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 10439952
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 8964405
+      },
+      {
+        "frame": "writeUtf8String :0",
+        "microseconds": 4172161
+      },
+      {
+        "frame": "KafkaJSError file:///app/node_modules/kafkajs/src/errors.js:5",
+        "microseconds": 4075483
+      },
+      {
+        "frame": "getElement file:///app/node_modules/mongodb/lib/cmap/wire_protocol/on_demand/document.js:57",
+        "microseconds": 3482927
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 3297433
+      },
+      {
+        "frame": "sendCommand file:///app/node_modules/mongodb/lib/cmap/connection.js:268",
+        "microseconds": 3077829
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/utils/lock.js:46",
+        "microseconds": 2839691
+      },
+      {
+        "frame": "sendWire file:///app/node_modules/mongodb/lib/cmap/connection.js:232",
+        "microseconds": 2735463
+      },
+      {
+        "frame": "prepareCommand file:///app/node_modules/mongodb/lib/cmap/connection.js:159",
+        "microseconds": 2707171
+      },
+      {
+        "frame": "command file:///app/node_modules/mongodb/lib/cmap/connection.js:331",
+        "microseconds": 2430681
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 2430679
+      },
+      {
+        "frame": "getBigInt64LE file:///app/node_modules/bson/lib/bson.cjs:486",
+        "microseconds": 2138764
+      },
+      {
+        "frame": "nextTick node:internal/process/task_queues:111",
+        "microseconds": 2038361
+      },
+      {
+        "frame": "nodes file:///app/node_modules/mongodb/lib/utils.js:552",
+        "microseconds": 1841089
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 1796825
+      },
+      {
+        "frame": "deserializeObject file:///app/node_modules/bson/lib/bson.cjs:3072",
+        "microseconds": 1503178
+      },
+      {
+        "frame": "emit node:events:466",
+        "microseconds": 1389113
+      },
+      {
+        "frame": "onData file:///app/node_modules/mongodb/lib/cmap/wire_protocol/on_data.js:12",
+        "microseconds": 1371751
+      },
+      {
+        "frame": "FastBuffer node:internal/buffer:956",
+        "microseconds": 1270284
+      },
+      {
+        "frame": "serializeInto file:///app/node_modules/bson/lib/bson.cjs:3751",
+        "microseconds": 1252819
+      },
+      {
+        "frame": "tryOperation file:///app/node_modules/mongodb/lib/operations/execute_operation.js:132",
+        "microseconds": 1250183
+      },
+      {
+        "frame": "getLibuvNow :0",
+        "microseconds": 1185512
+      },
+      {
+        "frame": "staleMetadata file:///app/node_modules/kafkajs/src/protocol/error.js:590",
+        "microseconds": 1177148
+      },
+      {
+        "frame": "AbstractCursor file:///app/node_modules/mongodb/lib/cursor/abstract_cursor.js:40",
+        "microseconds": 1083858
+      },
+      {
+        "frame": "runChecks file:///app/node_modules/zod/v4/core/schemas.js:34",
+        "microseconds": 1081477
+      }
+    ]
+  },
+  {
+    "role": "gateway-2",
+    "file": "gateway-a06dcbd4d623-1795085722482.cpuprofile",
+    "sampledMicroseconds": 355475963,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 138466961
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 27912477
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 19307447
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 18272116
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 8126173
+      },
+      {
+        "frame": "writeUtf8String :0",
+        "microseconds": 5067559
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 4182782
+      },
+      {
+        "frame": "writeOrBuffer node:internal/streams/writable:548",
+        "microseconds": 3808139
+      },
+      {
+        "frame": "endSession file:///app/node_modules/mongodb/lib/sessions.js:119",
+        "microseconds": 3242763
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 3132306
+      },
+      {
+        "frame": "maybeReadMore node:internal/streams/readable:857",
+        "microseconds": 3071630
+      },
+      {
+        "frame": "frame file:///app/packages/gateway/dist/runtime.js:289",
+        "microseconds": 2661882
+      },
+      {
+        "frame": "CursorResponse file:///app/node_modules/mongodb/lib/cmap/wire_protocol/responses.js:162",
+        "microseconds": 2461369
+      },
+      {
+        "frame": "toJSValue file:///app/node_modules/mongodb/lib/cmap/wire_protocol/on_demand/document.js:94",
+        "microseconds": 2211598
+      },
+      {
+        "frame": " file:///app/packages/gateway/dist/runtime.js:45",
+        "microseconds": 2117174
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 2067550
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 1997006
+      },
+      {
+        "frame": "_stackWithCauses file:///app/node_modules/pino-std-serializers/lib/err-helpers.js:46",
+        "microseconds": 1964166
+      },
+      {
+        "frame": "nextTick node:internal/process/task_queues:111",
+        "microseconds": 1858892
+      },
+      {
+        "frame": "getElement file:///app/node_modules/mongodb/lib/cmap/wire_protocol/on_demand/document.js:57",
+        "microseconds": 1852929
+      },
+      {
+        "frame": "writeString :0",
+        "microseconds": 1831009
+      },
+      {
+        "frame": "emit node:events:466",
+        "microseconds": 1798059
+      },
+      {
+        "frame": "deserializeObject file:///app/node_modules/bson/lib/bson.cjs:3072",
+        "microseconds": 1683356
+      },
+      {
+        "frame": "createUnsafeBuffer node:internal/buffer:1082",
+        "microseconds": 1666169
+      },
+      {
+        "frame": "FastBuffer node:internal/buffer:956",
+        "microseconds": 1624994
+      },
+      {
+        "frame": "handleSubscriberReply file:///app/node_modules/ioredis/built/DataHandler.js:77",
+        "microseconds": 1608985
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 1573050
+      },
+      {
+        "frame": "sendWire file:///app/node_modules/mongodb/lib/cmap/connection.js:232",
+        "microseconds": 1526205
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:317",
+        "microseconds": 1410132
+      },
+      {
+        "frame": "errSerializer file:///app/node_modules/pino-std-serializers/lib/err.js:11",
+        "microseconds": 1306846
+      }
+    ]
+  },
+  {
+    "role": "gateway-3",
+    "file": "gateway-dc759d172f8a-1795085723130.cpuprofile",
+    "sampledMicroseconds": 355287020,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 134569478
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 34776139
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 31184482
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 19593135
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 8554793
+      },
+      {
+        "frame": "writeUtf8String :0",
+        "microseconds": 5234500
+      },
+      {
+        "frame": "Readable.on node:internal/streams/readable:1127",
+        "microseconds": 4112790
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 3988919
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 2546201
+      },
+      {
+        "frame": "stddev :0",
+        "microseconds": 2420084
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 2099634
+      },
+      {
+        "frame": "writeString :0",
+        "microseconds": 1969695
+      },
+      {
+        "frame": "nextTick node:internal/process/task_queues:111",
+        "microseconds": 1884833
+      },
+      {
+        "frame": " :3",
+        "microseconds": 1839745
+      },
+      {
+        "frame": "frame file:///app/packages/gateway/dist/runtime.js:289",
+        "microseconds": 1832702
+      },
+      {
+        "frame": "tryOperation file:///app/node_modules/mongodb/lib/operations/execute_operation.js:132",
+        "microseconds": 1785611
+      },
+      {
+        "frame": "deserializeObject file:///app/node_modules/bson/lib/bson.cjs:3072",
+        "microseconds": 1667724
+      },
+      {
+        "frame": "FastBuffer node:internal/buffer:956",
+        "microseconds": 1534880
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 1466327
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 1464420
+      },
+      {
+        "frame": "send file:///app/node_modules/ws/lib/sender.js:354",
+        "microseconds": 1442673
+      },
+      {
+        "frame": "prepareCommand file:///app/node_modules/mongodb/lib/cmap/connection.js:159",
+        "microseconds": 1434402
+      },
+      {
+        "frame": "addChunk node:internal/streams/readable:550",
+        "microseconds": 1386516
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 1284003
+      },
+      {
+        "frame": "serializeObject file:///app/node_modules/bson/lib/bson.cjs:3598",
+        "microseconds": 1261350
+      },
+      {
+        "frame": "emit node:events:466",
+        "microseconds": 1212222
+      },
+      {
+        "frame": "onStreamRead node:internal/stream_base_commons:166",
+        "microseconds": 1200641
+      },
+      {
+        "frame": "sendWire file:///app/node_modules/mongodb/lib/cmap/connection.js:232",
+        "microseconds": 1185582
+      },
+      {
+        "frame": "sendCommand file:///app/node_modules/ioredis/built/Redis.js:338",
+        "microseconds": 1167478
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 1094418
+      }
+    ]
+  },
+  {
+    "role": "processor-1",
+    "file": "processor-3960312d232e-1795085724335.cpuprofile",
+    "sampledMicroseconds": 354624151,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 191150848
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 24410146
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 24251936
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 9386615
+      },
+      {
+        "frame": "writeUtf8String :0",
+        "microseconds": 8034927
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 7552670
+      },
+      {
+        "frame": "onStreamRead node:internal/stream_base_commons:166",
+        "microseconds": 5801641
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 4395477
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 3559067
+      },
+      {
+        "frame": "setTimeout node:timers:133",
+        "microseconds": 3022206
+      },
+      {
+        "frame": "evaluateLogLevel file:///app/node_modules/kafkajs/src/loggers/index.js:31",
+        "microseconds": 2599092
+      },
+      {
+        "frame": "writevGeneric node:internal/stream_base_commons:121",
+        "microseconds": 2266667
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 2035830
+      },
+      {
+        "frame": "getValueString file:///app/node_modules/prom-client/lib/util.js:3",
+        "microseconds": 2021858
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 1833226
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 1828906
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 1183198
+      },
+      {
+        "frame": "ConsumerGroup file:///app/node_modules/kafkajs/src/consumer/consumerGroup.js:64",
+        "microseconds": 1123680
+      },
+      {
+        "frame": "writeString :0",
+        "microseconds": 1098935
+      },
+      {
+        "frame": "cpuUsage :0",
+        "microseconds": 1021838
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/protocol/requests/index.js:87",
+        "microseconds": 971831
+      },
+      {
+        "frame": "Command file:///app/node_modules/ioredis/built/Command.js:37",
+        "microseconds": 948475
+      },
+      {
+        "frame": "deprecate node:internal/util:175",
+        "microseconds": 934832
+      },
+      {
+        "frame": "Runner file:///app/node_modules/kafkajs/src/consumer/runner.js:30",
+        "microseconds": 909489
+      },
+      {
+        "frame": "internalDeserialize file:///app/node_modules/bson/lib/bson.cjs:3050",
+        "microseconds": 892431
+      },
+      {
+        "frame": "seq file:///app/node_modules/kafkajs/src/utils/seq.js:6",
+        "microseconds": 832454
+      },
+      {
+        "frame": "FastBuffer node:internal/buffer:956",
+        "microseconds": 799836
+      },
+      {
+        "frame": "stddev :0",
+        "microseconds": 686653
+      },
+      {
+        "frame": "deserializeObject file:///app/node_modules/bson/lib/bson.cjs:3072",
+        "microseconds": 621525
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 599629
+      }
+    ]
+  },
+  {
+    "role": "processor-2",
+    "file": "processor-fd7b99bdfea8-1795085724983.cpuprofile",
+    "sampledMicroseconds": 354550232,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 208887731
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 23554381
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 17194959
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 7305764
+      },
+      {
+        "frame": "writeUtf8String :0",
+        "microseconds": 5543054
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 4944320
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 4347410
+      },
+      {
+        "frame": "3 file:///app/node_modules/kafkajs/src/protocol/requests/leaveGroup/index.js:26",
+        "microseconds": 3648331
+      },
+      {
+        "frame": "writeString :0",
+        "microseconds": 3185191
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 2303369
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 2014759
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 1990530
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 1907035
+      },
+      {
+        "frame": "encode file:///app/node_modules/kafkajs/src/protocol/requests/leaveGroup/v3/request.js:20",
+        "microseconds": 1893701
+      },
+      {
+        "frame": "close :0",
+        "microseconds": 1874590
+      },
+      {
+        "frame": "onStreamRead node:internal/stream_base_commons:166",
+        "microseconds": 1777504
+      },
+      {
+        "frame": "module.exports file:///app/node_modules/kafkajs/src/consumer/consumerGroup.js:196",
+        "microseconds": 1760379
+      },
+      {
+        "frame": "escapeLabelValue file:///app/node_modules/prom-client/lib/registry.js:228",
+        "microseconds": 1553017
+      },
+      {
+        "frame": "Socket._onTimeout node:net:591",
+        "microseconds": 1551339
+      },
+      {
+        "frame": "onCrash file:///app/node_modules/kafkajs/src/consumer/index.js:246",
+        "microseconds": 1358945
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 1280920
+      },
+      {
+        "frame": "serializeInto file:///app/node_modules/bson/lib/bson.cjs:3751",
+        "microseconds": 1050280
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:317",
+        "microseconds": 1031316
+      },
+      {
+        "frame": "Readable.push node:internal/streams/readable:387",
+        "microseconds": 1014243
+      },
+      {
+        "frame": "process file:///app/packages/processor/dist/messages.js:248",
+        "microseconds": 996936
+      },
+      {
+        "frame": "metrics file:///app/node_modules/prom-client/lib/registry.js:83",
+        "microseconds": 946288
+      },
+      {
+        "frame": "module.exports file:///app/node_modules/kafkajs/src/protocol/request.js:3",
+        "microseconds": 883334
+      },
+      {
+        "frame": "selectServer file:///app/node_modules/mongodb/lib/sdam/topology.js:253",
+        "microseconds": 846353
+      },
+      {
+        "frame": "writevGeneric node:internal/stream_base_commons:121",
+        "microseconds": 843468
+      },
+      {
+        "frame": "getLibuvNow :0",
+        "microseconds": 814939
+      }
+    ]
+  }
+]

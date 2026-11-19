@@ -11,6 +11,11 @@ const envSchema = z.object({
   LOG_LEVEL: z
     .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
     .default('info'),
+  TRACE_MESSAGES: z
+    .enum(['true', 'false'])
+    .default('false')
+    .transform((value) => value === 'true'),
+  CPU_PROFILE_DIR: z.string().default(''),
   KAFKA_BROKERS: z
     .string()
     .min(1)
@@ -23,6 +28,9 @@ const envSchema = z.object({
   KAFKA_PARTITIONS: z.coerce.number().int().min(6).default(6),
   KAFKA_REPLICATION_FACTOR: positiveInteger.default(1),
   KAFKA_REQUEST_TIMEOUT_MS: positiveInteger.default(30000),
+  KAFKA_BATCH_MAX_MESSAGES: positiveInteger.max(256).default(64),
+  KAFKA_BATCH_LINGER_MS: z.coerce.number().int().min(0).max(100).default(5),
+  PROCESSOR_PARTITION_CONCURRENCY: positiveInteger.max(64).default(6),
   REDIS_URL: z
     .string()
     .url()

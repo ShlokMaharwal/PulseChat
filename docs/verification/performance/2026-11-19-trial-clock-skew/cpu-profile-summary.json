@@ -1,0 +1,637 @@
+[
+  {
+    "role": "gateway-1",
+    "file": "gateway-f4b9b2b9ab7a-1795082218990.cpuprofile",
+    "sampledMicroseconds": 76153375,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 33578337
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 26683747
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 2762616
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 1296825
+      },
+      {
+        "frame": "readdir :0",
+        "microseconds": 986914
+      },
+      {
+        "frame": "escapeString file:///app/node_modules/prom-client/lib/registry.js:234",
+        "microseconds": 729561
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 610209
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 551359
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 450059
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 437002
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 401045
+      },
+      {
+        "frame": "internalModuleStat :0",
+        "microseconds": 337351
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 312867
+      },
+      {
+        "frame": "decode file:///app/node_modules/kafkajs/src/protocol/requests/produce/v6/response.js:19",
+        "microseconds": 303612
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 285271
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 231402
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:317",
+        "microseconds": 197039
+      },
+      {
+        "frame": "stddev :0",
+        "microseconds": 180857
+      },
+      {
+        "frame": "wrapSafe node:internal/modules/cjs/loader:1671",
+        "microseconds": 180694
+      },
+      {
+        "frame": "writevGeneric node:internal/stream_base_commons:121",
+        "microseconds": 176412
+      },
+      {
+        "frame": "get file:///app/node_modules/prom-client/lib/gauge.js:108",
+        "microseconds": 166739
+      },
+      {
+        "frame": "inst._zod.parse file:///app/node_modules/zod/v4/core/schemas.js:1199",
+        "microseconds": 155656
+      },
+      {
+        "frame": " node:internal/modules/cjs/loader:683",
+        "microseconds": 151241
+      },
+      {
+        "frame": "updateSequence file:///app/node_modules/kafkajs/src/producer/eosManager/index.js:214",
+        "microseconds": 140713
+      },
+      {
+        "frame": "readPackageJSON :0",
+        "microseconds": 122159
+      },
+      {
+        "frame": "nextTick node:internal/process/task_queues:111",
+        "microseconds": 118499
+      },
+      {
+        "frame": "_copyActual node:buffer:243",
+        "microseconds": 118331
+      },
+      {
+        "frame": "FastBuffer node:internal/buffer:956",
+        "microseconds": 118061
+      },
+      {
+        "frame": "send file:///app/packages/gateway/dist/runtime.js:94",
+        "microseconds": 117749
+      },
+      {
+        "frame": " :3",
+        "microseconds": 100617
+      }
+    ]
+  },
+  {
+    "role": "gateway-2",
+    "file": "gateway-ec8f69893367-1795082222551.cpuprofile",
+    "sampledMicroseconds": 73524406,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 45682286
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 15230334
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 4573243
+      },
+      {
+        "frame": "stddev :0",
+        "microseconds": 973057
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 952297
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 882994
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 412789
+      },
+      {
+        "frame": "writevGeneric node:internal/stream_base_commons:121",
+        "microseconds": 346866
+      },
+      {
+        "frame": "writeString :0",
+        "microseconds": 336562
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 289252
+      },
+      {
+        "frame": "onParserExecuteCommon node:_http_server:947",
+        "microseconds": 263136
+      },
+      {
+        "frame": "boundedCheck file:///app/packages/shared/dist/health.js:12",
+        "microseconds": 213190
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 206150
+      },
+      {
+        "frame": "readFileUtf8 :0",
+        "microseconds": 193225
+      },
+      {
+        "frame": "enqueue node:internal/perf/observe:391",
+        "microseconds": 176058
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 169374
+      },
+      {
+        "frame": "getValueString file:///app/node_modules/prom-client/lib/util.js:3",
+        "microseconds": 168742
+      },
+      {
+        "frame": "mean :0",
+        "microseconds": 145200
+      },
+      {
+        "frame": "escapeString file:///app/node_modules/prom-client/lib/registry.js:234",
+        "microseconds": 144020
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 141415
+      },
+      {
+        "frame": "deserializeObject file:///app/node_modules/bson/lib/bson.cjs:3072",
+        "microseconds": 140563
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 138036
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 133863
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:317",
+        "microseconds": 133338
+      },
+      {
+        "frame": "_addListener node:events:547",
+        "microseconds": 120486
+      },
+      {
+        "frame": "processTicksAndRejections node:internal/process/task_queues:71",
+        "microseconds": 120033
+      },
+      {
+        "frame": "getOrSetAsyncId node:internal/async_hooks:429",
+        "microseconds": 90646
+      },
+      {
+        "frame": "setTimeout node:timers:133",
+        "microseconds": 89539
+      },
+      {
+        "frame": " file:///app/node_modules/prom-client/lib/metrics/osMemoryHeapLinux.js:13",
+        "microseconds": 75993
+      },
+      {
+        "frame": "ServerResponse node:_http_server:197",
+        "microseconds": 61362
+      }
+    ]
+  },
+  {
+    "role": "gateway-3",
+    "file": "gateway-574dfdf49d93-1795082223539.cpuprofile",
+    "sampledMicroseconds": 73582039,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 36008066
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 21959260
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 4537387
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 1760502
+      },
+      {
+        "frame": "frame file:///app/packages/gateway/dist/runtime.js:289",
+        "microseconds": 430179
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 424999
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 343660
+      },
+      {
+        "frame": "writevGeneric node:internal/stream_base_commons:121",
+        "microseconds": 316849
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 309017
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 308486
+      },
+      {
+        "frame": "produce file:///app/node_modules/kafkajs/src/broker/index.js:231",
+        "microseconds": 307626
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 282266
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 254143
+      },
+      {
+        "frame": "addMultipleTargetTopics file:///app/node_modules/kafkajs/src/cluster/index.js:216",
+        "microseconds": 227970
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 205832
+      },
+      {
+        "frame": "FastBuffer node:internal/buffer:956",
+        "microseconds": 188930
+      },
+      {
+        "frame": "tryOperation file:///app/node_modules/mongodb/lib/operations/execute_operation.js:132",
+        "microseconds": 179242
+      },
+      {
+        "frame": "getValueString file:///app/node_modules/prom-client/lib/util.js:3",
+        "microseconds": 166752
+      },
+      {
+        "frame": "get file:///app/node_modules/mongodb/lib/cmap/wire_protocol/responses.js:50",
+        "microseconds": 152347
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 142687
+      },
+      {
+        "frame": "nextTick node:internal/process/task_queues:111",
+        "microseconds": 141835
+      },
+      {
+        "frame": "formatLabels file:///app/node_modules/prom-client/lib/registry.js:205",
+        "microseconds": 137630
+      },
+      {
+        "frame": "isErrorLike file:///app/node_modules/pino-std-serializers/lib/err-helpers.js:8",
+        "microseconds": 137484
+      },
+      {
+        "frame": "Writable.uncork node:internal/streams/writable:520",
+        "microseconds": 132104
+      },
+      {
+        "frame": "metrics file:///app/node_modules/prom-client/lib/registry.js:83",
+        "microseconds": 121996
+      },
+      {
+        "frame": "stddev :0",
+        "microseconds": 116349
+      },
+      {
+        "frame": "convertBufferToString file:///app/node_modules/ioredis/built/utils/index.js:23",
+        "microseconds": 115806
+      },
+      {
+        "frame": "dispatch :0",
+        "microseconds": 112069
+      },
+      {
+        "frame": "setTimeout node:timers:133",
+        "microseconds": 110061
+      },
+      {
+        "frame": "Duplex node:internal/streams/duplex:64",
+        "microseconds": 107345
+      }
+    ]
+  },
+  {
+    "role": "processor-1",
+    "file": "processor-08269483db32-1795082223887.cpuprofile",
+    "sampledMicroseconds": 73619877,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 39563551
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 10043406
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 6088136
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 3650256
+      },
+      {
+        "frame": "closeHandler file:///app/node_modules/mongodb/lib/cmap/wire_protocol/on_data.js:98",
+        "microseconds": 1167410
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 1065528
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 968338
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 953539
+      },
+      {
+        "frame": "FastBuffer node:internal/buffer:956",
+        "microseconds": 798046
+      },
+      {
+        "frame": "isConnected file:///app/node_modules/kafkajs/src/network/connection.js:101",
+        "microseconds": 602261
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:317",
+        "microseconds": 540670
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 519434
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 509690
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 488118
+      },
+      {
+        "frame": "setTimeout node:timers:133",
+        "microseconds": 454355
+      },
+      {
+        "frame": "mean :0",
+        "microseconds": 447409
+      },
+      {
+        "frame": "formatLabels file:///app/node_modules/prom-client/lib/registry.js:205",
+        "microseconds": 325432
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/protocol/requests/listOffsets/v2/response.js:37",
+        "microseconds": 301948
+      },
+      {
+        "frame": "checkInt node:internal/buffer:60",
+        "microseconds": 262810
+      },
+      {
+        "frame": " file:///app/node_modules/prom-client/lib/metrics/osMemoryHeapLinux.js:14",
+        "microseconds": 256328
+      },
+      {
+        "frame": "check file:///app/packages/shared/dist/dependencies.js:52",
+        "microseconds": 240479
+      },
+      {
+        "frame": "getLibuvNow :0",
+        "microseconds": 211721
+      },
+      {
+        "frame": "metrics file:///app/node_modules/prom-client/lib/registry.js:83",
+        "microseconds": 165328
+      },
+      {
+        "frame": "get file:///app/node_modules/prom-client/lib/gauge.js:108",
+        "microseconds": 159934
+      },
+      {
+        "frame": "readBytes file:///app/node_modules/kafkajs/src/protocol/decoder.js:130",
+        "microseconds": 157870
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 151958
+      },
+      {
+        "frame": "escapeString file:///app/node_modules/prom-client/lib/registry.js:234",
+        "microseconds": 145855
+      },
+      {
+        "frame": "unenroll node:timers:75",
+        "microseconds": 131962
+      },
+      {
+        "frame": "writevGeneric node:internal/stream_base_commons:121",
+        "microseconds": 104798
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 104460
+      }
+    ]
+  },
+  {
+    "role": "processor-2",
+    "file": "processor-72200a8fd03b-1795082225120.cpuprofile",
+    "sampledMicroseconds": 73491352,
+    "topSelfTime": [
+      {
+        "frame": "(idle) :0",
+        "microseconds": 33902589
+      },
+      {
+        "frame": "post node:inspector:118",
+        "microseconds": 9395719
+      },
+      {
+        "frame": "(program) :0",
+        "microseconds": 5880226
+      },
+      {
+        "frame": "(garbage collector) :0",
+        "microseconds": 2533842
+      },
+      {
+        "frame": "writeBuffer :0",
+        "microseconds": 1527797
+      },
+      {
+        "frame": "processTimers node:internal/timers:506",
+        "microseconds": 1033885
+      },
+      {
+        "frame": "listOnTimeout node:internal/timers:526",
+        "microseconds": 736467
+      },
+      {
+        "frame": "insert node:internal/timers:367",
+        "microseconds": 708958
+      },
+      {
+        "frame": "writeUtf8String :0",
+        "microseconds": 706842
+      },
+      {
+        "frame": "_addListener node:events:547",
+        "microseconds": 676235
+      },
+      {
+        "frame": "stddev :0",
+        "microseconds": 652985
+      },
+      {
+        "frame": "buildCommand file:///app/node_modules/mongodb/lib/operations/command.js:52",
+        "microseconds": 548870
+      },
+      {
+        "frame": "writevGeneric node:internal/stream_base_commons:121",
+        "microseconds": 523925
+      },
+      {
+        "frame": "scheduleCheckPendingRequests file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:306",
+        "microseconds": 467757
+      },
+      {
+        "frame": "getMetricsAsString file:///app/node_modules/prom-client/lib/registry.js:31",
+        "microseconds": 460621
+      },
+      {
+        "frame": "runMicrotasks :0",
+        "microseconds": 458092
+      },
+      {
+        "frame": " :3",
+        "microseconds": 427895
+      },
+      {
+        "frame": "buildCommandDocument file:///app/node_modules/mongodb/lib/operations/update.js:32",
+        "microseconds": 413017
+      },
+      {
+        "frame": "writev :0",
+        "microseconds": 380830
+      },
+      {
+        "frame": " file:///app/node_modules/prom-client/lib/histogram.js:232",
+        "microseconds": 345643
+      },
+      {
+        "frame": "lookupAndConnect node:net:1311",
+        "microseconds": 301097
+      },
+      {
+        "frame": "require node:internal/modules/helpers:146",
+        "microseconds": 296383
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:91",
+        "microseconds": 294705
+      },
+      {
+        "frame": "executeOperation file:///app/node_modules/mongodb/lib/operations/execute_operation.js:34",
+        "microseconds": 273547
+      },
+      {
+        "frame": "formatLabels file:///app/node_modules/prom-client/lib/registry.js:205",
+        "microseconds": 269427
+      },
+      {
+        "frame": "setTimeout node:timers:133",
+        "microseconds": 255665
+      },
+      {
+        "frame": "metrics file:///app/node_modules/prom-client/lib/registry.js:83",
+        "microseconds": 251549
+      },
+      {
+        "frame": " file:///app/node_modules/kafkajs/src/network/requestQueue/index.js:317",
+        "microseconds": 242253
+      },
+      {
+        "frame": "hashObject file:///app/node_modules/prom-client/lib/util.js:88",
+        "microseconds": 205286
+      },
+      {
+        "frame": " file:///app/node_modules/mongodb/lib/cmap/connection_pool.js:147",
+        "microseconds": 202683
+      }
+    ]
+  }
+]

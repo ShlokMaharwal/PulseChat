@@ -4,6 +4,18 @@ import { Counter, Gauge, Histogram, type Registry } from 'prom-client';
 export function applicationMetrics(registry: Registry) {
   const registers = [registry];
   return {
+    producerQueued: new Gauge({
+      name: 'pulsechat_producer_queued_records',
+      help: 'Records queued for the next durable Kafka produce batch',
+      registers,
+    }),
+    producerBatch: new Histogram({
+      name: 'pulsechat_producer_batch_records',
+      help: 'Records per topic in each attempted durable Kafka batch',
+      labelNames: ['topic'] as const,
+      buckets: [1, 2, 4, 8, 16, 32, 64, 128, 256],
+      registers,
+    }),
     connections: new Gauge({
       name: 'pulsechat_active_connections',
       help: 'Open authenticated WebSocket connections',
@@ -12,6 +24,11 @@ export function applicationMetrics(registry: Registry) {
     incoming: new Counter({
       name: 'pulsechat_messages_in_total',
       help: 'Gateway message attempts or processor-consumed message records, including replay',
+      registers,
+    }),
+    inflight: new Gauge({
+      name: 'pulsechat_inflight_operations',
+      help: 'Gateway WebSocket operations awaiting validation, persistence handoff, or response',
       registers,
     }),
     outgoing: new Counter({
@@ -37,6 +54,22 @@ export function applicationMetrics(registry: Registry) {
       buckets: [
         0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30, 60,
       ],
+      registers,
+    }),
+    stage: new Histogram({
+      name: 'pulsechat_pipeline_stage_seconds',
+      help: 'Pipeline stage duration; produce ACK and consume timing overlap and must not be summed',
+      labelNames: ['stage'] as const,
+      buckets: [
+        0.0001, 0.0005, 0.001, 0.0025, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5,
+        1, 2.5, 5, 10, 30, 60, 120,
+      ],
+      registers,
+    }),
+    clockSkew: new Counter({
+      name: 'pulsechat_pipeline_clock_skew_total',
+      help: 'Nonfinite or negative cross-process stage samples omitted from latency histograms',
+      labelNames: ['stage'] as const,
       registers,
     }),
     dedupe: new Counter({

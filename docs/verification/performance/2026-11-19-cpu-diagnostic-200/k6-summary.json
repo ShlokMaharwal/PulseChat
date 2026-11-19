@@ -1,0 +1,288 @@
+{
+  "options": {
+    "noColor": false,
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(50)",
+      "p(95)",
+      "p(99)"
+    ],
+    "summaryTimeUnit": ""
+  },
+  "state": {
+    "isStdOutTTY": false,
+    "isStdErrTTY": false,
+    "testRunDurationMs": 143437.194072
+  },
+  "metrics": {
+    "ws_msgs_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 3654,
+        "rate": 25.47456413687116
+      }
+    },
+    "socket_errors": {
+      "values": {
+        "rate": 0.43921662304950276,
+        "count": 63
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "ws_sessions": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 200,
+        "rate": 1.3943384858714374
+      }
+    },
+    "ordering_violations": {
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "generator_scheduler_delay_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 167.9587912087912,
+        "min": 0,
+        "med": 23,
+        "max": 4809,
+        "p(50)": 23,
+        "p(95)": 717.7999999999997,
+        "p(99)": 1921.5900000000006
+      }
+    },
+    "connections_opened": {
+      "contains": "default",
+      "values": {
+        "count": 200,
+        "rate": 1.3943384858714374
+      },
+      "type": "counter"
+    },
+    "ws_msgs_sent": {
+      "contains": "default",
+      "values": {
+        "rate": 29.023155583413967,
+        "count": 4163
+      },
+      "type": "counter"
+    },
+    "delivery_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(99)": 95567.02,
+        "avg": 40707.77011494253,
+        "min": 2776,
+        "med": 37190,
+        "max": 97152,
+        "p(50)": 37190,
+        "p(95)": 85203.2
+      }
+    },
+    "sync_requests": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1594,
+        "rate": 11.112877732395356
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 4,
+        "rate": 0.027886769717428747
+      }
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 200,
+        "fails": 0
+      },
+      "thresholds": {
+        "rate>0.99": {
+          "ok": true
+        }
+      }
+    },
+    "rate_rejections": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 4,
+        "min": 0,
+        "max": 4
+      }
+    },
+    "messages_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 5.772561331507751,
+        "count": 828
+      }
+    },
+    "messages_received_acked": {
+      "values": {
+        "count": 263,
+        "rate": 1.83355510892094
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "vus": {
+      "contains": "default",
+      "values": {
+        "max": 4,
+        "value": 3,
+        "min": 0
+      },
+      "type": "gauge"
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 529030,
+        "rate": 3688.2344459028322
+      }
+    },
+    "messages_confirmed": {
+      "contains": "default",
+      "values": {
+        "count": 87,
+        "rate": 0.6065372413540753
+      },
+      "thresholds": {
+        "count>0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "duplicate_wire_frames": {
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "data_received": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 2530949,
+        "rate": 17644.99798238914
+      }
+    },
+    "ws_session_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(50)": 115694.539671,
+        "p(95)": 137309.60634455,
+        "p(99)": 139327.04493006,
+        "avg": 114305.11942113498,
+        "min": 96720.467553,
+        "med": 115694.539671,
+        "max": 140657.975378
+      }
+    },
+    "ws_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(99)": 35110.06296861,
+        "avg": 13095.007088915003,
+        "min": 51.717626,
+        "med": 3038.726444,
+        "max": 35329.636401,
+        "p(50)": 3038.726444,
+        "p(95)": 34339.53408315
+      }
+    },
+    "received_ack_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 33029.65134099617,
+        "min": 1585,
+        "med": 32629,
+        "max": 92118,
+        "p(50)": 32629,
+        "p(95)": 71278,
+        "p(99)": 87425.39999999997
+      }
+    },
+    "iteration_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(50)": 143043.180504,
+        "p(95)": 143191.69313149998,
+        "p(99)": 143212.1191751,
+        "avg": 140542.34275649997,
+        "min": 132865.784332,
+        "med": 143043.180504,
+        "max": 143217.225686
+      }
+    }
+  },
+  "setup_data": {
+    "closesAt": 1795085852866,
+    "sendsEndAt": 1795085792866,
+    "startsAt": 1795085747866,
+    "steadyStartAt": 1795085762866
+  },
+  "root_group": {
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [],
+    "checks": [
+        {
+          "fails": 0,
+          "name": "Authenticated welcome received",
+          "path": "::Authenticated welcome received",
+          "id": "f291411d292ee3e36a4231d25b6c37db",
+          "passes": 200
+        }
+      ],
+    "name": ""
+  }
+}

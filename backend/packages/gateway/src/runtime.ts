@@ -11,6 +11,9 @@ import {
   consumeToken,
   UserRouter,
   applicationMetrics,
+  timestamp,
+  observeStage,
+  DurableProducerBatch,
   type ClientFrame,
   type ServerFrame,
   type ServiceContext,
@@ -43,6 +46,7 @@ class GatewayRuntime {
   private readonly chats;
   private readonly http;
   private readonly producer;
+  private readonly batcher;
   private readonly subscriber;
   private readonly sockets = new Map<string, Set<Connection>>();
   private readonly socketState = new WeakMap<WebSocket, Connection>();
@@ -64,6 +68,7 @@ class GatewayRuntime {
       dependencies.redis,
       config.INSTANCE_ID,
       config.PRESENCE_TTL_SECONDS,
+      (stage, start, end) => observeStage(this.metrics, stage, start, end),
     );
     this.http = new GatewayHttpApi(
       this.auth,
@@ -75,6 +80,13 @@ class GatewayRuntime {
     this.producer = dependencies.kafka.producer({
       idempotent: true,
       maxInFlightRequests: 1,
+    });
+    this.batcher = new DurableProducerBatch(this.producer, {
+      maxMessages: config.KAFKA_BATCH_MAX_MESSAGES,
+      lingerMs: config.KAFKA_BATCH_LINGER_MS,
+      queued: (count) => this.metrics.producerQueued.set(count),
+      batch: (topic, count) =>
+        this.metrics.producerBatch.observe({ topic }, count),
     });
     this.subscriber = dependencies.redis.duplicate({ lazyConnect: true });
     this.subscriber.on('error', (err) => {
@@ -151,9 +163,9 @@ class GatewayRuntime {
 
   private send(socket: WebSocket, frame: ServerFrame) {
     if (socket.readyState !== WebSocket.OPEN) return;
-    const encoded = JSON.stringify(frame);
     const connection = this.socketState.get(socket);
     if (connection && !connection.ready && frame.type !== 'welcome') {
+      const encoded = JSON.stringify(frame);
       connection.outgoingBytes += Buffer.byteLength(encoded);
       if (
         connection.outgoingBytes > this.context.config.MAX_SOCKET_BUFFER_BYTES
@@ -162,6 +174,18 @@ class GatewayRuntime {
       else connection.outgoing.push(frame);
       return;
     }
+    if (frame.type === 'message' && frame.trace) {
+      const pushed = timestamp();
+      if (frame.trace.redisPublishStartedAt !== undefined)
+        observeStage(
+          this.metrics,
+          'publish_to_gateway_push',
+          frame.trace.redisPublishStartedAt,
+          pushed,
+        );
+      frame = { ...frame, trace: { ...frame.trace, gatewayPushedAt: pushed } };
+    }
+    const encoded = JSON.stringify(frame);
     if (
       socket.bufferedAmount + Buffer.byteLength(encoded) >
       this.context.config.MAX_SOCKET_BUFFER_BYTES
@@ -287,6 +311,7 @@ class GatewayRuntime {
       this.trackCleanup(this.refresh(connection));
     });
     socket.on('message', (data, binary) => {
+      const receivedAt = timestamp();
       if (this.closing) {
         this.send(socket, {
           type: 'error',
@@ -329,7 +354,7 @@ class GatewayRuntime {
         /* Schema validation reports malformed JSON below. */
       }
       const operation = (control ? connection.control : connection.chain)
-        .then(() => this.frame(connection, data, admission))
+        .then(() => this.frame(connection, data, admission, receivedAt))
         .catch((err: unknown) => {
           this.context.logger.error({ err, userId }, 'Socket operation failed');
           this.send(socket, {
@@ -342,10 +367,12 @@ class GatewayRuntime {
         .finally(() => {
           connection.pending--;
           this.inFlight.delete(operation);
+          this.metrics.inflight.set(this.inFlight.size);
         });
       if (control) connection.control = operation;
       else connection.chain = operation;
       this.inFlight.add(operation);
+      this.metrics.inflight.set(this.inFlight.size);
     });
   }
 
@@ -353,6 +380,7 @@ class GatewayRuntime {
     connection: Connection,
     data: RawData,
     admission?: ReturnType<typeof consumeToken>,
+    receivedAt = timestamp(),
   ) {
     if (Date.now() >= connection.expiresAt) {
       connection.socket.close(4001, 'Token expired');
@@ -453,24 +481,19 @@ class GatewayRuntime {
           'Client receipt accepted',
         );
         if (seq)
-          await this.producer.send({
-            topic: 'receipts',
-            acks: -1,
-            messages: [
-              {
-                key: frame.chatId,
-                value: JSON.stringify({
-                  type: 'receipt_event',
-                  chatId: frame.chatId,
-                  userId: connection.userId,
-                  status: frame.type,
-                  seq,
-                  timestamp: new Date().toISOString(),
-                  ...(message ? { messageCreatedAt: message.createdAt } : {}),
-                }),
-              },
-            ],
-          });
+          await this.batcher.send(
+            'receipts',
+            frame.chatId,
+            JSON.stringify({
+              type: 'receipt_event',
+              chatId: frame.chatId,
+              userId: connection.userId,
+              status: frame.type,
+              seq,
+              timestamp: new Date().toISOString(),
+              ...(message ? { messageCreatedAt: message.createdAt } : {}),
+            }),
+          );
         return;
       }
       if (frame.type !== 'message')
@@ -489,6 +512,16 @@ class GatewayRuntime {
           'CONFLICT',
           'clientMsgId belongs to a different message',
         );
+      const produceStartedAt = timestamp();
+      observeStage(
+        this.metrics,
+        'gateway_prepare',
+        receivedAt,
+        produceStartedAt,
+      );
+      const trace = config.TRACE_MESSAGES
+        ? { gatewayReceivedAt: receivedAt, produceStartedAt }
+        : undefined;
       const record = kafkaMessageSchema.parse({
         messageId,
         clientMsgId: frame.clientMsgId,
@@ -497,12 +530,16 @@ class GatewayRuntime {
         senderId: connection.userId,
         recipientIds: chat.memberIds,
         createdAt: new Date().toISOString(),
+        ...(trace ? { trace } : {}),
       });
-      await this.producer.send({
-        topic: 'messages',
-        acks: -1,
-        messages: [{ key: frame.chatId, value: JSON.stringify(record) }],
-      });
+      await this.batcher.send('messages', frame.chatId, JSON.stringify(record));
+      const kafkaAcknowledgedAt = timestamp();
+      observeStage(
+        this.metrics,
+        'kafka_produce_ack',
+        produceStartedAt,
+        kafkaAcknowledgedAt,
+      );
       this.context.logger.info(
         { messageId, chatId: frame.chatId, userId: connection.userId },
         'Message accepted by Kafka',
@@ -511,6 +548,7 @@ class GatewayRuntime {
         type: 'ack',
         clientMsgId: frame.clientMsgId,
         status: 'received',
+        ...(trace ? { trace: { ...trace, kafkaAcknowledgedAt } } : {}),
       });
     } catch (err) {
       const code =
@@ -595,6 +633,7 @@ class GatewayRuntime {
     await closed;
     clearTimeout(deadline);
     await Promise.allSettled([...this.cleanup]);
+    await this.batcher.close();
     await this.producer.disconnect();
     this.subscriber.disconnect();
   }

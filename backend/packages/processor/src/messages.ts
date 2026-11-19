@@ -6,6 +6,9 @@ import {
   deadLetterSchema,
   UserRouter,
   applicationMetrics,
+  timestamp,
+  observeStage,
+  type PipelineTrace,
   type ReceiptEvent,
   type ChatReceiptRecord,
   type ServiceContext,
@@ -46,6 +49,7 @@ export class MessageProcessor {
       context.dependencies.redis,
       context.config.INSTANCE_ID,
       context.config.PRESENCE_TTL_SECONDS,
+      (stage, start, end) => observeStage(this.metrics, stage, start, end),
     );
     this.consumer.on(this.consumer.events.GROUP_JOIN, () => {
       this.active = true;
@@ -69,7 +73,8 @@ export class MessageProcessor {
     await this.consumer.run({
       autoCommit: false,
       eachBatchAutoResolve: false,
-      partitionsConsumedConcurrently: 3,
+      partitionsConsumedConcurrently:
+        this.context.config.PROCESSOR_PARTITION_CONCURRENCY,
       eachBatch: (payload) => this.batch(payload),
     });
     const poll = () => {
@@ -130,6 +135,7 @@ export class MessageProcessor {
     isRunning,
     isStale,
   }: EachBatchPayload) {
+    const consumedAt = timestamp();
     let nextOffset: string | undefined;
     for (const record of batch.messages) {
       if (!isRunning() || isStale()) break;
@@ -148,6 +154,7 @@ export class MessageProcessor {
         record,
         heartbeat,
         () => isRunning() && !isStale(),
+        consumedAt,
       );
       if (!completed) break;
       resolveOffset(record.offset);
@@ -168,6 +175,7 @@ export class MessageProcessor {
     record: KafkaMessage,
     heartbeat: () => Promise<void>,
     running: () => boolean,
+    consumedAt: number,
   ) {
     const attempts = this.context.config.PROCESSING_MAX_RETRIES + 1;
     const result = await retryOperation({
@@ -188,7 +196,7 @@ export class MessageProcessor {
         if (record.key?.toString('utf8') !== event.chatId)
           throw new Error('Kafka partition key does not match chatId');
         if ('type' in event) await this.receipt(event);
-        else await this.process(event, heartbeat);
+        else await this.process(event, heartbeat, consumedAt);
       },
       failed: (error, attempt) => {
         this.context.logger.warn(
@@ -248,25 +256,36 @@ export class MessageProcessor {
       .findOne({ id: event.chatId, memberIds: event.userId });
     if (!chat) throw new Error('Receipt user is not a chat member');
     const collection = db.collection<ChatReceiptRecord>('chat_receipts');
-    const previous = await collection.findOne({
-      chatId: event.chatId,
-      userId: event.userId,
-    });
-    const current =
-      event.status === 'read' ? previous?.readSeq : previous?.deliveredSeq;
-    if ((current ?? 0) >= event.seq) return;
-    await collection.updateOne(
+    const cursorField = event.status === 'read' ? 'readSeq' : 'deliveredSeq';
+    const previous = await collection.findOneAndUpdate(
       { chatId: event.chatId, userId: event.userId },
-      {
-        $max: {
-          deliveredSeq: event.seq,
-          readSeq: event.status === 'read' ? event.seq : 0,
+      [
+        {
+          $set: {
+            chatId: { $literal: event.chatId },
+            userId: { $literal: event.userId },
+            deliveredSeq: {
+              $max: [{ $ifNull: ['$deliveredSeq', 0] }, event.seq],
+            },
+            readSeq: {
+              $max: [
+                { $ifNull: ['$readSeq', 0] },
+                event.status === 'read' ? event.seq : 0,
+              ],
+            },
+            updatedAt: {
+              $cond: [
+                { $lt: [{ $ifNull: ['$' + cursorField, 0] }, event.seq] },
+                { $literal: event.timestamp },
+                '$updatedAt',
+              ],
+            },
+          },
         },
-        $set: { updatedAt: event.timestamp },
-        $setOnInsert: { chatId: event.chatId, userId: event.userId },
-      },
-      { upsert: true },
+      ],
+      { upsert: true, returnDocument: 'before', includeResultMetadata: false },
     );
+    if ((previous?.[cursorField] ?? 0) >= event.seq) return;
     if (event.status === 'delivered' && event.messageCreatedAt)
       this.metrics.delivery.observe(
         Math.max(
@@ -284,20 +303,23 @@ export class MessageProcessor {
       },
       'Receipt persisted',
     );
-    for (const userId of chat.memberIds)
-      await this.publish(userId, {
-        type: 'receipt',
-        chatId: event.chatId,
-        userId: event.userId,
-        status: event.status,
-        seq: event.seq,
-        timestamp: event.timestamp,
-      }).catch((err: unknown) =>
-        this.context.logger.warn(
-          { err, chatId: event.chatId, userId },
-          'Receipt live delivery unavailable',
+    await Promise.all(
+      chat.memberIds.map((userId) =>
+        this.publish(userId, {
+          type: 'receipt',
+          chatId: event.chatId,
+          userId: event.userId,
+          status: event.status,
+          seq: event.seq,
+          timestamp: event.timestamp,
+        }).catch((err: unknown) =>
+          this.context.logger.warn(
+            { err, chatId: event.chatId, userId },
+            'Receipt live delivery unavailable',
+          ),
         ),
-      );
+      ),
+    );
   }
 
   private assertSame(existing: StoredMessage, incoming: InputMessage) {
@@ -328,7 +350,22 @@ export class MessageProcessor {
   async process(
     input: InputMessage,
     heartbeat: () => Promise<void> = async () => undefined,
+    consumedAt = timestamp(),
   ) {
+    const processorStartedAt = timestamp();
+    observeStage(
+      this.metrics,
+      'partition_queue',
+      consumedAt,
+      processorStartedAt,
+    );
+    if (input.trace)
+      observeStage(
+        this.metrics,
+        'kafka_to_processor',
+        input.trace.produceStartedAt,
+        consumedAt,
+      );
     const { db } = this.context.dependencies;
     const messages = db.collection<StoredMessage>('messages');
     const existingRecord = await messages.findOne(
@@ -355,10 +392,24 @@ export class MessageProcessor {
       );
       return existing;
     }
+    const sequenceStartedAt = timestamp();
+    observeStage(
+      this.metrics,
+      'processor_prepare',
+      processorStartedAt,
+      sequenceStartedAt,
+    );
     const seq = await this.allocator.assign(
       input.chatId,
       input.messageId,
       heartbeat,
+    );
+    const sequenceAssignedAt = timestamp();
+    observeStage(
+      this.metrics,
+      'sequence_assign',
+      sequenceStartedAt,
+      sequenceAssignedAt,
     );
     let message: StoredMessage = {
       messageId: input.messageId,
@@ -370,6 +421,7 @@ export class MessageProcessor {
       seq,
     };
     let inserted = true;
+    const mongoPersistStartedAt = timestamp();
     try {
       // The driver may add _id to its argument; keep it out of the wire object.
       await messages.insertOne({ ...message });
@@ -391,6 +443,24 @@ export class MessageProcessor {
       inserted = false;
       this.metrics.dedupe.inc();
     }
+    const mongoPersistedAt = timestamp();
+    observeStage(
+      this.metrics,
+      'mongo_persist',
+      mongoPersistStartedAt,
+      mongoPersistedAt,
+    );
+    const trace: PipelineTrace | undefined = input.trace
+      ? {
+          ...input.trace,
+          processorConsumedAt: consumedAt,
+          processorStartedAt,
+          sequenceStartedAt,
+          sequenceAssignedAt,
+          mongoPersistStartedAt,
+          mongoPersistedAt,
+        }
+      : undefined;
     this.context.logger.info(
       {
         messageId: message.messageId,
@@ -409,15 +479,20 @@ export class MessageProcessor {
     );
     if (inserted) {
       this.metrics.outgoing.inc();
-      for (const recipientId of new Set(input.recipientIds)) {
-        await this.publish(recipientId, { type: 'message', ...message }).catch(
-          (err: unknown) =>
+      await Promise.all(
+        [...new Set(input.recipientIds)].map((recipientId) =>
+          this.publish(recipientId, {
+            type: 'message',
+            ...message,
+            ...(trace ? { trace } : {}),
+          }).catch((err: unknown) =>
             this.context.logger.warn(
               { err, messageId: message.messageId, userId: recipientId },
               'Live delivery unavailable',
             ),
-        );
-      }
+          ),
+        ),
+      );
     }
     return message;
   }

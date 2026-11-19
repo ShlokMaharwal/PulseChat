@@ -1,0 +1,48 @@
+{
+  "id": "d2481a47",
+  "commandCode": "const fs=require('fs');const {performance}=require('perf_hooks');const line=JSON.stringify({event:'io_probe',body:'x'.repeat(480)})+'\\n';for(let r=0;r<3;r++){for(const path of (r%2?['/windows','/native']:['/native','/windows'])){const fd=fs.openSync(path+'/probe-'+r+'.jsonl','w');const start=performance.now();for(let i=0;i<300;i++)fs.writeSync(fd,line);fs.closeSync(fd);console.log(JSON.stringify({path,repeat:r,writes:300,bytesPerWrite:Buffer.byteLength(line),elapsedMs:performance.now()-start}));}}",
+  "samples": [
+    {
+      "path": "/native",
+      "repeat": 0,
+      "writes": 300,
+      "bytesPerWrite": 511,
+      "elapsedMs": 12.735423999999966
+    },
+    {
+      "path": "/windows",
+      "repeat": 0,
+      "writes": 300,
+      "bytesPerWrite": 511,
+      "elapsedMs": 902.085494
+    },
+    {
+      "path": "/windows",
+      "repeat": 1,
+      "writes": 300,
+      "bytesPerWrite": 511,
+      "elapsedMs": 759.773647
+    },
+    {
+      "path": "/native",
+      "repeat": 1,
+      "writes": 300,
+      "bytesPerWrite": 511,
+      "elapsedMs": 6.173962999999958
+    },
+    {
+      "path": "/native",
+      "repeat": 2,
+      "writes": 300,
+      "bytesPerWrite": 511,
+      "elapsedMs": 13.412018999999873
+    },
+    {
+      "path": "/windows",
+      "repeat": 2,
+      "writes": 300,
+      "bytesPerWrite": 511,
+      "elapsedMs": 528.0336369999998
+    }
+  ]
+}

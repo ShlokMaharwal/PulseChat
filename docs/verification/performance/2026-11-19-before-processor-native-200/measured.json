@@ -1,0 +1,9065 @@
+{
+  "runId": "4877ac1928b3479482c123cbe1eea6cf",
+  "revision": "00b77000d56e49541fa3c1b8577f4d6d59500159",
+  "sourceSha256": "40715e6a65d552e7668c1951f8d40b4353bafb29dd135bd00d21f9a7f26cbde0",
+  "targetConnections": 200,
+  "uniqueUsers": 200,
+  "chats": 100,
+  "chatType": "1:1",
+  "config": {
+    "rampMs": 10000,
+    "warmupMs": 30000,
+    "steadyMs": 30000,
+    "drainMs": 60000,
+    "messageIntervalMs": 5000,
+    "socketsPerVu": 50,
+    "readReceipts": true,
+    "cpuProfile": false,
+    "fixtureMode": "reuse"
+  },
+  "startedAt": "2026-11-19T12:29:40.021Z",
+  "generatorEndedAt": "2026-11-19T12:32:03.468Z",
+  "endedAt": "2026-11-19T12:32:39.838Z",
+  "k6ExitCode": 0,
+  "summaryMissing": false,
+  "sent": {
+    "count": 1266,
+    "rate": 9.434818341528757
+  },
+  "k6Metrics": {
+    "messages_confirmed": {
+      "contains": "default",
+      "values": {
+        "count": 751,
+        "rate": 5.596799821870534
+      },
+      "thresholds": {
+        "count>0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    },
+    "delivery_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(50)": 43667,
+        "p(95)": 71762,
+        "p(99)": 77285,
+        "avg": 43819.7896138482,
+        "min": 9908,
+        "med": 43667,
+        "max": 83014
+      }
+    },
+    "ws_connecting": {
+      "contains": "time",
+      "values": {
+        "avg": 2895.1066409199993,
+        "min": 40.92553,
+        "med": 3201.9296,
+        "max": 5852.566488,
+        "p(50)": 3201.9296,
+        "p(95)": 4310.5552576499995,
+        "p(99)": 5020.392794549998
+      },
+      "type": "trend"
+    },
+    "messages_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1266,
+        "rate": 9.434818341528757
+      }
+    },
+    "data_received": {
+      "values": {
+        "count": 3726828,
+        "rate": 27774.04831763265
+      },
+      "type": "counter",
+      "contains": "data"
+    },
+    "socket_errors": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 4,
+        "rate": 0.02980985257986969
+      }
+    },
+    "iteration_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 133791.457536,
+        "med": 133891.957483,
+        "max": 133954.783918,
+        "p(50)": 133891.957483,
+        "p(95)": 133947.199645,
+        "p(99)": 133953.2670634,
+        "avg": 133882.539105
+      }
+    },
+    "checks": {
+      "thresholds": {
+        "rate>0.99": {
+          "ok": true
+        }
+      },
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 200,
+        "fails": 0
+      }
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 4,
+        "min": 0,
+        "max": 4
+      }
+    },
+    "ws_msgs_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 10811,
+        "rate": 80.56857906024281
+      }
+    },
+    "sync_requests": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 2053,
+        "rate": 15.299906836618119
+      }
+    },
+    "ws_sessions": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 200,
+        "rate": 1.4904926289934846
+      }
+    },
+    "ws_session_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 126223.58532163492,
+        "min": 120449.593087,
+        "med": 126370.292577,
+        "max": 131376.387575,
+        "p(50)": 126370.292577,
+        "p(95)": 130583.28014485,
+        "p(99)": 130998.50475133
+      }
+    },
+    "rate_rejections": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "received_ack_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 35396.2,
+        "p(99)": 39013.560000000005,
+        "avg": 25644.201112877585,
+        "min": 8829,
+        "med": 28431,
+        "max": 42997,
+        "p(50)": 28431
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0.02980985257986969,
+        "count": 4
+      }
+    },
+    "ordering_violations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      }
+    },
+    "generator_scheduler_delay_ms": {
+      "contains": "time",
+      "values": {
+        "max": 3109,
+        "p(50)": 8,
+        "p(95)": 924.3499999999999,
+        "p(99)": 2016.3899999999971,
+        "avg": 138.4090909090909,
+        "min": 0,
+        "med": 8
+      },
+      "type": "trend"
+    },
+    "ws_msgs_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 6387,
+        "rate": 47.59888210690693
+      }
+    },
+    "duplicate_wire_frames": {
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "messages_received_acked": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1266,
+        "rate": 9.434818341528757
+      }
+    },
+    "vus_max": {
+      "values": {
+        "max": 4,
+        "value": 4,
+        "min": 0
+      },
+      "type": "gauge",
+      "contains": "default"
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 778878,
+        "rate": 5804.559589425936
+      }
+    },
+    "connections_opened": {
+      "values": {
+        "count": 200,
+        "rate": 1.4904926289934846
+      },
+      "type": "counter",
+      "contains": "default"
+    }
+  },
+  "peakObservedConnections": 200,
+  "drain": {
+    "drained": true,
+    "samples": [
+      {
+        "at": "2026-11-19T12:32:06.644Z",
+        "processorLag": 1768,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 62,
+          "messages:2": 131,
+          "messages:0": 70,
+          "messages:3": 201,
+          "messages:5": 46,
+          "messages:4": 108
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:02.972Z"
+      },
+      {
+        "at": "2026-11-19T12:32:07.956Z",
+        "processorLag": 1677,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 62,
+          "messages:2": 131,
+          "messages:0": 70,
+          "messages:3": 201,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:02.972Z"
+      },
+      {
+        "at": "2026-11-19T12:32:09.778Z",
+        "processorLag": 1677,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 62,
+          "messages:2": 131,
+          "messages:0": 70,
+          "messages:3": 201,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:04.747Z"
+      },
+      {
+        "at": "2026-11-19T12:32:11.472Z",
+        "processorLag": 1677,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 62,
+          "messages:2": 131,
+          "messages:0": 70,
+          "messages:3": 201,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:07.995Z"
+      },
+      {
+        "at": "2026-11-19T12:32:12.976Z",
+        "processorLag": 1677,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 62,
+          "messages:2": 131,
+          "messages:0": 70,
+          "messages:3": 201,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:07.995Z"
+      },
+      {
+        "at": "2026-11-19T12:32:14.337Z",
+        "processorLag": 1545,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 131,
+          "messages:0": 0,
+          "messages:3": 201,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:09.747Z"
+      },
+      {
+        "at": "2026-11-19T12:32:16.051Z",
+        "processorLag": 1371,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 131,
+          "messages:0": 0,
+          "messages:3": 27,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:12.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:17.610Z",
+        "processorLag": 1257,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 17,
+          "messages:0": 0,
+          "messages:3": 27,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:12.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:18.842Z",
+        "processorLag": 1257,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 17,
+          "messages:0": 0,
+          "messages:3": 27,
+          "messages:5": 46,
+          "messages:4": 17
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:14.742Z"
+      },
+      {
+        "at": "2026-11-19T12:32:20.026Z",
+        "processorLag": 1223,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 27,
+          "messages:5": 46,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:15.585Z"
+      },
+      {
+        "at": "2026-11-19T12:32:21.174Z",
+        "processorLag": 1196,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 46,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:17.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:22.318Z",
+        "processorLag": 1196,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 46,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:17.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:23.538Z",
+        "processorLag": 1196,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 46,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:19.740Z"
+      },
+      {
+        "at": "2026-11-19T12:32:24.718Z",
+        "processorLag": 1196,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 142,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 46,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:19.740Z"
+      },
+      {
+        "at": "2026-11-19T12:32:25.871Z",
+        "processorLag": 1056,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 2,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 46,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:22.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:27.024Z",
+        "processorLag": 1056,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 217,
+          "receipts:2": 91,
+          "receipts:0": 283,
+          "receipts:3": 224,
+          "receipts:5": 2,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 46,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:22.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:28.264Z",
+        "processorLag": 438,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 14,
+          "receipts:2": 0,
+          "receipts:0": 7,
+          "receipts:3": 224,
+          "receipts:5": 0,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 0,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:24.740Z"
+      },
+      {
+        "at": "2026-11-19T12:32:29.383Z",
+        "processorLag": 417,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 0,
+          "receipts:2": 0,
+          "receipts:0": 0,
+          "receipts:3": 224,
+          "receipts:5": 0,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 0,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:24.740Z"
+      },
+      {
+        "at": "2026-11-19T12:32:30.566Z",
+        "processorLag": 417,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 0,
+          "receipts:2": 0,
+          "receipts:0": 0,
+          "receipts:3": 224,
+          "receipts:5": 0,
+          "receipts:4": 193,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 0,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:25.561Z"
+      },
+      {
+        "at": "2026-11-19T12:32:31.695Z",
+        "processorLag": 0,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 0,
+          "receipts:2": 0,
+          "receipts:0": 0,
+          "receipts:3": 0,
+          "receipts:5": 0,
+          "receipts:4": 0,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 0,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:27.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:32.780Z",
+        "processorLag": 0,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 0,
+          "receipts:2": 0,
+          "receipts:0": 0,
+          "receipts:3": 0,
+          "receipts:5": 0,
+          "receipts:4": 0,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 0,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:27.996Z"
+      },
+      {
+        "at": "2026-11-19T12:32:37.954Z",
+        "processorLag": 0,
+        "auditLag": 0,
+        "partitions": {
+          "receipts:1": 0,
+          "receipts:2": 0,
+          "receipts:0": 0,
+          "receipts:3": 0,
+          "receipts:5": 0,
+          "receipts:4": 0,
+          "messages:1": 0,
+          "messages:2": 0,
+          "messages:0": 0,
+          "messages:3": 0,
+          "messages:5": 0,
+          "messages:4": 0
+        },
+        "auditJoined": true,
+        "inflight": 0,
+        "reportingGateways": 3,
+        "oldestScrapeAt": "2026-11-19T12:32:32.998Z"
+      }
+    ]
+  },
+  "prometheusStages": {
+    "before": {
+      "stages": [
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "141"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "141"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "258"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "275"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "297"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "310"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "334"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "351"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "378"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "475"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "623"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "822"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "1175"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "1562"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "2162"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "9"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "14"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "18"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "51"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "105"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "294"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "623"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "956"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "1906"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "2391"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "4"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "104"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "322"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "940"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "1436"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "1925"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2307"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2394"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2435"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2446"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "134"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "334"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "754"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "1205"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "1866"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2147"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2324"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2418"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2443"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2449"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.813,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "9"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "136"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "369"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "935"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "1518"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "1953"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2300"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2397"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2426"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2449"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.813,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "174"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "406"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "1061"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "1843"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "3237"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4090"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4526"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4813"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4877"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4894"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4903"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4904"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4904"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4904"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4904"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4904"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.813,
+            "4904"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "24"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "24"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "471"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "932"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "1622"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "2278"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3128"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3476"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3693"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3770"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3788"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3792"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.813,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "4"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "13"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "17"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "21"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "31"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "51"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "127"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "452"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "993"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "1652"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "2052"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "2111"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "2114"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "2114"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "2114"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "2114"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.813,
+            "2114"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "8"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "12"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "19"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "177"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "442"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.813,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "3"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "7"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "10"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "12"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "12"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "17"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "57"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "638"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "1037"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "1084"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.813,
+            "1100"
+          ]
+        }
+      ],
+      "stageCounts": [
+        {
+          "metric": {
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.896,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.896,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.896,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.896,
+            "2452"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.896,
+            "2451"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.896,
+            "4904"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.896,
+            "3793"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.896,
+            "2114"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.896,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.896,
+            "1100"
+          ]
+        }
+      ],
+      "stageSums": [
+        {
+          "metric": {
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091379.918,
+            "10697.746000000006"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091379.918,
+            "44199.30399999999"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091379.918,
+            "226.18900000000093"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091379.918,
+            "71.34900000000025"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.918,
+            "210.8270000000004"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091379.918,
+            "187.61400000000117"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091379.918,
+            "73.1240000000002"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091379.918,
+            "1526.3159999999998"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091379.918,
+            "29604.10499999999"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091379.918,
+            "2960.3040000000005"
+          ]
+        }
+      ],
+      "skew": [
+        {
+          "metric": {
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091379.954,
+            "1"
+          ]
+        }
+      ],
+      "producerBatchCounts": [
+        {
+          "metric": {
+            "topic": "messages"
+          },
+          "value": [
+            1795091379.97,
+            "107"
+          ]
+        },
+        {
+          "metric": {
+            "topic": "receipts"
+          },
+          "value": [
+            1795091379.97,
+            "273"
+          ]
+        }
+      ],
+      "producerBatchRecords": [
+        {
+          "metric": {
+            "topic": "messages"
+          },
+          "value": [
+            1795091380.014,
+            "1100"
+          ]
+        },
+        {
+          "metric": {
+            "topic": "receipts"
+          },
+          "value": [
+            1795091380.014,
+            "1701"
+          ]
+        }
+      ]
+    },
+    "after": {
+      "stages": [
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "159"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "159"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "291"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "308"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "332"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "345"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "370"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "389"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "422"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "540"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "728"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "1016"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "1547"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "2071"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "2938"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "3638"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "9"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "14"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "18"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "53"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "109"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "381"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "880"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "1408"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "2719"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "3603"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "7"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "186"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "564"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "1584"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "2329"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3005"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3507"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3625"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3682"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3708"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3716"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "2"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "2"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "226"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "590"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "1246"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "1933"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "2933"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3339"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3566"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3678"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3709"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3715"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091558.721,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "22"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "239"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "616"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "1597"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "2426"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3029"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3504"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3638"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3684"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3714"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091558.721,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "13"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "13"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "316"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "770"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "1840"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "3017"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "5233"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "6390"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "6964"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7324"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7404"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7422"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7433"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7436"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7436"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7436"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7436"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7436"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091558.721,
+            "7436"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "34"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "34"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "713"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "1374"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "2378"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "3311"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "4450"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "4919"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5183"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5274"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5297"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5301"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5302"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5304"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5304"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5304"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5304"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5304"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091558.721,
+            "5304"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "6"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "18"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "38"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "49"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "74"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "124"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "290"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "847"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "1717"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "2772"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "3497"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "3611"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "3622"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "3622"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "3622"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "3622"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091558.721,
+            "3622"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "5"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "8"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "12"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "15"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "74"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "533"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "1638"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091558.721,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0001",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0005",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.001",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.0025",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.005",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.01",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "3"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.025",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "7"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.05",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "10"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.1",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "12"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.25",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "12"
+          ]
+        },
+        {
+          "metric": {
+            "le": "0.5",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "17"
+          ]
+        },
+        {
+          "metric": {
+            "le": "1.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "68"
+          ]
+        },
+        {
+          "metric": {
+            "le": "2.5",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "1084"
+          ]
+        },
+        {
+          "metric": {
+            "le": "5.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "2105"
+          ]
+        },
+        {
+          "metric": {
+            "le": "10.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "2291"
+          ]
+        },
+        {
+          "metric": {
+            "le": "30.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "le": "60.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "le": "120.0",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "le": "+Inf",
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091558.721,
+            "2366"
+          ]
+        }
+      ],
+      "stageCounts": [
+        {
+          "metric": {
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091560.5,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091560.5,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091560.5,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091560.5,
+            "3718"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091560.5,
+            "3717"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091560.5,
+            "7436"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091560.5,
+            "5304"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091560.5,
+            "3622"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091560.5,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091560.5,
+            "2366"
+          ]
+        }
+      ],
+      "stageSums": [
+        {
+          "metric": {
+            "stage": "partition_queue"
+          },
+          "value": [
+            1795091560.528,
+            "24325.742000000013"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_to_processor"
+          },
+          "value": [
+            1795091560.528,
+            "75338.64799999988"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "processor_prepare"
+          },
+          "value": [
+            1795091560.528,
+            "336.20599999999945"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "sequence_assign"
+          },
+          "value": [
+            1795091560.528,
+            "92.10800000000057"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091560.528,
+            "297.8669999999994"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "route_lookup"
+          },
+          "value": [
+            1795091560.528,
+            "251.55100000000186"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "redis_publish"
+          },
+          "value": [
+            1795091560.528,
+            "100.1220000000003"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "publish_to_gateway_push"
+          },
+          "value": [
+            1795091560.528,
+            "2676.131000000001"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "gateway_prepare"
+          },
+          "value": [
+            1795091560.528,
+            "53931.429999999964"
+          ]
+        },
+        {
+          "metric": {
+            "stage": "kafka_produce_ack"
+          },
+          "value": [
+            1795091560.528,
+            "7692.888000000001"
+          ]
+        }
+      ],
+      "skew": [
+        {
+          "metric": {
+            "stage": "mongo_persist"
+          },
+          "value": [
+            1795091560.548,
+            "1"
+          ]
+        }
+      ],
+      "producerBatchCounts": [
+        {
+          "metric": {
+            "topic": "messages"
+          },
+          "value": [
+            1795091560.568,
+            "169"
+          ]
+        },
+        {
+          "metric": {
+            "topic": "receipts"
+          },
+          "value": [
+            1795091560.568,
+            "494"
+          ]
+        }
+      ],
+      "producerBatchRecords": [
+        {
+          "metric": {
+            "topic": "messages"
+          },
+          "value": [
+            1795091560.591,
+            "2366"
+          ]
+        },
+        {
+          "metric": {
+            "topic": "receipts"
+          },
+          "value": [
+            1795091560.591,
+            "3105"
+          ]
+        }
+      ]
+    }
+  },
+  "telemetry": {
+    "connections": [
+      {
+        "metric": {},
+        "values": [
+          [
+            1795091380.021,
+            "0"
+          ],
+          [
+            1795091382.021,
+            "0"
+          ],
+          [
+            1795091384.021,
+            "0"
+          ],
+          [
+            1795091386.021,
+            "0"
+          ],
+          [
+            1795091388.021,
+            "0"
+          ],
+          [
+            1795091390.021,
+            "2"
+          ],
+          [
+            1795091392.021,
+            "5"
+          ],
+          [
+            1795091394.021,
+            "29"
+          ],
+          [
+            1795091396.021,
+            "84"
+          ],
+          [
+            1795091398.021,
+            "100"
+          ],
+          [
+            1795091400.021,
+            "119"
+          ],
+          [
+            1795091402.021,
+            "154"
+          ],
+          [
+            1795091404.021,
+            "181"
+          ],
+          [
+            1795091406.021,
+            "200"
+          ],
+          [
+            1795091408.021,
+            "200"
+          ],
+          [
+            1795091410.021,
+            "200"
+          ],
+          [
+            1795091412.021,
+            "200"
+          ],
+          [
+            1795091414.021,
+            "133"
+          ],
+          [
+            1795091432.021,
+            "67"
+          ],
+          [
+            1795091434.021,
+            "134"
+          ],
+          [
+            1795091436.021,
+            "200"
+          ],
+          [
+            1795091438.021,
+            "200"
+          ],
+          [
+            1795091440.021,
+            "200"
+          ],
+          [
+            1795091442.021,
+            "200"
+          ],
+          [
+            1795091444.021,
+            "133"
+          ],
+          [
+            1795091446.021,
+            "67"
+          ],
+          [
+            1795091448.021,
+            "67"
+          ],
+          [
+            1795091450.021,
+            "67"
+          ],
+          [
+            1795091466.021,
+            "133"
+          ],
+          [
+            1795091468.021,
+            "200"
+          ],
+          [
+            1795091470.021,
+            "200"
+          ],
+          [
+            1795091472.021,
+            "200"
+          ],
+          [
+            1795091474.021,
+            "200"
+          ],
+          [
+            1795091476.021,
+            "200"
+          ],
+          [
+            1795091478.021,
+            "200"
+          ],
+          [
+            1795091480.021,
+            "200"
+          ],
+          [
+            1795091482.021,
+            "200"
+          ],
+          [
+            1795091484.021,
+            "200"
+          ],
+          [
+            1795091486.021,
+            "134"
+          ],
+          [
+            1795091488.021,
+            "134"
+          ],
+          [
+            1795091490.021,
+            "134"
+          ],
+          [
+            1795091492.021,
+            "134"
+          ],
+          [
+            1795091494.021,
+            "67"
+          ],
+          [
+            1795091496.021,
+            "133"
+          ],
+          [
+            1795091498.021,
+            "200"
+          ],
+          [
+            1795091500.021,
+            "200"
+          ],
+          [
+            1795091502.021,
+            "200"
+          ],
+          [
+            1795091504.021,
+            "200"
+          ],
+          [
+            1795091506.021,
+            "200"
+          ],
+          [
+            1795091508.021,
+            "200"
+          ],
+          [
+            1795091510.021,
+            "200"
+          ],
+          [
+            1795091512.021,
+            "200"
+          ],
+          [
+            1795091514.021,
+            "200"
+          ],
+          [
+            1795091516.021,
+            "200"
+          ],
+          [
+            1795091518.021,
+            "200"
+          ],
+          [
+            1795091520.021,
+            "190"
+          ],
+          [
+            1795091522.021,
+            "123"
+          ],
+          [
+            1795091524.021,
+            "56"
+          ],
+          [
+            1795091526.021,
+            "0"
+          ],
+          [
+            1795091528.021,
+            "0"
+          ],
+          [
+            1795091530.021,
+            "0"
+          ],
+          [
+            1795091532.021,
+            "0"
+          ],
+          [
+            1795091534.021,
+            "0"
+          ],
+          [
+            1795091536.021,
+            "0"
+          ],
+          [
+            1795091538.021,
+            "0"
+          ],
+          [
+            1795091540.021,
+            "0"
+          ],
+          [
+            1795091542.021,
+            "0"
+          ],
+          [
+            1795091544.021,
+            "0"
+          ],
+          [
+            1795091546.021,
+            "0"
+          ],
+          [
+            1795091548.021,
+            "0"
+          ],
+          [
+            1795091550.021,
+            "0"
+          ],
+          [
+            1795091552.021,
+            "0"
+          ],
+          [
+            1795091554.021,
+            "0"
+          ],
+          [
+            1795091556.021,
+            "0"
+          ],
+          [
+            1795091558.021,
+            "0"
+          ]
+        ]
+      }
+    ],
+    "gatewayConnections": [
+      {
+        "metric": {
+          "__name__": "pulsechat_active_connections",
+          "exported_instance": "5d60dd105efa",
+          "instance": "gateway-2:8080",
+          "job": "pulsechat-gateways",
+          "service": "gateway"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0"
+          ],
+          [
+            1795091382.021,
+            "0"
+          ],
+          [
+            1795091384.021,
+            "0"
+          ],
+          [
+            1795091386.021,
+            "0"
+          ],
+          [
+            1795091388.021,
+            "0"
+          ],
+          [
+            1795091390.021,
+            "2"
+          ],
+          [
+            1795091392.021,
+            "2"
+          ],
+          [
+            1795091394.021,
+            "2"
+          ],
+          [
+            1795091396.021,
+            "31"
+          ],
+          [
+            1795091398.021,
+            "31"
+          ],
+          [
+            1795091400.021,
+            "50"
+          ],
+          [
+            1795091402.021,
+            "50"
+          ],
+          [
+            1795091404.021,
+            "50"
+          ],
+          [
+            1795091406.021,
+            "66"
+          ],
+          [
+            1795091408.021,
+            "66"
+          ],
+          [
+            1795091410.021,
+            "66"
+          ],
+          [
+            1795091412.021,
+            "66"
+          ],
+          [
+            1795091414.021,
+            "66"
+          ],
+          [
+            1795091436.021,
+            "66"
+          ],
+          [
+            1795091438.021,
+            "66"
+          ],
+          [
+            1795091440.021,
+            "66"
+          ],
+          [
+            1795091442.021,
+            "66"
+          ],
+          [
+            1795091444.021,
+            "66"
+          ],
+          [
+            1795091466.021,
+            "66"
+          ],
+          [
+            1795091468.021,
+            "66"
+          ],
+          [
+            1795091470.021,
+            "66"
+          ],
+          [
+            1795091472.021,
+            "66"
+          ],
+          [
+            1795091474.021,
+            "66"
+          ],
+          [
+            1795091476.021,
+            "66"
+          ],
+          [
+            1795091478.021,
+            "66"
+          ],
+          [
+            1795091480.021,
+            "66"
+          ],
+          [
+            1795091482.021,
+            "66"
+          ],
+          [
+            1795091484.021,
+            "66"
+          ],
+          [
+            1795091496.021,
+            "66"
+          ],
+          [
+            1795091498.021,
+            "66"
+          ],
+          [
+            1795091500.021,
+            "66"
+          ],
+          [
+            1795091502.021,
+            "66"
+          ],
+          [
+            1795091504.021,
+            "66"
+          ],
+          [
+            1795091506.021,
+            "66"
+          ],
+          [
+            1795091508.021,
+            "66"
+          ],
+          [
+            1795091510.021,
+            "66"
+          ],
+          [
+            1795091512.021,
+            "66"
+          ],
+          [
+            1795091514.021,
+            "66"
+          ],
+          [
+            1795091516.021,
+            "66"
+          ],
+          [
+            1795091518.021,
+            "66"
+          ],
+          [
+            1795091520.021,
+            "56"
+          ],
+          [
+            1795091522.021,
+            "56"
+          ],
+          [
+            1795091524.021,
+            "56"
+          ],
+          [
+            1795091526.021,
+            "0"
+          ],
+          [
+            1795091528.021,
+            "0"
+          ],
+          [
+            1795091530.021,
+            "0"
+          ],
+          [
+            1795091532.021,
+            "0"
+          ],
+          [
+            1795091534.021,
+            "0"
+          ],
+          [
+            1795091536.021,
+            "0"
+          ],
+          [
+            1795091538.021,
+            "0"
+          ],
+          [
+            1795091540.021,
+            "0"
+          ],
+          [
+            1795091542.021,
+            "0"
+          ],
+          [
+            1795091544.021,
+            "0"
+          ],
+          [
+            1795091546.021,
+            "0"
+          ],
+          [
+            1795091548.021,
+            "0"
+          ],
+          [
+            1795091550.021,
+            "0"
+          ],
+          [
+            1795091552.021,
+            "0"
+          ],
+          [
+            1795091554.021,
+            "0"
+          ],
+          [
+            1795091556.021,
+            "0"
+          ],
+          [
+            1795091558.021,
+            "0"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "pulsechat_active_connections",
+          "exported_instance": "9657ac7a562a",
+          "instance": "gateway-1:8080",
+          "job": "pulsechat-gateways",
+          "service": "gateway"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0"
+          ],
+          [
+            1795091382.021,
+            "0"
+          ],
+          [
+            1795091384.021,
+            "0"
+          ],
+          [
+            1795091386.021,
+            "0"
+          ],
+          [
+            1795091388.021,
+            "0"
+          ],
+          [
+            1795091390.021,
+            "0"
+          ],
+          [
+            1795091392.021,
+            "0"
+          ],
+          [
+            1795091394.021,
+            "24"
+          ],
+          [
+            1795091396.021,
+            "24"
+          ],
+          [
+            1795091398.021,
+            "40"
+          ],
+          [
+            1795091400.021,
+            "40"
+          ],
+          [
+            1795091402.021,
+            "40"
+          ],
+          [
+            1795091404.021,
+            "67"
+          ],
+          [
+            1795091406.021,
+            "67"
+          ],
+          [
+            1795091408.021,
+            "67"
+          ],
+          [
+            1795091410.021,
+            "67"
+          ],
+          [
+            1795091412.021,
+            "67"
+          ],
+          [
+            1795091434.021,
+            "67"
+          ],
+          [
+            1795091436.021,
+            "67"
+          ],
+          [
+            1795091438.021,
+            "67"
+          ],
+          [
+            1795091440.021,
+            "67"
+          ],
+          [
+            1795091442.021,
+            "67"
+          ],
+          [
+            1795091468.021,
+            "67"
+          ],
+          [
+            1795091470.021,
+            "67"
+          ],
+          [
+            1795091472.021,
+            "67"
+          ],
+          [
+            1795091474.021,
+            "67"
+          ],
+          [
+            1795091476.021,
+            "67"
+          ],
+          [
+            1795091478.021,
+            "67"
+          ],
+          [
+            1795091480.021,
+            "67"
+          ],
+          [
+            1795091482.021,
+            "67"
+          ],
+          [
+            1795091484.021,
+            "67"
+          ],
+          [
+            1795091486.021,
+            "67"
+          ],
+          [
+            1795091488.021,
+            "67"
+          ],
+          [
+            1795091490.021,
+            "67"
+          ],
+          [
+            1795091492.021,
+            "67"
+          ],
+          [
+            1795091498.021,
+            "67"
+          ],
+          [
+            1795091500.021,
+            "67"
+          ],
+          [
+            1795091502.021,
+            "67"
+          ],
+          [
+            1795091504.021,
+            "67"
+          ],
+          [
+            1795091506.021,
+            "67"
+          ],
+          [
+            1795091508.021,
+            "67"
+          ],
+          [
+            1795091510.021,
+            "67"
+          ],
+          [
+            1795091512.021,
+            "67"
+          ],
+          [
+            1795091514.021,
+            "67"
+          ],
+          [
+            1795091516.021,
+            "67"
+          ],
+          [
+            1795091518.021,
+            "67"
+          ],
+          [
+            1795091520.021,
+            "67"
+          ],
+          [
+            1795091522.021,
+            "67"
+          ],
+          [
+            1795091524.021,
+            "0"
+          ],
+          [
+            1795091526.021,
+            "0"
+          ],
+          [
+            1795091528.021,
+            "0"
+          ],
+          [
+            1795091530.021,
+            "0"
+          ],
+          [
+            1795091532.021,
+            "0"
+          ],
+          [
+            1795091534.021,
+            "0"
+          ],
+          [
+            1795091536.021,
+            "0"
+          ],
+          [
+            1795091538.021,
+            "0"
+          ],
+          [
+            1795091540.021,
+            "0"
+          ],
+          [
+            1795091542.021,
+            "0"
+          ],
+          [
+            1795091544.021,
+            "0"
+          ],
+          [
+            1795091546.021,
+            "0"
+          ],
+          [
+            1795091548.021,
+            "0"
+          ],
+          [
+            1795091550.021,
+            "0"
+          ],
+          [
+            1795091552.021,
+            "0"
+          ],
+          [
+            1795091554.021,
+            "0"
+          ],
+          [
+            1795091556.021,
+            "0"
+          ],
+          [
+            1795091558.021,
+            "0"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "pulsechat_active_connections",
+          "exported_instance": "d2f315bfeae5",
+          "instance": "gateway-3:8080",
+          "job": "pulsechat-gateways",
+          "service": "gateway"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0"
+          ],
+          [
+            1795091382.021,
+            "0"
+          ],
+          [
+            1795091384.021,
+            "0"
+          ],
+          [
+            1795091386.021,
+            "0"
+          ],
+          [
+            1795091388.021,
+            "0"
+          ],
+          [
+            1795091390.021,
+            "0"
+          ],
+          [
+            1795091392.021,
+            "3"
+          ],
+          [
+            1795091394.021,
+            "3"
+          ],
+          [
+            1795091396.021,
+            "29"
+          ],
+          [
+            1795091398.021,
+            "29"
+          ],
+          [
+            1795091400.021,
+            "29"
+          ],
+          [
+            1795091402.021,
+            "64"
+          ],
+          [
+            1795091404.021,
+            "64"
+          ],
+          [
+            1795091406.021,
+            "67"
+          ],
+          [
+            1795091408.021,
+            "67"
+          ],
+          [
+            1795091410.021,
+            "67"
+          ],
+          [
+            1795091412.021,
+            "67"
+          ],
+          [
+            1795091414.021,
+            "67"
+          ],
+          [
+            1795091432.021,
+            "67"
+          ],
+          [
+            1795091434.021,
+            "67"
+          ],
+          [
+            1795091436.021,
+            "67"
+          ],
+          [
+            1795091438.021,
+            "67"
+          ],
+          [
+            1795091440.021,
+            "67"
+          ],
+          [
+            1795091442.021,
+            "67"
+          ],
+          [
+            1795091444.021,
+            "67"
+          ],
+          [
+            1795091446.021,
+            "67"
+          ],
+          [
+            1795091448.021,
+            "67"
+          ],
+          [
+            1795091450.021,
+            "67"
+          ],
+          [
+            1795091466.021,
+            "67"
+          ],
+          [
+            1795091468.021,
+            "67"
+          ],
+          [
+            1795091470.021,
+            "67"
+          ],
+          [
+            1795091472.021,
+            "67"
+          ],
+          [
+            1795091474.021,
+            "67"
+          ],
+          [
+            1795091476.021,
+            "67"
+          ],
+          [
+            1795091478.021,
+            "67"
+          ],
+          [
+            1795091480.021,
+            "67"
+          ],
+          [
+            1795091482.021,
+            "67"
+          ],
+          [
+            1795091484.021,
+            "67"
+          ],
+          [
+            1795091486.021,
+            "67"
+          ],
+          [
+            1795091488.021,
+            "67"
+          ],
+          [
+            1795091490.021,
+            "67"
+          ],
+          [
+            1795091492.021,
+            "67"
+          ],
+          [
+            1795091494.021,
+            "67"
+          ],
+          [
+            1795091496.021,
+            "67"
+          ],
+          [
+            1795091498.021,
+            "67"
+          ],
+          [
+            1795091500.021,
+            "67"
+          ],
+          [
+            1795091502.021,
+            "67"
+          ],
+          [
+            1795091504.021,
+            "67"
+          ],
+          [
+            1795091506.021,
+            "67"
+          ],
+          [
+            1795091508.021,
+            "67"
+          ],
+          [
+            1795091510.021,
+            "67"
+          ],
+          [
+            1795091512.021,
+            "67"
+          ],
+          [
+            1795091514.021,
+            "67"
+          ],
+          [
+            1795091516.021,
+            "67"
+          ],
+          [
+            1795091518.021,
+            "67"
+          ],
+          [
+            1795091520.021,
+            "67"
+          ],
+          [
+            1795091522.021,
+            "0"
+          ],
+          [
+            1795091524.021,
+            "0"
+          ],
+          [
+            1795091526.021,
+            "0"
+          ],
+          [
+            1795091528.021,
+            "0"
+          ],
+          [
+            1795091530.021,
+            "0"
+          ],
+          [
+            1795091532.021,
+            "0"
+          ],
+          [
+            1795091534.021,
+            "0"
+          ],
+          [
+            1795091536.021,
+            "0"
+          ],
+          [
+            1795091538.021,
+            "0"
+          ],
+          [
+            1795091540.021,
+            "0"
+          ],
+          [
+            1795091542.021,
+            "0"
+          ],
+          [
+            1795091544.021,
+            "0"
+          ],
+          [
+            1795091546.021,
+            "0"
+          ],
+          [
+            1795091548.021,
+            "0"
+          ],
+          [
+            1795091550.021,
+            "0"
+          ],
+          [
+            1795091552.021,
+            "0"
+          ],
+          [
+            1795091554.021,
+            "0"
+          ],
+          [
+            1795091556.021,
+            "0"
+          ],
+          [
+            1795091558.021,
+            "0"
+          ]
+        ]
+      }
+    ],
+    "cpu": [
+      {
+        "metric": {},
+        "values": [
+          [
+            1795091380.021,
+            "0.6538012736697398"
+          ],
+          [
+            1795091382.021,
+            "0.6455176234598463"
+          ],
+          [
+            1795091384.021,
+            "0.6449348842352283"
+          ],
+          [
+            1795091386.021,
+            "0.588640780510826"
+          ],
+          [
+            1795091388.021,
+            "0.5489743200994117"
+          ],
+          [
+            1795091390.021,
+            "0.5091474037382937"
+          ],
+          [
+            1795091392.021,
+            "0.5228625203640406"
+          ],
+          [
+            1795091394.021,
+            "0.6435591903212178"
+          ],
+          [
+            1795091396.021,
+            "1.219827838388877"
+          ],
+          [
+            1795091398.021,
+            "1.511143844644109"
+          ],
+          [
+            1795091400.021,
+            "1.6883420424824869"
+          ],
+          [
+            1795091402.021,
+            "1.9171738332623576"
+          ],
+          [
+            1795091404.021,
+            "1.9702227142215585"
+          ],
+          [
+            1795091406.021,
+            "1.838309520721227"
+          ],
+          [
+            1795091408.021,
+            "1.701457447772352"
+          ],
+          [
+            1795091410.021,
+            "1.584759659988685"
+          ],
+          [
+            1795091412.021,
+            "1.3790919476619488"
+          ],
+          [
+            1795091414.021,
+            "1.2416782971392"
+          ],
+          [
+            1795091416.021,
+            "0.7770457380867197"
+          ],
+          [
+            1795091418.021,
+            "0.45782915257215584"
+          ],
+          [
+            1795091420.021,
+            "0.2691993017806547"
+          ],
+          [
+            1795091422.021,
+            "0.12255399731183718"
+          ],
+          [
+            1795091424.021,
+            "0.12255399731183718"
+          ],
+          [
+            1795091426.021,
+            "0.08093102294065405"
+          ],
+          [
+            1795091428.021,
+            "0.08093102294065403"
+          ],
+          [
+            1795091430.021,
+            "0.09515642613223951"
+          ],
+          [
+            1795091432.021,
+            "0.11012989217732672"
+          ],
+          [
+            1795091434.021,
+            "0.11012989217732672"
+          ],
+          [
+            1795091436.021,
+            "0.4392759190991019"
+          ],
+          [
+            1795091438.021,
+            "0.7001838272895848"
+          ],
+          [
+            1795091440.021,
+            "1.115094044897809"
+          ],
+          [
+            1795091442.021,
+            "1.3412406232514051"
+          ],
+          [
+            1795091444.021,
+            "1.370479199734474"
+          ],
+          [
+            1795091446.021,
+            "1.26107613058221"
+          ],
+          [
+            1795091448.021,
+            "0.972185207202864"
+          ],
+          [
+            1795091450.021,
+            "0.735238787540355"
+          ],
+          [
+            1795091452.021,
+            "0.44831395177587274"
+          ],
+          [
+            1795091454.021,
+            "0.4150354202515308"
+          ],
+          [
+            1795091456.021,
+            "0.1333278731308189"
+          ],
+          [
+            1795091458.021,
+            "0.13332787313081892"
+          ],
+          [
+            1795091460.021,
+            "0.1438089018248142"
+          ],
+          [
+            1795091462.021,
+            "0.16313452627635078"
+          ],
+          [
+            1795091464.021,
+            "0.16313452627635078"
+          ],
+          [
+            1795091466.021,
+            "0.3218449555697169"
+          ],
+          [
+            1795091468.021,
+            "0.3218449555697169"
+          ],
+          [
+            1795091470.021,
+            "0.7488077189123006"
+          ],
+          [
+            1795091472.021,
+            "1.0405749601930447"
+          ],
+          [
+            1795091474.021,
+            "1.2624408619274405"
+          ],
+          [
+            1795091476.021,
+            "1.6249236970919816"
+          ],
+          [
+            1795091478.021,
+            "1.81618885646034"
+          ],
+          [
+            1795091480.021,
+            "1.6936544001764307"
+          ],
+          [
+            1795091482.021,
+            "1.7182231238276615"
+          ],
+          [
+            1795091484.021,
+            "1.8004304597803802"
+          ],
+          [
+            1795091486.021,
+            "1.6744903724500348"
+          ],
+          [
+            1795091488.021,
+            "1.4325181824280984"
+          ],
+          [
+            1795091490.021,
+            "1.1058591442897117"
+          ],
+          [
+            1795091492.021,
+            "0.9110219221064247"
+          ],
+          [
+            1795091494.021,
+            "0.7400478241089051"
+          ],
+          [
+            1795091496.021,
+            "0.47819374895383193"
+          ],
+          [
+            1795091498.021,
+            "0.5698514221773792"
+          ],
+          [
+            1795091500.021,
+            "0.7092171682830305"
+          ],
+          [
+            1795091502.021,
+            "0.8521627131624905"
+          ],
+          [
+            1795091504.021,
+            "0.8624134889160826"
+          ],
+          [
+            1795091506.021,
+            "1.1269051096233513"
+          ],
+          [
+            1795091508.021,
+            "1.3173677251995064"
+          ],
+          [
+            1795091510.021,
+            "1.4135985066989367"
+          ],
+          [
+            1795091512.021,
+            "1.5104392535317728"
+          ],
+          [
+            1795091514.021,
+            "1.5846191206344562"
+          ],
+          [
+            1795091516.021,
+            "1.771638524237707"
+          ],
+          [
+            1795091518.021,
+            "1.772300626196473"
+          ],
+          [
+            1795091520.021,
+            "1.7694668251393495"
+          ],
+          [
+            1795091522.021,
+            "1.6782743651376257"
+          ],
+          [
+            1795091524.021,
+            "1.5618442264892198"
+          ],
+          [
+            1795091526.021,
+            "1.3590056650287272"
+          ],
+          [
+            1795091528.021,
+            "1.1633872482507386"
+          ],
+          [
+            1795091530.021,
+            "1.257570815228967"
+          ],
+          [
+            1795091532.021,
+            "1.3216316299423818"
+          ],
+          [
+            1795091534.021,
+            "1.278365311604646"
+          ],
+          [
+            1795091536.021,
+            "1.458965339801595"
+          ],
+          [
+            1795091538.021,
+            "1.469858763278481"
+          ],
+          [
+            1795091540.021,
+            "1.5889309914231844"
+          ],
+          [
+            1795091542.021,
+            "1.73685277136018"
+          ],
+          [
+            1795091544.021,
+            "1.7530468829990171"
+          ],
+          [
+            1795091546.021,
+            "1.8853332926816886"
+          ],
+          [
+            1795091548.021,
+            "1.882112892681688"
+          ],
+          [
+            1795091550.021,
+            "1.685001651565687"
+          ],
+          [
+            1795091552.021,
+            "1.6768987238676027"
+          ],
+          [
+            1795091554.021,
+            "1.6714052045514654"
+          ],
+          [
+            1795091556.021,
+            "1.446395937242449"
+          ],
+          [
+            1795091558.021,
+            "0.996322424804924"
+          ]
+        ]
+      }
+    ],
+    "lag": [
+      {
+        "metric": {},
+        "values": [
+          [
+            1795091380.021,
+            "0"
+          ],
+          [
+            1795091382.021,
+            "0"
+          ],
+          [
+            1795091384.021,
+            "0"
+          ],
+          [
+            1795091386.021,
+            "0"
+          ],
+          [
+            1795091388.021,
+            "0"
+          ],
+          [
+            1795091390.021,
+            "0"
+          ],
+          [
+            1795091392.021,
+            "0"
+          ],
+          [
+            1795091394.021,
+            "0"
+          ],
+          [
+            1795091396.021,
+            "0"
+          ],
+          [
+            1795091398.021,
+            "0"
+          ],
+          [
+            1795091400.021,
+            "0"
+          ],
+          [
+            1795091402.021,
+            "0"
+          ],
+          [
+            1795091404.021,
+            "0"
+          ],
+          [
+            1795091406.021,
+            "0"
+          ],
+          [
+            1795091408.021,
+            "0"
+          ],
+          [
+            1795091410.021,
+            "0"
+          ],
+          [
+            1795091412.021,
+            "0"
+          ],
+          [
+            1795091414.021,
+            "0"
+          ],
+          [
+            1795091416.021,
+            "0"
+          ],
+          [
+            1795091418.021,
+            "0"
+          ],
+          [
+            1795091420.021,
+            "0"
+          ],
+          [
+            1795091422.021,
+            "0"
+          ],
+          [
+            1795091424.021,
+            "0"
+          ],
+          [
+            1795091426.021,
+            "0"
+          ],
+          [
+            1795091428.021,
+            "0"
+          ],
+          [
+            1795091430.021,
+            "0"
+          ],
+          [
+            1795091432.021,
+            "0"
+          ],
+          [
+            1795091434.021,
+            "0"
+          ],
+          [
+            1795091436.021,
+            "0"
+          ],
+          [
+            1795091438.021,
+            "0"
+          ],
+          [
+            1795091440.021,
+            "161"
+          ],
+          [
+            1795091442.021,
+            "180"
+          ],
+          [
+            1795091444.021,
+            "180"
+          ],
+          [
+            1795091446.021,
+            "204"
+          ],
+          [
+            1795091448.021,
+            "204"
+          ],
+          [
+            1795091450.021,
+            "236"
+          ],
+          [
+            1795091452.021,
+            "250"
+          ],
+          [
+            1795091454.021,
+            "250"
+          ],
+          [
+            1795091456.021,
+            "297"
+          ],
+          [
+            1795091458.021,
+            "297"
+          ],
+          [
+            1795091460.021,
+            "307"
+          ],
+          [
+            1795091462.021,
+            "307"
+          ],
+          [
+            1795091464.021,
+            "307"
+          ],
+          [
+            1795091466.021,
+            "297"
+          ],
+          [
+            1795091468.021,
+            "297"
+          ],
+          [
+            1795091470.021,
+            "297"
+          ],
+          [
+            1795091472.021,
+            "421"
+          ],
+          [
+            1795091474.021,
+            "421"
+          ],
+          [
+            1795091476.021,
+            "730"
+          ],
+          [
+            1795091478.021,
+            "730"
+          ],
+          [
+            1795091480.021,
+            "871"
+          ],
+          [
+            1795091482.021,
+            "871"
+          ],
+          [
+            1795091484.021,
+            "871"
+          ],
+          [
+            1795091486.021,
+            "871"
+          ],
+          [
+            1795091488.021,
+            "1047"
+          ],
+          [
+            1795091490.021,
+            "1129"
+          ],
+          [
+            1795091492.021,
+            "1129"
+          ],
+          [
+            1795091494.021,
+            "1129"
+          ],
+          [
+            1795091496.021,
+            "1232"
+          ],
+          [
+            1795091498.021,
+            "1232"
+          ],
+          [
+            1795091500.021,
+            "1317"
+          ],
+          [
+            1795091502.021,
+            "1318"
+          ],
+          [
+            1795091504.021,
+            "1318"
+          ],
+          [
+            1795091506.021,
+            "1409"
+          ],
+          [
+            1795091508.021,
+            "1409"
+          ],
+          [
+            1795091510.021,
+            "1629"
+          ],
+          [
+            1795091512.021,
+            "1616"
+          ],
+          [
+            1795091514.021,
+            "1616"
+          ],
+          [
+            1795091516.021,
+            "1762"
+          ],
+          [
+            1795091518.021,
+            "1762"
+          ],
+          [
+            1795091520.021,
+            "1873"
+          ],
+          [
+            1795091522.021,
+            "1775"
+          ],
+          [
+            1795091524.021,
+            "1775"
+          ],
+          [
+            1795091526.021,
+            "1843"
+          ],
+          [
+            1795091528.021,
+            "1843"
+          ],
+          [
+            1795091530.021,
+            "1823"
+          ],
+          [
+            1795091532.021,
+            "1677"
+          ],
+          [
+            1795091534.021,
+            "1677"
+          ],
+          [
+            1795091536.021,
+            "1615"
+          ],
+          [
+            1795091538.021,
+            "1615"
+          ],
+          [
+            1795091540.021,
+            "1615"
+          ],
+          [
+            1795091542.021,
+            "1257"
+          ],
+          [
+            1795091544.021,
+            "1257"
+          ],
+          [
+            1795091546.021,
+            "1196"
+          ],
+          [
+            1795091548.021,
+            "1196"
+          ],
+          [
+            1795091550.021,
+            "1196"
+          ],
+          [
+            1795091552.021,
+            "438"
+          ],
+          [
+            1795091554.021,
+            "438"
+          ],
+          [
+            1795091556.021,
+            "438"
+          ],
+          [
+            1795091558.021,
+            "417"
+          ]
+        ]
+      }
+    ],
+    "eventLoop": [
+      {
+        "metric": {
+          "__name__": "pulsechat_nodejs_eventloop_lag_seconds",
+          "exported_instance": "5d60dd105efa",
+          "instance": "gateway-2:8080",
+          "job": "pulsechat-gateways",
+          "service": "gateway"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0.021011813"
+          ],
+          [
+            1795091382.021,
+            "0.021011813"
+          ],
+          [
+            1795091384.021,
+            "0.021011813"
+          ],
+          [
+            1795091386.021,
+            "0.019428575"
+          ],
+          [
+            1795091388.021,
+            "0.019428575"
+          ],
+          [
+            1795091390.021,
+            "0.117535268"
+          ],
+          [
+            1795091392.021,
+            "0.117535268"
+          ],
+          [
+            1795091394.021,
+            "0.117535268"
+          ],
+          [
+            1795091396.021,
+            "0.070199197"
+          ],
+          [
+            1795091398.021,
+            "0.070199197"
+          ],
+          [
+            1795091400.021,
+            "0.145870719"
+          ],
+          [
+            1795091402.021,
+            "0.145870719"
+          ],
+          [
+            1795091404.021,
+            "0.145870719"
+          ],
+          [
+            1795091406.021,
+            "0.050567762"
+          ],
+          [
+            1795091408.021,
+            "0.050567762"
+          ],
+          [
+            1795091410.021,
+            "0.023884454"
+          ],
+          [
+            1795091412.021,
+            "0.023884454"
+          ],
+          [
+            1795091414.021,
+            "0.023884454"
+          ],
+          [
+            1795091436.021,
+            "0.029770538"
+          ],
+          [
+            1795091438.021,
+            "0.029770538"
+          ],
+          [
+            1795091440.021,
+            "0.348287418"
+          ],
+          [
+            1795091442.021,
+            "0.348287418"
+          ],
+          [
+            1795091444.021,
+            "0.348287418"
+          ],
+          [
+            1795091466.021,
+            "0.011863477"
+          ],
+          [
+            1795091468.021,
+            "0.011863477"
+          ],
+          [
+            1795091470.021,
+            "0.013436274"
+          ],
+          [
+            1795091472.021,
+            "0.013436274"
+          ],
+          [
+            1795091474.021,
+            "0.013436274"
+          ],
+          [
+            1795091476.021,
+            "0.073441759"
+          ],
+          [
+            1795091478.021,
+            "0.073441759"
+          ],
+          [
+            1795091480.021,
+            "0.201540575"
+          ],
+          [
+            1795091482.021,
+            "0.201540575"
+          ],
+          [
+            1795091484.021,
+            "0.201540575"
+          ],
+          [
+            1795091496.021,
+            "0.09486647"
+          ],
+          [
+            1795091498.021,
+            "0.09486647"
+          ],
+          [
+            1795091500.021,
+            "0.012138217"
+          ],
+          [
+            1795091502.021,
+            "0.012138217"
+          ],
+          [
+            1795091504.021,
+            "0.012138217"
+          ],
+          [
+            1795091506.021,
+            "0.02435324"
+          ],
+          [
+            1795091508.021,
+            "0.02435324"
+          ],
+          [
+            1795091510.021,
+            "0.045074866"
+          ],
+          [
+            1795091512.021,
+            "0.045074866"
+          ],
+          [
+            1795091514.021,
+            "0.045074866"
+          ],
+          [
+            1795091516.021,
+            "0.068317839"
+          ],
+          [
+            1795091518.021,
+            "0.068317839"
+          ],
+          [
+            1795091520.021,
+            "0.108747866"
+          ],
+          [
+            1795091522.021,
+            "0.108747866"
+          ],
+          [
+            1795091524.021,
+            "0.108747866"
+          ],
+          [
+            1795091526.021,
+            "0.08794236"
+          ],
+          [
+            1795091528.021,
+            "0.08794236"
+          ],
+          [
+            1795091530.021,
+            "0.045852913"
+          ],
+          [
+            1795091532.021,
+            "0.045852913"
+          ],
+          [
+            1795091534.021,
+            "0.045852913"
+          ],
+          [
+            1795091536.021,
+            "0.049504445"
+          ],
+          [
+            1795091538.021,
+            "0.049504445"
+          ],
+          [
+            1795091540.021,
+            "0.034168797"
+          ],
+          [
+            1795091542.021,
+            "0.034168797"
+          ],
+          [
+            1795091544.021,
+            "0.034168797"
+          ],
+          [
+            1795091546.021,
+            "0.018879208"
+          ],
+          [
+            1795091548.021,
+            "0.018879208"
+          ],
+          [
+            1795091550.021,
+            "0.05943167"
+          ],
+          [
+            1795091552.021,
+            "0.05943167"
+          ],
+          [
+            1795091554.021,
+            "0.05943167"
+          ],
+          [
+            1795091556.021,
+            "0.05943167"
+          ],
+          [
+            1795091558.021,
+            "0.008325844"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "pulsechat_nodejs_eventloop_lag_seconds",
+          "exported_instance": "650c2ed32155",
+          "instance": "processor-2:8080",
+          "job": "pulsechat-processors",
+          "service": "processor"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0.029243815"
+          ],
+          [
+            1795091382.021,
+            "0.029243815"
+          ],
+          [
+            1795091384.021,
+            "0.029243815"
+          ],
+          [
+            1795091386.021,
+            "0.017435326"
+          ],
+          [
+            1795091388.021,
+            "0.017435326"
+          ],
+          [
+            1795091390.021,
+            "0.040148452"
+          ],
+          [
+            1795091392.021,
+            "0.040148452"
+          ],
+          [
+            1795091394.021,
+            "0.040148452"
+          ],
+          [
+            1795091396.021,
+            "0.01124554"
+          ],
+          [
+            1795091398.021,
+            "0.01124554"
+          ],
+          [
+            1795091400.021,
+            "0.026702476"
+          ],
+          [
+            1795091402.021,
+            "0.026702476"
+          ],
+          [
+            1795091404.021,
+            "0.026702476"
+          ],
+          [
+            1795091406.021,
+            "0.017858939"
+          ],
+          [
+            1795091408.021,
+            "0.017858939"
+          ],
+          [
+            1795091410.021,
+            "0.14350633"
+          ],
+          [
+            1795091412.021,
+            "0.14350633"
+          ],
+          [
+            1795091414.021,
+            "0.14350633"
+          ],
+          [
+            1795091416.021,
+            "0.043154567"
+          ],
+          [
+            1795091418.021,
+            "0.043154567"
+          ],
+          [
+            1795091420.021,
+            "0.20416882"
+          ],
+          [
+            1795091422.021,
+            "0.20416882"
+          ],
+          [
+            1795091424.021,
+            "0.20416882"
+          ],
+          [
+            1795091426.021,
+            "1.428566941"
+          ],
+          [
+            1795091428.021,
+            "1.428566941"
+          ],
+          [
+            1795091430.021,
+            "0.139995099"
+          ],
+          [
+            1795091432.021,
+            "0.139995099"
+          ],
+          [
+            1795091434.021,
+            "0.139995099"
+          ],
+          [
+            1795091436.021,
+            "0.03526097"
+          ],
+          [
+            1795091438.021,
+            "0.03526097"
+          ],
+          [
+            1795091440.021,
+            "0.041741485"
+          ],
+          [
+            1795091442.021,
+            "0.041741485"
+          ],
+          [
+            1795091444.021,
+            "0.041741485"
+          ],
+          [
+            1795091446.021,
+            "0.063797136"
+          ],
+          [
+            1795091448.021,
+            "0.063797136"
+          ],
+          [
+            1795091450.021,
+            "0.249769276"
+          ],
+          [
+            1795091452.021,
+            "0.249769276"
+          ],
+          [
+            1795091454.021,
+            "0.249769276"
+          ],
+          [
+            1795091456.021,
+            "0.189186794"
+          ],
+          [
+            1795091458.021,
+            "0.189186794"
+          ],
+          [
+            1795091460.021,
+            "0.325328055"
+          ],
+          [
+            1795091462.021,
+            "0.325328055"
+          ],
+          [
+            1795091464.021,
+            "0.325328055"
+          ],
+          [
+            1795091466.021,
+            "0.629625682"
+          ],
+          [
+            1795091468.021,
+            "0.629625682"
+          ],
+          [
+            1795091470.021,
+            "0.042724818"
+          ],
+          [
+            1795091472.021,
+            "0.042724818"
+          ],
+          [
+            1795091474.021,
+            "0.042724818"
+          ],
+          [
+            1795091476.021,
+            "0.281568659"
+          ],
+          [
+            1795091478.021,
+            "0.281568659"
+          ],
+          [
+            1795091480.021,
+            "0.026744614"
+          ],
+          [
+            1795091482.021,
+            "0.026744614"
+          ],
+          [
+            1795091484.021,
+            "0.026744614"
+          ],
+          [
+            1795091486.021,
+            "0.05751782"
+          ],
+          [
+            1795091488.021,
+            "0.05751782"
+          ],
+          [
+            1795091490.021,
+            "2.933755397"
+          ],
+          [
+            1795091492.021,
+            "2.933755397"
+          ],
+          [
+            1795091494.021,
+            "2.933755397"
+          ],
+          [
+            1795091496.021,
+            "0.188759139"
+          ],
+          [
+            1795091498.021,
+            "0.188759139"
+          ],
+          [
+            1795091500.021,
+            "0.131399184"
+          ],
+          [
+            1795091502.021,
+            "0.131399184"
+          ],
+          [
+            1795091504.021,
+            "0.131399184"
+          ],
+          [
+            1795091506.021,
+            "0.054443114"
+          ],
+          [
+            1795091508.021,
+            "0.054443114"
+          ],
+          [
+            1795091510.021,
+            "0.199422813"
+          ],
+          [
+            1795091512.021,
+            "0.199422813"
+          ],
+          [
+            1795091514.021,
+            "0.199422813"
+          ],
+          [
+            1795091516.021,
+            "0.081257646"
+          ],
+          [
+            1795091518.021,
+            "0.081257646"
+          ],
+          [
+            1795091520.021,
+            "0.046701952"
+          ],
+          [
+            1795091522.021,
+            "0.046701952"
+          ],
+          [
+            1795091524.021,
+            "0.046701952"
+          ],
+          [
+            1795091526.021,
+            "0.161841628"
+          ],
+          [
+            1795091528.021,
+            "0.161841628"
+          ],
+          [
+            1795091530.021,
+            "0.025595789"
+          ],
+          [
+            1795091532.021,
+            "0.025595789"
+          ],
+          [
+            1795091534.021,
+            "0.025595789"
+          ],
+          [
+            1795091536.021,
+            "0.032613651"
+          ],
+          [
+            1795091538.021,
+            "0.032613651"
+          ],
+          [
+            1795091540.021,
+            "0.030279984"
+          ],
+          [
+            1795091542.021,
+            "0.030279984"
+          ],
+          [
+            1795091544.021,
+            "0.030279984"
+          ],
+          [
+            1795091546.021,
+            "0.024827005"
+          ],
+          [
+            1795091548.021,
+            "0.024827005"
+          ],
+          [
+            1795091550.021,
+            "0.085996105"
+          ],
+          [
+            1795091552.021,
+            "0.085996105"
+          ],
+          [
+            1795091554.021,
+            "0.085996105"
+          ],
+          [
+            1795091556.021,
+            "0.085996105"
+          ],
+          [
+            1795091558.021,
+            "0.015567335"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "pulsechat_nodejs_eventloop_lag_seconds",
+          "exported_instance": "9657ac7a562a",
+          "instance": "gateway-1:8080",
+          "job": "pulsechat-gateways",
+          "service": "gateway"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0.138535286"
+          ],
+          [
+            1795091382.021,
+            "0.138535286"
+          ],
+          [
+            1795091384.021,
+            "0.045687917"
+          ],
+          [
+            1795091386.021,
+            "0.045687917"
+          ],
+          [
+            1795091388.021,
+            "0.194894126"
+          ],
+          [
+            1795091390.021,
+            "0.194894126"
+          ],
+          [
+            1795091392.021,
+            "0.194894126"
+          ],
+          [
+            1795091394.021,
+            "0.045262077"
+          ],
+          [
+            1795091396.021,
+            "0.045262077"
+          ],
+          [
+            1795091398.021,
+            "0.813953836"
+          ],
+          [
+            1795091400.021,
+            "0.813953836"
+          ],
+          [
+            1795091402.021,
+            "0.813953836"
+          ],
+          [
+            1795091404.021,
+            "0.06939172"
+          ],
+          [
+            1795091406.021,
+            "0.06939172"
+          ],
+          [
+            1795091408.021,
+            "0.124846475"
+          ],
+          [
+            1795091410.021,
+            "0.124846475"
+          ],
+          [
+            1795091412.021,
+            "0.124846475"
+          ],
+          [
+            1795091434.021,
+            "0.028827861"
+          ],
+          [
+            1795091436.021,
+            "0.028827861"
+          ],
+          [
+            1795091438.021,
+            "0.016156604"
+          ],
+          [
+            1795091440.021,
+            "0.016156604"
+          ],
+          [
+            1795091442.021,
+            "0.016156604"
+          ],
+          [
+            1795091468.021,
+            "0.05739689"
+          ],
+          [
+            1795091470.021,
+            "0.05739689"
+          ],
+          [
+            1795091472.021,
+            "0.05739689"
+          ],
+          [
+            1795091474.021,
+            "0.060708483"
+          ],
+          [
+            1795091476.021,
+            "0.060708483"
+          ],
+          [
+            1795091478.021,
+            "0.133819043"
+          ],
+          [
+            1795091480.021,
+            "0.133819043"
+          ],
+          [
+            1795091482.021,
+            "0.133819043"
+          ],
+          [
+            1795091484.021,
+            "0.190181127"
+          ],
+          [
+            1795091486.021,
+            "0.190181127"
+          ],
+          [
+            1795091488.021,
+            "0.624316726"
+          ],
+          [
+            1795091490.021,
+            "0.624316726"
+          ],
+          [
+            1795091492.021,
+            "0.624316726"
+          ],
+          [
+            1795091498.021,
+            "0.096952427"
+          ],
+          [
+            1795091500.021,
+            "0.096952427"
+          ],
+          [
+            1795091502.021,
+            "0.096952427"
+          ],
+          [
+            1795091504.021,
+            "0.077223536"
+          ],
+          [
+            1795091506.021,
+            "0.077223536"
+          ],
+          [
+            1795091508.021,
+            "0.605959694"
+          ],
+          [
+            1795091510.021,
+            "0.605959694"
+          ],
+          [
+            1795091512.021,
+            "0.605959694"
+          ],
+          [
+            1795091514.021,
+            "0.009937444"
+          ],
+          [
+            1795091516.021,
+            "0.009937444"
+          ],
+          [
+            1795091518.021,
+            "0.060580704"
+          ],
+          [
+            1795091520.021,
+            "0.060580704"
+          ],
+          [
+            1795091522.021,
+            "0.060580704"
+          ],
+          [
+            1795091524.021,
+            "0.175861119"
+          ],
+          [
+            1795091526.021,
+            "0.175861119"
+          ],
+          [
+            1795091528.021,
+            "0.084874146"
+          ],
+          [
+            1795091530.021,
+            "0.084874146"
+          ],
+          [
+            1795091532.021,
+            "0.084874146"
+          ],
+          [
+            1795091534.021,
+            "0.054616283"
+          ],
+          [
+            1795091536.021,
+            "0.054616283"
+          ],
+          [
+            1795091538.021,
+            "0.034212598"
+          ],
+          [
+            1795091540.021,
+            "0.034212598"
+          ],
+          [
+            1795091542.021,
+            "0.034212598"
+          ],
+          [
+            1795091544.021,
+            "0.01160179"
+          ],
+          [
+            1795091546.021,
+            "0.01160179"
+          ],
+          [
+            1795091548.021,
+            "0.021872157"
+          ],
+          [
+            1795091550.021,
+            "0.021872157"
+          ],
+          [
+            1795091552.021,
+            "0.021872157"
+          ],
+          [
+            1795091554.021,
+            "0.022773627"
+          ],
+          [
+            1795091556.021,
+            "0.022773627"
+          ],
+          [
+            1795091558.021,
+            "0.022773627"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "pulsechat_nodejs_eventloop_lag_seconds",
+          "exported_instance": "d2f315bfeae5",
+          "instance": "gateway-3:8080",
+          "job": "pulsechat-gateways",
+          "service": "gateway"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0.01373655"
+          ],
+          [
+            1795091382.021,
+            "0.017479627"
+          ],
+          [
+            1795091384.021,
+            "0.017479627"
+          ],
+          [
+            1795091386.021,
+            "0.153488951"
+          ],
+          [
+            1795091388.021,
+            "0.153488951"
+          ],
+          [
+            1795091390.021,
+            "0.153488951"
+          ],
+          [
+            1795091392.021,
+            "0.294546706"
+          ],
+          [
+            1795091394.021,
+            "0.294546706"
+          ],
+          [
+            1795091396.021,
+            "0.039630853"
+          ],
+          [
+            1795091398.021,
+            "0.039630853"
+          ],
+          [
+            1795091400.021,
+            "0.039630853"
+          ],
+          [
+            1795091402.021,
+            "0.247070495"
+          ],
+          [
+            1795091404.021,
+            "0.247070495"
+          ],
+          [
+            1795091406.021,
+            "0.044536347"
+          ],
+          [
+            1795091408.021,
+            "0.044536347"
+          ],
+          [
+            1795091410.021,
+            "0.044536347"
+          ],
+          [
+            1795091412.021,
+            "0.055500956"
+          ],
+          [
+            1795091414.021,
+            "0.055500956"
+          ],
+          [
+            1795091432.021,
+            "0.054427639"
+          ],
+          [
+            1795091434.021,
+            "0.054427639"
+          ],
+          [
+            1795091436.021,
+            "0.026699036"
+          ],
+          [
+            1795091438.021,
+            "0.026699036"
+          ],
+          [
+            1795091440.021,
+            "0.026699036"
+          ],
+          [
+            1795091442.021,
+            "0.244940524"
+          ],
+          [
+            1795091444.021,
+            "0.244940524"
+          ],
+          [
+            1795091446.021,
+            "0.119490317"
+          ],
+          [
+            1795091448.021,
+            "0.119490317"
+          ],
+          [
+            1795091450.021,
+            "0.119490317"
+          ],
+          [
+            1795091466.021,
+            "0.019154264"
+          ],
+          [
+            1795091468.021,
+            "0.019154264"
+          ],
+          [
+            1795091470.021,
+            "0.019154264"
+          ],
+          [
+            1795091472.021,
+            "0.023523455"
+          ],
+          [
+            1795091474.021,
+            "0.023523455"
+          ],
+          [
+            1795091476.021,
+            "0.04392004"
+          ],
+          [
+            1795091478.021,
+            "0.04392004"
+          ],
+          [
+            1795091480.021,
+            "0.04392004"
+          ],
+          [
+            1795091482.021,
+            "0.035235203"
+          ],
+          [
+            1795091484.021,
+            "0.035235203"
+          ],
+          [
+            1795091486.021,
+            "0.087705507"
+          ],
+          [
+            1795091488.021,
+            "0.087705507"
+          ],
+          [
+            1795091490.021,
+            "0.087705507"
+          ],
+          [
+            1795091492.021,
+            "0.5318194"
+          ],
+          [
+            1795091494.021,
+            "0.5318194"
+          ],
+          [
+            1795091496.021,
+            "0.703592546"
+          ],
+          [
+            1795091498.021,
+            "0.703592546"
+          ],
+          [
+            1795091500.021,
+            "0.703592546"
+          ],
+          [
+            1795091502.021,
+            "0.018333586"
+          ],
+          [
+            1795091504.021,
+            "0.018333586"
+          ],
+          [
+            1795091506.021,
+            "0.145046462"
+          ],
+          [
+            1795091508.021,
+            "0.145046462"
+          ],
+          [
+            1795091510.021,
+            "0.145046462"
+          ],
+          [
+            1795091512.021,
+            "0.030413464"
+          ],
+          [
+            1795091514.021,
+            "0.030413464"
+          ],
+          [
+            1795091516.021,
+            "0.01718534"
+          ],
+          [
+            1795091518.021,
+            "0.01718534"
+          ],
+          [
+            1795091520.021,
+            "0.01718534"
+          ],
+          [
+            1795091522.021,
+            "0.050118343"
+          ],
+          [
+            1795091524.021,
+            "0.050118343"
+          ],
+          [
+            1795091526.021,
+            "0.056777442"
+          ],
+          [
+            1795091528.021,
+            "0.056777442"
+          ],
+          [
+            1795091530.021,
+            "0.056777442"
+          ],
+          [
+            1795091532.021,
+            "0.071994818"
+          ],
+          [
+            1795091534.021,
+            "0.071994818"
+          ],
+          [
+            1795091536.021,
+            "0.034828317"
+          ],
+          [
+            1795091538.021,
+            "0.034828317"
+          ],
+          [
+            1795091540.021,
+            "0.034828317"
+          ],
+          [
+            1795091542.021,
+            "0.064229475"
+          ],
+          [
+            1795091544.021,
+            "0.064229475"
+          ],
+          [
+            1795091546.021,
+            "0.049057301"
+          ],
+          [
+            1795091548.021,
+            "0.049057301"
+          ],
+          [
+            1795091550.021,
+            "0.049057301"
+          ],
+          [
+            1795091552.021,
+            "0.013379729"
+          ],
+          [
+            1795091554.021,
+            "0.013379729"
+          ],
+          [
+            1795091556.021,
+            "0.013379729"
+          ],
+          [
+            1795091558.021,
+            "0.029362946"
+          ]
+        ]
+      },
+      {
+        "metric": {
+          "__name__": "pulsechat_nodejs_eventloop_lag_seconds",
+          "exported_instance": "e84fa559d43c",
+          "instance": "processor-1:8080",
+          "job": "pulsechat-processors",
+          "service": "processor"
+        },
+        "values": [
+          [
+            1795091380.021,
+            "0.024059264"
+          ],
+          [
+            1795091382.021,
+            "0.023970486"
+          ],
+          [
+            1795091384.021,
+            "0.023970486"
+          ],
+          [
+            1795091386.021,
+            "0.04335816"
+          ],
+          [
+            1795091388.021,
+            "0.04335816"
+          ],
+          [
+            1795091390.021,
+            "0.04335816"
+          ],
+          [
+            1795091392.021,
+            "0.257729975"
+          ],
+          [
+            1795091394.021,
+            "0.257729975"
+          ],
+          [
+            1795091396.021,
+            "0.065748512"
+          ],
+          [
+            1795091398.021,
+            "0.065748512"
+          ],
+          [
+            1795091400.021,
+            "0.065748512"
+          ],
+          [
+            1795091402.021,
+            "0.011633532"
+          ],
+          [
+            1795091404.021,
+            "0.011633532"
+          ],
+          [
+            1795091406.021,
+            "0.044412945"
+          ],
+          [
+            1795091408.021,
+            "0.044412945"
+          ],
+          [
+            1795091410.021,
+            "0.044412945"
+          ],
+          [
+            1795091412.021,
+            "0.0473137"
+          ],
+          [
+            1795091414.021,
+            "0.0473137"
+          ],
+          [
+            1795091416.021,
+            "0.068564159"
+          ],
+          [
+            1795091418.021,
+            "0.068564159"
+          ],
+          [
+            1795091420.021,
+            "0.068564159"
+          ],
+          [
+            1795091422.021,
+            "1.387361142"
+          ],
+          [
+            1795091424.021,
+            "1.387361142"
+          ],
+          [
+            1795091426.021,
+            "0.586488773"
+          ],
+          [
+            1795091428.021,
+            "0.586488773"
+          ],
+          [
+            1795091430.021,
+            "0.586488773"
+          ],
+          [
+            1795091432.021,
+            "0.070281545"
+          ],
+          [
+            1795091434.021,
+            "0.070281545"
+          ],
+          [
+            1795091436.021,
+            "0.041034184"
+          ],
+          [
+            1795091438.021,
+            "0.041034184"
+          ],
+          [
+            1795091440.021,
+            "0.041034184"
+          ],
+          [
+            1795091442.021,
+            "0.131630224"
+          ],
+          [
+            1795091444.021,
+            "0.131630224"
+          ],
+          [
+            1795091446.021,
+            "0.073218189"
+          ],
+          [
+            1795091448.021,
+            "0.073218189"
+          ],
+          [
+            1795091450.021,
+            "0.073218189"
+          ],
+          [
+            1795091452.021,
+            "0.84567988"
+          ],
+          [
+            1795091454.021,
+            "0.84567988"
+          ],
+          [
+            1795091456.021,
+            "0.579818627"
+          ],
+          [
+            1795091458.021,
+            "0.579818627"
+          ],
+          [
+            1795091460.021,
+            "0.579818627"
+          ],
+          [
+            1795091462.021,
+            "0.270981394"
+          ],
+          [
+            1795091464.021,
+            "0.270981394"
+          ],
+          [
+            1795091466.021,
+            "0.284441712"
+          ],
+          [
+            1795091468.021,
+            "0.284441712"
+          ],
+          [
+            1795091470.021,
+            "0.284441712"
+          ],
+          [
+            1795091472.021,
+            "0.038901225"
+          ],
+          [
+            1795091474.021,
+            "0.038901225"
+          ],
+          [
+            1795091476.021,
+            "0.080833444"
+          ],
+          [
+            1795091478.021,
+            "0.080833444"
+          ],
+          [
+            1795091480.021,
+            "0.080833444"
+          ],
+          [
+            1795091482.021,
+            "0.076719694"
+          ],
+          [
+            1795091484.021,
+            "0.076719694"
+          ],
+          [
+            1795091486.021,
+            "0.076719694"
+          ],
+          [
+            1795091488.021,
+            "0.024996861"
+          ],
+          [
+            1795091490.021,
+            "0.024996861"
+          ],
+          [
+            1795091492.021,
+            "0.281605532"
+          ],
+          [
+            1795091494.021,
+            "0.281605532"
+          ],
+          [
+            1795091496.021,
+            "1.931404147"
+          ],
+          [
+            1795091498.021,
+            "1.931404147"
+          ],
+          [
+            1795091500.021,
+            "1.931404147"
+          ],
+          [
+            1795091502.021,
+            "0.15405961"
+          ],
+          [
+            1795091504.021,
+            "0.15405961"
+          ],
+          [
+            1795091506.021,
+            "0.302419455"
+          ],
+          [
+            1795091508.021,
+            "0.302419455"
+          ],
+          [
+            1795091510.021,
+            "0.302419455"
+          ],
+          [
+            1795091512.021,
+            "0.048781369"
+          ],
+          [
+            1795091514.021,
+            "0.048781369"
+          ],
+          [
+            1795091516.021,
+            "0.146759831"
+          ],
+          [
+            1795091518.021,
+            "0.146759831"
+          ],
+          [
+            1795091520.021,
+            "0.146759831"
+          ],
+          [
+            1795091522.021,
+            "0.074273469"
+          ],
+          [
+            1795091524.021,
+            "0.074273469"
+          ],
+          [
+            1795091526.021,
+            "1.027144101"
+          ],
+          [
+            1795091528.021,
+            "1.027144101"
+          ],
+          [
+            1795091530.021,
+            "1.027144101"
+          ],
+          [
+            1795091532.021,
+            "0.020026217"
+          ],
+          [
+            1795091534.021,
+            "0.020026217"
+          ],
+          [
+            1795091536.021,
+            "0.078226583"
+          ],
+          [
+            1795091538.021,
+            "0.078226583"
+          ],
+          [
+            1795091540.021,
+            "0.078226583"
+          ],
+          [
+            1795091542.021,
+            "0.254081115"
+          ],
+          [
+            1795091544.021,
+            "0.254081115"
+          ],
+          [
+            1795091546.021,
+            "0.020569036"
+          ],
+          [
+            1795091548.021,
+            "0.020569036"
+          ],
+          [
+            1795091550.021,
+            "0.020569036"
+          ],
+          [
+            1795091552.021,
+            "0.030036716"
+          ],
+          [
+            1795091554.021,
+            "0.030036716"
+          ],
+          [
+            1795091556.021,
+            "0.030036716"
+          ],
+          [
+            1795091558.021,
+            "0.004491508"
+          ]
+        ]
+      }
+    ]
+  },
+  "hardware": {
+    "host": {
+      "platform": "win32",
+      "release": "10.0.22621",
+      "cpuModel": "Intel(R) Core(TM) i5-3437U CPU @ 1.90GHz",
+      "logicalCpus": 4,
+      "memoryBytes": 6299365376
+    },
+    "docker": {
+      "version": "25.0.3",
+      "cpus": 4,
+      "memoryBytes": 2978533376,
+      "os": "Docker Desktop (containerized)",
+      "kernel": "6.18.58.1-microsoft-standard-WSL2"
+    },
+    "containers": [
+      {
+        "name": "/pulsechat-gateway-2-1",
+        "image": "sha256:df0e235a9a1998e68fd78cdf1cf539b00d7bc3e34996e5113befa9f41304a0a7",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-gateway-1-1",
+        "image": "sha256:df0e235a9a1998e68fd78cdf1cf539b00d7bc3e34996e5113befa9f41304a0a7",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-gateway-3-1",
+        "image": "sha256:df0e235a9a1998e68fd78cdf1cf539b00d7bc3e34996e5113befa9f41304a0a7",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-nginx-1",
+        "image": "sha256:dc73b49f5124cf2ee538dfbdfbd121f0b4ccdcb20fea30f3a81bd477c02e2bb5",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-processor-2-1",
+        "image": "sha256:283bc0f7d7954b2d156daa74ede4e68c08cd5c43f0fd50c041f484e8d022ce21",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "1",
+          "KAFKA_BATCH_LINGER_MS": "5"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-processor-1-1",
+        "image": "sha256:283bc0f7d7954b2d156daa74ede4e68c08cd5c43f0fd50c041f484e8d022ce21",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "1",
+          "KAFKA_BATCH_LINGER_MS": "5"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-kafka-1",
+        "image": "sha256:44a48f9d78af26959fa4d61accb9be35f939a79bfdae05cad6df4baca8e22eeb",
+        "runtimeSettings": {
+          "KAFKA_BROKER_SESSION_TIMEOUT_MS": "60000"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-frontend-1",
+        "image": "sha256:58810534601f7d10f7b7b3298d300bd991a163d81b9f7994a68406efdf980e95",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-grafana-1",
+        "image": "sha256:5c42a1c2e40bdbf0d7c55cbef9f51ba8a8c928678ac16421e321f4ca246e2ac3",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-mongo-1",
+        "image": "sha256:b1574608720ee095c98916aa9b19d319c297ad21aa92a41c4a3b8875128900bf",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-redis-1",
+        "image": "sha256:bb8953020f6597e47d5d699a9910a25d77a69608dbd58e0f722940598ed85fc0",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-prometheus-1",
+        "image": "sha256:503e04849f1c820b73ed19f348cb8da0c9728f38b6a4f68eb68d8c3eb0e1869f",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      }
+    ]
+  },
+  "runnerResources": {
+    "startedAt": "2026-11-19T12:29:36.991Z",
+    "endedAt": "2026-11-19T12:32:41.087Z",
+    "elapsedMs": 184096,
+    "cpuMicroseconds": {
+      "user": 3860000,
+      "system": 625000
+    },
+    "eventLoopDelayMs": {
+      "resolution": 20,
+      "mean": 30.29864397432099,
+      "p95": 32.784383,
+      "p99": 36.405247,
+      "max": 127.074303
+    },
+    "stderr": ""
+  },
+  "loadGeneratorMemoryLimitBytes": 671088640,
+  "generatorResultsFilesystem": "Docker anonymous volume",
+  "classification": {
+    "issued": 1266,
+    "receivedAcked": 1266,
+    "kafkaAccepted": 1266,
+    "persisted": 1266,
+    "peerDelivered": 751,
+    "clientFailedBeforeAck": 0,
+    "unresolvedBeforeAck": 0,
+    "persistedWithoutReceivedAck": 0,
+    "acceptedButUnpersisted": 0,
+    "unexpectedIds": [],
+    "acceptedButUnpersistedIds": [],
+    "clientFailedBeforeAckIds": [],
+    "unresolvedBeforeAckIds": []
+  },
+  "ledgerComplete": true,
+  "resourceSamplingComplete": true,
+  "resourceCpuPercent": {
+    "pulsechat-gateway-2-1": {
+      "count": 234,
+      "p50": 43.89,
+      "p95": 82.813,
+      "p99": 100.55029999999977,
+      "min": 10.62,
+      "max": 106.52,
+      "mean": 47.050854700854714
+    },
+    "pulsechat-gateway-1-1": {
+      "count": 235,
+      "p50": 46.13,
+      "p95": 70.239,
+      "p99": 98.93,
+      "min": 12.19,
+      "max": 98.93,
+      "mean": 47.069106382978795
+    },
+    "pulsechat-gateway-3-1": {
+      "count": 235,
+      "p50": 46.87,
+      "p95": 87.57,
+      "p99": 104.69979999999995,
+      "min": 10.85,
+      "max": 108.96,
+      "mean": 46.78714893617021
+    },
+    "pulsechat-nginx-1": {
+      "count": 235,
+      "p50": 6.35,
+      "p95": 13.86,
+      "p99": 81.49739999999967,
+      "min": 0,
+      "max": 114.95,
+      "mean": 7.719531914893614
+    },
+    "pulsechat-processor-2-1": {
+      "count": 231,
+      "p50": 26.4,
+      "p95": 76.77,
+      "p99": 133.74,
+      "min": 6.02,
+      "max": 133.74,
+      "mean": 32.94199134199131
+    },
+    "pulsechat-processor-1-1": {
+      "count": 235,
+      "p50": 25.5,
+      "p95": 52.84,
+      "p99": 61.96079999999999,
+      "min": 5.35,
+      "max": 62.77,
+      "mean": 26.918978723404276
+    },
+    "pulsechat-kafka-1": {
+      "count": 236,
+      "p50": 11.09,
+      "p95": 41.94,
+      "p99": 112.86,
+      "min": 2.44,
+      "max": 112.86,
+      "mean": 17.023771186440683
+    },
+    "pulsechat-frontend-1": {
+      "count": 235,
+      "p50": 0,
+      "p95": 3.392999999999998,
+      "p99": 7.87,
+      "min": 0,
+      "max": 11.17,
+      "mean": 0.47859574468085114
+    },
+    "pulsechat-grafana-1": {
+      "count": 236,
+      "p50": 2.01,
+      "p95": 48.66,
+      "p99": 158.43,
+      "min": 0.34,
+      "max": 158.43,
+      "mean": 12.317033898305086
+    },
+    "pulsechat-mongo-1": {
+      "count": 233,
+      "p50": 51.33,
+      "p95": 104.35,
+      "p99": 130.55,
+      "min": 3.5,
+      "max": 415.44,
+      "mean": 55.35510729613732
+    },
+    "pulsechat-redis-1": {
+      "count": 236,
+      "p50": 12.385,
+      "p95": 23.38,
+      "p99": 28.999500000000012,
+      "min": 3.55,
+      "max": 29.78,
+      "mean": 12.693771186440678
+    },
+    "pulsechat-prometheus-1": {
+      "count": 233,
+      "p50": 1.57,
+      "p95": 13.08,
+      "p99": 19.619600000000023,
+      "min": 0.05,
+      "max": 20.73,
+      "mean": 2.6912875536480687
+    },
+    "load-generator": {
+      "count": 234,
+      "p50": 29.75,
+      "p95": 58.278999999999954,
+      "p99": 137.12,
+      "min": 9.89,
+      "max": 137.12,
+      "mean": 34.20149572649574
+    }
+  },
+  "peakClientWelcomedConnections": 200,
+  "targetReached": true,
+  "steadyMinimumConnections": 200,
+  "steadyTargetHeld": true,
+  "deliveryLatencyMs": {
+    "count": 751,
+    "p50": 43667,
+    "p95": 71762,
+    "p99": 77285,
+    "min": 9908,
+    "max": 83014,
+    "mean": 43819.7896138482
+  },
+  "steadyCohortLatencyMs": {
+    "count": 551,
+    "p50": 48823,
+    "p95": 72767,
+    "p99": 80129,
+    "min": 30784,
+    "max": 83014,
+    "mean": 51847.528130671504
+  },
+  "steadyCohortIssued": 1066,
+  "steadyCohortUndelivered": 515,
+  "issuedNotPeerDelivered": 515,
+  "receivedAckedNotPeerDelivered": 515,
+  "steadyIssuedMessagesPerSecond": 35.53333333333333,
+  "steadyPeerDeliveriesPerSecond": 4.866666666666666,
+  "stageLatencyMs": {
+    "client_to_gateway": {
+      "count": 472,
+      "p50": 1566,
+      "p95": 4366.049999999999,
+      "p99": 8103.87,
+      "min": 5,
+      "max": 8399,
+      "mean": 1854.5063559322034
+    },
+    "gateway_prepare": {
+      "count": 472,
+      "p50": 11289,
+      "p95": 29946.749999999996,
+      "p99": 30758.310000000005,
+      "min": 3665,
+      "max": 33320,
+      "mean": 15739.599576271186
+    },
+    "kafka_to_processor": {
+      "count": 472,
+      "p50": 6906.5,
+      "p95": 37108.7,
+      "p99": 39452.740000000005,
+      "min": 324,
+      "max": 42754,
+      "mean": 11411.978813559323
+    },
+    "partition_queue": {
+      "count": 472,
+      "p50": 6247,
+      "p95": 32552.699999999993,
+      "p99": 36544.12,
+      "min": 0,
+      "max": 37638,
+      "mean": 10329.76906779661
+    },
+    "processor_prepare": {
+      "count": 472,
+      "p50": 37,
+      "p95": 374.29999999999984,
+      "p99": 1435.840000000008,
+      "min": 3,
+      "max": 7306,
+      "mean": 125.16525423728814
+    },
+    "sequence_assign": {
+      "count": 472,
+      "p50": 7,
+      "p95": 63.349999999999966,
+      "p99": 147.47000000000088,
+      "min": 1,
+      "max": 335,
+      "mean": 16.383474576271187
+    },
+    "mongo_persist": {
+      "count": 472,
+      "p50": 39,
+      "p95": 316.34999999999997,
+      "p99": 1016.0900000000024,
+      "min": 2,
+      "max": 4031,
+      "mean": 98.40466101694915
+    },
+    "persist_to_publish": {
+      "count": 472,
+      "p50": 55,
+      "p95": 302.9,
+      "p99": 964.9600000000025,
+      "min": 5,
+      "max": 6083,
+      "mean": 121.94067796610169
+    },
+    "publish_to_gateway_push": {
+      "count": 472,
+      "p50": 446.5,
+      "p95": 1757.6499999999996,
+      "p99": 4059.5900000000033,
+      "min": 1,
+      "max": 7232,
+      "mean": 660.8580508474577
+    },
+    "gateway_push_to_client": {
+      "count": 472,
+      "p50": 29,
+      "p95": 1896.3999999999994,
+      "p99": 8599.170000000004,
+      "min": 0,
+      "max": 18034,
+      "mean": 420.76906779661016
+    },
+    "kafka_produce_ack": {
+      "count": 1266,
+      "p50": 2941,
+      "p95": 8709.75,
+      "p99": 12128.4,
+      "min": 870,
+      "max": 13882,
+      "mean": 3738.218009478673
+    }
+  },
+  "omittedNegativeOrInvalidStageSamples": {},
+  "produceAckConsumeOverlapSamples": 91,
+  "unexpectedRecipients": 0,
+  "persistenceObservedAt": "2026-11-19T12:32:43.555Z",
+  "timing": {
+    "event": "timing",
+    "startsAt": 1795091388431,
+    "steadyStartAt": 1795091428431,
+    "sendsEndAt": 1795091458431,
+    "closesAt": 1795091518431
+  }
+}

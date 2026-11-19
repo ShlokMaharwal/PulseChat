@@ -16,6 +16,20 @@ export interface Message {
   body: string;
   seq: number;
   createdAt: string;
+  trace?: PipelineTrace;
+}
+export interface PipelineTrace {
+  gatewayReceivedAt: number;
+  produceStartedAt: number;
+  kafkaAcknowledgedAt?: number;
+  processorConsumedAt?: number;
+  processorStartedAt?: number;
+  sequenceStartedAt?: number;
+  sequenceAssignedAt?: number;
+  mongoPersistStartedAt?: number;
+  mongoPersistedAt?: number;
+  redisPublishStartedAt?: number;
+  gatewayPushedAt?: number;
 }
 export interface Receipt {
   userId: string;
@@ -50,6 +64,7 @@ export type ServerFrame =
       status: 'received' | 'sent';
       messageId?: string;
       seq?: number;
+      trace?: PipelineTrace;
     }
   | ({ type: 'message' } & Message)
   | {

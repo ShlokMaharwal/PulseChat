@@ -1,0 +1,288 @@
+{
+  "state": {
+    "isStdOutTTY": false,
+    "isStdErrTTY": false,
+    "testRunDurationMs": 143022.140882
+  },
+  "metrics": {
+    "received_ack_latency_ms": {
+      "contains": "time",
+      "values": {
+        "max": 72880,
+        "p(50)": 27739,
+        "p(95)": 59374.25,
+        "p(99)": 69233.40000000002,
+        "avg": 31885.856812933027,
+        "min": 68,
+        "med": 27739
+      },
+      "type": "trend"
+    },
+    "rate_rejections": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 3,
+        "min": 3,
+        "max": 4
+      }
+    },
+    "delivery_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "avg": 38076.377245508986,
+        "min": 299,
+        "med": 36243,
+        "max": 77728,
+        "p(50)": 36243,
+        "p(95)": 67419,
+        "p(99)": 71375
+      }
+    },
+    "iteration_duration": {
+      "contains": "time",
+      "values": {
+        "avg": 142841.41939575,
+        "min": 142364.716934,
+        "med": 142986.329377,
+        "max": 143028.301895,
+        "p(50)": 142986.329377,
+        "p(95)": 143025.35696435,
+        "p(99)": 143027.71290887002
+      },
+      "type": "trend"
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 648552,
+        "rate": 4534.626569008542
+      }
+    },
+    "data_received": {
+      "values": {
+        "count": 2782977,
+        "rate": 19458.3648576208
+      },
+      "type": "counter",
+      "contains": "data"
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "min": 4,
+        "max": 4,
+        "value": 4
+      }
+    },
+    "generator_scheduler_delay_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 9,
+        "max": 8804,
+        "p(50)": 9,
+        "p(95)": 1261.3999999999999,
+        "p(99)": 6074.360000000017,
+        "avg": 283.1711491442543,
+        "min": 0
+      }
+    },
+    "connections_opened": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 200,
+        "rate": 1.3983848847921345
+      }
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 200,
+        "fails": 0
+      },
+      "thresholds": {
+        "rate>0.99": {
+          "ok": true
+        }
+      }
+    },
+    "sync_requests": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 1981,
+        "rate": 13.851002283866093
+      }
+    },
+    "ws_msgs_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 5531,
+        "rate": 38.67233398892648
+      }
+    },
+    "messages_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 6.565417034099071,
+        "count": 939
+      }
+    },
+    "socket_errors": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 8,
+        "rate": 0.05593539539168538
+      }
+    },
+    "messages_received_acked": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 866,
+        "rate": 6.055006551149942
+      }
+    },
+    "ws_sessions": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 200,
+        "rate": 1.3983848847921345
+      }
+    },
+    "ws_msgs_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 9293,
+        "rate": 64.97595367186653
+      }
+    },
+    "ws_session_duration": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 139084.42112075,
+        "p(99)": 139846.9406233,
+        "avg": 132854.47600455504,
+        "min": 120560.358052,
+        "med": 132794.457979,
+        "max": 140461.476166,
+        "p(50)": 132794.457979
+      }
+    },
+    "messages_confirmed": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 501,
+        "rate": 3.502954136404297
+      },
+      "thresholds": {
+        "count>0": {
+          "ok": true
+        }
+      }
+    },
+    "ws_connecting": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 8.871759,
+        "med": 3086.484613,
+        "max": 7195.126121,
+        "p(50)": 3086.484613,
+        "p(95)": 6059.993875149999,
+        "p(99)": 6831.961046999999,
+        "avg": 2552.065431115
+      }
+    },
+    "duplicate_wire_frames": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 4,
+        "rate": 0.02796769769584269
+      }
+    },
+    "ordering_violations": {
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      },
+      "type": "counter"
+    }
+  },
+  "setup_data": {
+    "closesAt": 1795089687543,
+    "sendsEndAt": 1795089627543,
+    "startsAt": 1795089557543,
+    "steadyStartAt": 1795089597543
+  },
+  "root_group": {
+    "checks": [
+      {
+        "id": "f291411d292ee3e36a4231d25b6c37db",
+        "passes": 200,
+        "fails": 0,
+        "name": "Authenticated welcome received",
+        "path": "::Authenticated welcome received"
+      }
+    ],
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": []
+  },
+  "options": {
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(50)",
+      "p(95)",
+      "p(99)"
+    ],
+    "summaryTimeUnit": "",
+    "noColor": false
+  }
+}

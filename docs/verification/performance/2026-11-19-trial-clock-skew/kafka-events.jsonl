@@ -1,0 +1,11 @@
+{"event":"kafka_accepted","clientMsgId":"e9a10f6c-5a34-4555-81b7-3ed899427fa3","messageId":"b8d43db0-3a57-5fb1-84dc-0a0709ee0b67","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1527"}
+{"event":"kafka_accepted","clientMsgId":"4491b9c3-6a4d-4708-a9ea-18418a013eb9","messageId":"6da58990-f70e-54ed-9bca-502683b85a44","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1528"}
+{"event":"kafka_accepted","clientMsgId":"f4a87e97-f3ab-4df2-96e5-b4f3bdc5be9a","messageId":"c1085938-5212-5fd2-9978-b915c9faf873","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1529"}
+{"event":"kafka_accepted","clientMsgId":"13fc4ef8-a1a9-484f-8769-9af818c504bb","messageId":"198978e4-c416-50a8-89df-06fddb15e649","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1530"}
+{"event":"kafka_accepted","clientMsgId":"f95b2700-eb4e-417e-b092-4747f8216f6b","messageId":"2a933650-4b19-5c09-a904-7dd980af022e","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1531"}
+{"event":"kafka_accepted","clientMsgId":"38a3f7ea-44f1-4d11-bb6c-06691dd32c44","messageId":"10a90007-cbce-5cbd-b797-744d777ba5e0","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1532"}
+{"event":"kafka_accepted","clientMsgId":"358b50a1-bfde-4436-b505-685c3027d574","messageId":"582dd445-f7da-56c9-aa01-b6f4026ef527","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1533"}
+{"event":"kafka_accepted","clientMsgId":"112641e0-4f45-4e50-887e-33cb8b22f130","messageId":"c959d419-df78-5bec-b3ba-ba1662272460","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1534"}
+{"event":"kafka_accepted","clientMsgId":"c6271e37-e8fc-4e9c-bfb7-1256bf9c2820","messageId":"50dcb1e1-969b-5543-aede-3c86256de099","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1535"}
+{"event":"kafka_accepted","clientMsgId":"2d5c5322-4310-4068-bbe2-921cc996381c","messageId":"d8d881df-e5b4-5ae2-b046-a00b6451e52f","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1536"}
+{"event":"kafka_accepted","clientMsgId":"8349f0fa-acb2-40fc-beed-1fb653a805f4","messageId":"320ddf7e-871d-5ca5-aec8-5a7ca2770a75","chatId":"2e14824c-8568-4950-821d-74c4c60581e9","partition":3,"offset":"1537"}

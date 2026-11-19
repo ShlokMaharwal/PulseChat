@@ -1,0 +1,143 @@
+{
+  "drained": true,
+  "samples": [
+    {
+      "at": "2026-11-19T12:29:24.075Z",
+      "processorLag": 0,
+      "auditLag": 0,
+      "partitions": {
+        "receipts:1": 0,
+        "receipts:2": 0,
+        "receipts:0": 0,
+        "receipts:3": 0,
+        "receipts:5": 0,
+        "receipts:4": 0,
+        "messages:1": 0,
+        "messages:2": 0,
+        "messages:0": 0,
+        "messages:3": 0,
+        "messages:5": 0,
+        "messages:4": 0
+      },
+      "auditJoined": true,
+      "inflight": 0,
+      "reportingGateways": 3,
+      "oldestScrapeAt": "2026-11-19T12:29:19.795Z"
+    },
+    {
+      "at": "2026-11-19T12:29:25.570Z",
+      "processorLag": 0,
+      "auditLag": 0,
+      "partitions": {
+        "receipts:1": 0,
+        "receipts:2": 0,
+        "receipts:0": 0,
+        "receipts:3": 0,
+        "receipts:5": 0,
+        "receipts:4": 0,
+        "messages:1": 0,
+        "messages:2": 0,
+        "messages:0": 0,
+        "messages:3": 0,
+        "messages:5": 0,
+        "messages:4": 0
+      },
+      "auditJoined": true,
+      "inflight": 0,
+      "reportingGateways": 3,
+      "oldestScrapeAt": "2026-11-19T12:29:20.511Z"
+    },
+    {
+      "at": "2026-11-19T12:29:27.276Z",
+      "processorLag": 0,
+      "auditLag": 0,
+      "partitions": {
+        "receipts:1": 0,
+        "receipts:2": 0,
+        "receipts:0": 0,
+        "receipts:3": 0,
+        "receipts:5": 0,
+        "receipts:4": 0,
+        "messages:1": 0,
+        "messages:2": 0,
+        "messages:0": 0,
+        "messages:3": 0,
+        "messages:5": 0,
+        "messages:4": 0
+      },
+      "auditJoined": true,
+      "inflight": 0,
+      "reportingGateways": 3,
+      "oldestScrapeAt": "2026-11-19T12:29:22.940Z"
+    },
+    {
+      "at": "2026-11-19T12:29:28.415Z",
+      "processorLag": 0,
+      "auditLag": 0,
+      "partitions": {
+        "receipts:1": 0,
+        "receipts:2": 0,
+        "receipts:0": 0,
+        "receipts:3": 0,
+        "receipts:5": 0,
+        "receipts:4": 0,
+        "messages:1": 0,
+        "messages:2": 0,
+        "messages:0": 0,
+        "messages:3": 0,
+        "messages:5": 0,
+        "messages:4": 0
+      },
+      "auditJoined": true,
+      "inflight": 0,
+      "reportingGateways": 3,
+      "oldestScrapeAt": "2026-11-19T12:29:24.684Z"
+    },
+    {
+      "at": "2026-11-19T12:29:29.566Z",
+      "processorLag": 0,
+      "auditLag": 0,
+      "partitions": {
+        "receipts:1": 0,
+        "receipts:2": 0,
+        "receipts:0": 0,
+        "receipts:3": 0,
+        "receipts:5": 0,
+        "receipts:4": 0,
+        "messages:1": 0,
+        "messages:2": 0,
+        "messages:0": 0,
+        "messages:3": 0,
+        "messages:5": 0,
+        "messages:4": 0
+      },
+      "auditJoined": true,
+      "inflight": 0,
+      "reportingGateways": 3,
+      "oldestScrapeAt": "2026-11-19T12:29:24.684Z"
+    },
+    {
+      "at": "2026-11-19T12:29:30.764Z",
+      "processorLag": 0,
+      "auditLag": 0,
+      "partitions": {
+        "receipts:1": 0,
+        "receipts:2": 0,
+        "receipts:0": 0,
+        "receipts:3": 0,
+        "receipts:5": 0,
+        "receipts:4": 0,
+        "messages:1": 0,
+        "messages:2": 0,
+        "messages:0": 0,
+        "messages:3": 0,
+        "messages:5": 0,
+        "messages:4": 0
+      },
+      "auditJoined": true,
+      "inflight": 0,
+      "reportingGateways": 3,
+      "oldestScrapeAt": "2026-11-19T12:29:27.942Z"
+    }
+  ]
+}

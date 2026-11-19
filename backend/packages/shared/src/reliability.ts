@@ -1,4 +1,6 @@
 import type { createDependencies } from './dependencies.js';
+import type { ServerFrame } from './schemas.js';
+import { timestamp, type PipelineStage } from './tracing.js';
 
 type RedisClient = ReturnType<typeof createDependencies>['redis'];
 
@@ -62,9 +64,23 @@ redis.call('DEL', KEYS[1], KEYS[4])
 return 1
 `;
 
-const PRUNE_ROUTE_LUA = `
-if redis.call('EXISTS', KEYS[1]) == 0 then return redis.call('SREM', KEYS[2], ARGV[1]) end
-return 0
+const TARGET_ROUTES_LUA = `
+local candidates = redis.call('SMEMBERS', KEYS[2])
+local hint = redis.call('GET', KEYS[1])
+if hint then table.insert(candidates, hint) end
+local seen = {}
+local result = {}
+for _, gateway in ipairs(candidates) do
+  if not seen[gateway] then
+    seen[gateway] = true
+    if redis.call('EXISTS', ARGV[1] .. gateway) == 1 then
+      table.insert(result, gateway)
+    else
+      redis.call('SREM', KEYS[2], gateway)
+    end
+  end
+end
+return result
 `;
 
 export class UserRouter {
@@ -72,6 +88,11 @@ export class UserRouter {
     private readonly redis: RedisClient,
     private readonly gatewayId: string,
     private readonly ttl: number,
+    private readonly observe?: (
+      stage: PipelineStage,
+      start: number,
+      end?: number,
+    ) => void,
   ) {}
 
   async refresh(userId: string): Promise<boolean> {
@@ -104,38 +125,31 @@ export class UserRouter {
   }
 
   async targets(userId: string): Promise<string[]> {
-    const [hint, entries] = await Promise.all([
-      this.redis.get(`user:${userId}:gateway`),
-      this.redis.smembers(`user:${userId}:gateways`),
-    ]);
-    const gateways = [...new Set([...entries, ...(hint ? [hint] : [])])];
-    if (!gateways.length) return [];
-    const live = await this.redis.mget(
-      ...gateways.map((id) => `user:${userId}:gateway:${id}`),
-    );
-    const result: string[] = [];
-    await Promise.all(
-      gateways.map(async (id, index) => {
-        if (live[index]) result.push(id);
-        else
-          await this.redis.eval(
-            PRUNE_ROUTE_LUA,
-            2,
-            `user:${userId}:gateway:${id}`,
-            `user:${userId}:gateways`,
-            id,
-          );
-      }),
-    );
-    return result;
+    return (await this.redis.eval(
+      TARGET_ROUTES_LUA,
+      2,
+      `user:${userId}:gateway`,
+      `user:${userId}:gateways`,
+      `user:${userId}:gateway:`,
+    )) as string[];
   }
 
-  async publish(userId: string, payload: unknown) {
+  async publish(userId: string, payload: ServerFrame) {
+    const start = timestamp();
     const gateways = await this.targets(userId);
+    if (payload.type === 'message') this.observe?.('route_lookup', start);
+    const publishing = timestamp();
+    if (payload.type === 'message' && payload.trace)
+      payload = {
+        ...payload,
+        trace: { ...payload.trace, redisPublishStartedAt: publishing },
+      };
     const envelope = JSON.stringify({ userId, payload });
     await Promise.all(
       gateways.map((id) => this.redis.publish(`gateway:${id}`, envelope)),
     );
+    if (payload.type === 'message' && gateways.length)
+      this.observe?.('redis_publish', publishing);
   }
 
   async online(userIds: string[]): Promise<Map<string, boolean>> {

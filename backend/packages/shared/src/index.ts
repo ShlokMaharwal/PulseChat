@@ -8,3 +8,5 @@ export * from './service.js';
 export * from './sequencing.js';
 export * from './reliability.js';
 export * from './metrics.js';
+export * from './tracing.js';
+export * from './producer-batch.js';

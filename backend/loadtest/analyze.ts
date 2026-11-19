@@ -2,13 +2,19 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { MongoClient } from 'mongodb';
+import { analyzeRun } from './report.js';
 export async function inspectPersistence(directory: string) {
   const file = resolve(directory, 'measured.json');
   const measured = JSON.parse(await readFile(file, 'utf8')) as {
+    runId?: string;
     sent?: { count: number };
     confirmed?: { count: number };
     [key: string]: unknown;
   };
+  if (measured.runId) {
+    console.log(JSON.stringify(await analyzeRun(directory)));
+    return;
+  }
   const fixture = JSON.parse(
     await readFile(resolve(directory, 'fixture.json'), 'utf8'),
   ) as { accounts: { chatId: string }[] };

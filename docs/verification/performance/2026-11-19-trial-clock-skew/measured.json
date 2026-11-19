@@ -1,0 +1,167 @@
+{
+  "runId": "9755eea5517642558e081d945719163d",
+  "targetConnections": 2,
+  "peakObservedConnections": null,
+  "sent": {
+    "count": 11,
+    "rate": 0.7786512205271062
+  },
+  "drain": {
+    "drained": false,
+    "reason": "The collector failed while Kafka repeatedly lost coordinator leadership; manual evidence recovery."
+  },
+  "config": {
+    "rampMs": 1000,
+    "warmupMs": 1000,
+    "steadyMs": 5000,
+    "drainMs": 5000,
+    "messageIntervalMs": 1000,
+    "socketsPerVu": 50,
+    "readReceipts": true,
+    "cpuProfile": true
+  },
+  "invalidBenchmark": true,
+  "limitation": "Preflight trial only; process-start epoch conversion showed clock skew. Not a throughput baseline.",
+  "classification": {
+    "issued": 11,
+    "receivedAcked": 11,
+    "kafkaAccepted": 11,
+    "persisted": 11,
+    "peerDelivered": 6,
+    "clientFailedBeforeAck": 0,
+    "persistedWithoutReceivedAck": 0,
+    "acceptedButUnpersisted": 0,
+    "unexpectedIds": [],
+    "acceptedButUnpersistedIds": [],
+    "clientFailedBeforeAckIds": []
+  },
+  "ledgerComplete": true,
+  "peakClientWelcomedConnections": 2,
+  "targetReached": true,
+  "deliveryLatencyMs": {
+    "count": 6,
+    "p50": 8951,
+    "p95": 9585.25,
+    "p99": 9729.85,
+    "min": 7834,
+    "max": 9766,
+    "mean": 8802.333333333334
+  },
+  "steadyCohortLatencyMs": {
+    "count": 3,
+    "p50": 8269,
+    "p95": 8965.6,
+    "p99": 9027.52,
+    "min": 7834,
+    "max": 9043,
+    "mean": 8382
+  },
+  "steadyIssuedMessagesPerSecond": 1.6,
+  "steadyPeerDeliveriesPerSecond": 0,
+  "stageLatencyMs": {
+    "client_to_gateway": {
+      "count": 6,
+      "p50": 1093.496337890625,
+      "p95": 1588.251953125,
+      "p99": 1626.7716796875,
+      "min": 897.275634765625,
+      "max": 1636.401611328125,
+      "mean": 1178.4519449869792
+    },
+    "gateway_prepare": {
+      "count": 6,
+      "p50": 2776.566162109375,
+      "p95": 3549.9085083007812,
+      "p99": 3627.4248657226562,
+      "min": 81.780517578125,
+      "max": 3646.803955078125,
+      "mean": 2118.478230794271
+    },
+    "kafka_to_processor": {
+      "count": 5,
+      "p50": 1173.41259765625,
+      "p95": 5585.492919921875,
+      "p99": 5707.099951171875,
+      "min": 88.509033203125,
+      "max": 5737.501708984375,
+      "mean": 2467.8466796875
+    },
+    "partition_queue": {
+      "count": 6,
+      "p50": 3082.1080322265625,
+      "p95": 3709.5248413085938,
+      "p99": 3839.263757324219,
+      "min": 0.859619140625,
+      "max": 3871.698486328125,
+      "mean": 2677.981730143229
+    },
+    "processor_prepare": {
+      "count": 6,
+      "p50": 61.2476806640625,
+      "p95": 1896.9857788085938,
+      "p99": 2373.426452636719,
+      "min": 9.242919921875,
+      "max": 2492.53662109375,
+      "mean": 458.929931640625
+    },
+    "sequence_assign": {
+      "count": 6,
+      "p50": 35.1500244140625,
+      "p95": 62.125,
+      "p99": 64.93125,
+      "min": 5.17333984375,
+      "max": 65.6328125,
+      "mean": 33.0389404296875
+    },
+    "mongo_persist": {
+      "count": 6,
+      "p50": 34.6944580078125,
+      "p95": 81.10260009765625,
+      "p99": 84.71524658203126,
+      "min": 7.64599609375,
+      "max": 85.618408203125,
+      "mean": 40.584431966145836
+    },
+    "persist_to_publish": {
+      "count": 6,
+      "p50": 94.970947265625,
+      "p95": 385.34075927734375,
+      "p99": 388.0542846679688,
+      "min": 21.52783203125,
+      "max": 388.732666015625,
+      "mean": 168.70658365885416
+    },
+    "publish_to_gateway_push": {
+      "count": 6,
+      "p50": 927.667236328125,
+      "p95": 947.7354736328125,
+      "p99": 947.7672119140625,
+      "min": 894.91015625,
+      "max": 947.775146484375,
+      "mean": 924.15869140625
+    },
+    "kafka_produce_ack": {
+      "count": 11,
+      "p50": 767.358154296875,
+      "p95": 3909.838623046875,
+      "p99": 4457.514208984376,
+      "min": 104.242431640625,
+      "max": 4594.43310546875,
+      "mean": 1113.3295676491477
+    }
+  },
+  "omittedNegativeOrInvalidStageSamples": {
+    "gateway_push_to_client": 6,
+    "kafka_to_processor": 1
+  },
+  "produceAckConsumeOverlapSamples": 2,
+  "unexpectedRecipients": 0,
+  "persistenceObservedAt": "2026-11-19T10:06:47.300Z",
+  "timing": {
+    "event": "timing",
+    "startsAt": 1795082253089,
+    "steadyStartAt": 1795082255089,
+    "sendsEndAt": 1795082260089,
+    "closesAt": 1795082265089
+  }
+}

@@ -1,0 +1,14 @@
+services:
+  kafka:
+    environment:
+      # This local diagnostic override tolerates observed host scheduling stalls.
+      # The default Compose stack keeps its normal lease.
+      KAFKA_BROKER_SESSION_TIMEOUT_MS: ${KAFKA_BROKER_SESSION_TIMEOUT_MS:-60000}
+  gateway-1: &instrumented
+    environment:
+      TRACE_MESSAGES: "true"
+      CPU_PROFILE_DIR: /tmp/pulsechat-profiles
+  gateway-2: *instrumented
+  gateway-3: *instrumented
+  processor-1: *instrumented
+  processor-2: *instrumented

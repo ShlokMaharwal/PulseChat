@@ -2,6 +2,7 @@ import { parseConfig } from './config.js';
 import { createLogger } from './logger.js';
 import { createDependencies } from './dependencies.js';
 import { createHealthServer } from './health.js';
+import { installCpuProfiling } from './profiling.js';
 import type { IncomingMessage, ServerResponse, Server } from 'node:http';
 import type { Registry } from 'prom-client';
 import type { Logger } from 'pino';
@@ -33,6 +34,11 @@ export async function startService(
 ) {
   const config = parseConfig(process.env);
   const logger = createLogger(config, service);
+  const stopProfiling = installCpuProfiling(
+    config.CPU_PROFILE_DIR,
+    service + '-' + config.INSTANCE_ID,
+    logger,
+  );
   const dependencies = createDependencies(config, service, logger);
   let accepting = false;
   let closing = false;
@@ -89,6 +95,9 @@ export async function startService(
     });
     await httpClosed;
     await dependencies.close();
+    await stopProfiling().catch((err) =>
+      logger.error({ err }, 'CPU profile cleanup failed'),
+    );
     clearTimeout(deadline);
     logger.info('Service stopped');
   }

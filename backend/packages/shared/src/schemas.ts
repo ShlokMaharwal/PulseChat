@@ -2,6 +2,22 @@ import { z } from 'zod';
 
 export const uuidSchema = z.string().uuid();
 export const seqSchema = z.number().int().nonnegative().safe();
+export const pipelineTraceSchema = z
+  .object({
+    gatewayReceivedAt: z.number().finite().positive(),
+    produceStartedAt: z.number().finite().positive(),
+    kafkaAcknowledgedAt: z.number().finite().positive().optional(),
+    processorConsumedAt: z.number().finite().positive().optional(),
+    processorStartedAt: z.number().finite().positive().optional(),
+    sequenceStartedAt: z.number().finite().positive().optional(),
+    sequenceAssignedAt: z.number().finite().positive().optional(),
+    mongoPersistStartedAt: z.number().finite().positive().optional(),
+    mongoPersistedAt: z.number().finite().positive().optional(),
+    redisPublishStartedAt: z.number().finite().positive().optional(),
+    gatewayPushedAt: z.number().finite().positive().optional(),
+  })
+  .strict();
+export type PipelineTrace = z.infer<typeof pipelineTraceSchema>;
 export const registerSchema = z
   .object({
     username: z
@@ -75,7 +91,10 @@ export const storedMessageSchema = z
   .strict();
 export const kafkaMessageSchema = storedMessageSchema
   .omit({ seq: true })
-  .extend({ recipientIds: z.array(uuidSchema).min(1) });
+  .extend({
+    recipientIds: z.array(uuidSchema).min(1),
+    trace: pipelineTraceSchema.optional(),
+  });
 export const receiptCursorSchema = z
   .object({ userId: uuidSchema, deliveredSeq: seqSchema, readSeq: seqSchema })
   .strict();
@@ -136,9 +155,13 @@ export const serverFrameSchema = z.discriminatedUnion('type', [
       status: z.enum(['received', 'sent']),
       messageId: uuidSchema.optional(),
       seq: seqSchema.optional(),
+      trace: pipelineTraceSchema.optional(),
     })
     .strict(),
-  storedMessageSchema.extend({ type: z.literal('message') }),
+  storedMessageSchema.extend({
+    type: z.literal('message'),
+    trace: pipelineTraceSchema.optional(),
+  }),
   receiptSchema,
   z
     .object({

@@ -1,0 +1,91 @@
+[
+  {
+    "folder": "2026-11-19T09-55-42-737Z-2",
+    "note": "Recovered manually; invalid clock conversion and profiling overhead; not a baseline",
+    "sourceSha256": null,
+    "classification": {
+      "issued": 11,
+      "receivedAcked": 11,
+      "kafkaAccepted": 11,
+      "persisted": 11,
+      "peerDelivered": 6,
+      "clientFailedBeforeAck": 0,
+      "persistedWithoutReceivedAck": 0,
+      "acceptedButUnpersisted": 0,
+      "unexpectedIds": [],
+      "acceptedButUnpersistedIds": [],
+      "clientFailedBeforeAckIds": []
+    },
+    "drained": false,
+    "ledgerComplete": true,
+    "peakWelcomedConnections": 2,
+    "failure": null
+  },
+  {
+    "folder": "2026-11-19T10-19-38-413Z-2",
+    "note": "Kafka audit initialization failed before timed load",
+    "sourceSha256": null,
+    "classification": null,
+    "drained": null,
+    "ledgerComplete": null,
+    "peakWelcomedConnections": null,
+    "failure": {
+      "error": "KafkaJSProtocolError: This server is not the leader for that topic-partition",
+      "at": "2026-11-19T10:21:03.055Z"
+    }
+  },
+  {
+    "folder": "2026-11-19T10-23-42-907Z-2",
+    "note": "Complete two-user validation; orphan sampler manually stopped after measurement",
+    "sourceSha256": "b4403b72fcc2f42af4d8ee2e6567566278e2206cee9f9ea2d6bccf5f8d12829c",
+    "classification": {
+      "issued": 27,
+      "receivedAcked": 27,
+      "kafkaAccepted": 27,
+      "persisted": 27,
+      "peerDelivered": 27,
+      "clientFailedBeforeAck": 0,
+      "persistedWithoutReceivedAck": 0,
+      "acceptedButUnpersisted": 0,
+      "unexpectedIds": [],
+      "acceptedButUnpersistedIds": [],
+      "clientFailedBeforeAckIds": []
+    },
+    "drained": true,
+    "ledgerComplete": true,
+    "peakWelcomedConnections": 2,
+    "failure": null
+  },
+  {
+    "folder": "2026-11-19T10-29-44-787Z-2",
+    "note": "Runner exited itself; Kafka instability and observer boundary failure; unsettled run",
+    "sourceSha256": "377c96778e10dc122ddb3e84d5a57ed515662f3677dc623c94f94dfe8bffae26",
+    "classification": {
+      "issued": 6,
+      "receivedAcked": 6,
+      "kafkaAccepted": 0,
+      "persisted": 6,
+      "peerDelivered": 0,
+      "clientFailedBeforeAck": 0,
+      "persistedWithoutReceivedAck": 0,
+      "acceptedButUnpersisted": 0,
+      "unexpectedIds": [],
+      "acceptedButUnpersistedIds": [],
+      "clientFailedBeforeAckIds": []
+    },
+    "drained": false,
+    "ledgerComplete": true,
+    "peakWelcomedConnections": 2,
+    "failure": null
+  },
+  {
+    "folder": "2026-11-19T10-36-51-599Z-200",
+    "note": "HTTP registration returned 504 during setup; timed load never started",
+    "sourceSha256": null,
+    "classification": null,
+    "drained": null,
+    "ledgerComplete": null,
+    "peakWelcomedConnections": null,
+    "failure": null
+  }
+]

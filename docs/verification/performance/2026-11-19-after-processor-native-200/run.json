@@ -1,0 +1,323 @@
+{
+  "runId": "bf104751e5564dc79cc126698e33c4aa",
+  "revision": "00b77000d56e49541fa3c1b8577f4d6d59500159",
+  "sourceSha256": "f3c176e698db1ec04fca197feec94ce88be7dc4208bdd016081a25099d61bb1c",
+  "targetConnections": 200,
+  "config": {
+    "rampMs": 10000,
+    "warmupMs": 30000,
+    "steadyMs": 30000,
+    "drainMs": 60000,
+    "messageIntervalMs": 5000,
+    "socketsPerVu": 50,
+    "readReceipts": true,
+    "cpuProfile": false,
+    "fixtureMode": "reuse"
+  },
+  "hardware": {
+    "host": {
+      "platform": "win32",
+      "release": "10.0.22621",
+      "cpuModel": "Intel(R) Core(TM) i5-3437U CPU @ 1.90GHz",
+      "logicalCpus": 4,
+      "memoryBytes": 6299365376
+    },
+    "docker": {
+      "version": "25.0.3",
+      "cpus": 4,
+      "memoryBytes": 2978533376,
+      "os": "Docker Desktop (containerized)",
+      "kernel": "6.18.58.1-microsoft-standard-WSL2"
+    },
+    "containers": [
+      {
+        "name": "/pulsechat-nginx-1",
+        "image": "sha256:dc73b49f5124cf2ee538dfbdfbd121f0b4ccdcb20fea30f3a81bd477c02e2bb5",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-gateway-2-1",
+        "image": "sha256:1f17c980433d33f28df72f1c391e00ef11052d9df12a69da224748e12f95ea10",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5",
+          "PROCESSOR_PARTITION_CONCURRENCY": "6"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-processor-1-1",
+        "image": "sha256:5e93d14c4f577e55e37a86e79cc4de416356f505536468c84cd7ab1da9d3f429",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5",
+          "PROCESSOR_PARTITION_CONCURRENCY": "6"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-gateway-3-1",
+        "image": "sha256:1f17c980433d33f28df72f1c391e00ef11052d9df12a69da224748e12f95ea10",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5",
+          "PROCESSOR_PARTITION_CONCURRENCY": "6"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-processor-2-1",
+        "image": "sha256:5e93d14c4f577e55e37a86e79cc4de416356f505536468c84cd7ab1da9d3f429",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5",
+          "PROCESSOR_PARTITION_CONCURRENCY": "6"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-gateway-1-1",
+        "image": "sha256:1f17c980433d33f28df72f1c391e00ef11052d9df12a69da224748e12f95ea10",
+        "runtimeSettings": {
+          "NODE_ENV": "production",
+          "TRACE_MESSAGES": "true",
+          "KAFKA_PARTITIONS": "6",
+          "KAFKA_REPLICATION_FACTOR": "1",
+          "KAFKA_BATCH_MAX_MESSAGES": "64",
+          "KAFKA_BATCH_LINGER_MS": "5",
+          "PROCESSOR_PARTITION_CONCURRENCY": "6"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-kafka-1",
+        "image": "sha256:44a48f9d78af26959fa4d61accb9be35f939a79bfdae05cad6df4baca8e22eeb",
+        "runtimeSettings": {
+          "KAFKA_BROKER_SESSION_TIMEOUT_MS": "60000"
+        },
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-frontend-1",
+        "image": "sha256:58810534601f7d10f7b7b3298d300bd991a163d81b9f7994a68406efdf980e95",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-grafana-1",
+        "image": "sha256:5c42a1c2e40bdbf0d7c55cbef9f51ba8a8c928678ac16421e321f4ca246e2ac3",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-mongo-1",
+        "image": "sha256:b1574608720ee095c98916aa9b19d319c297ad21aa92a41c4a3b8875128900bf",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-redis-1",
+        "image": "sha256:bb8953020f6597e47d5d699a9910a25d77a69608dbd58e0f722940598ed85fc0",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      },
+      {
+        "name": "/pulsechat-prometheus-1",
+        "image": "sha256:503e04849f1c820b73ed19f348cb8da0c9728f38b6a4f68eb68d8c3eb0e1869f",
+        "runtimeSettings": {},
+        "limits": {
+          "memoryBytes": 0,
+          "nanoCpus": 0,
+          "cpuQuota": 0,
+          "cpuPeriod": 0,
+          "cpuset": ""
+        }
+      }
+    ]
+  },
+  "initialCursors": {
+    "df6af9f8-b9c0-44a0-b67f-a393ec4738c4": 109,
+    "beb0129a-a6b0-46f4-afff-225d0a970077": 100,
+    "b662f72e-2771-427b-9238-f040239fcfbf": 96,
+    "1743534a-e0aa-4093-9956-345529d56762": 92,
+    "cb1fbaf3-c94e-4b99-84e2-ac04febea14a": 96,
+    "169ad5ad-dd5d-4123-87bd-a9e63d8007f2": 91,
+    "8194be98-c1f1-4314-9451-50660765ae0e": 95,
+    "5d4ebfcf-0caf-4627-8176-10643dbee885": 95,
+    "b5ccef3f-1c09-444b-93ce-450242ec3d25": 96,
+    "12c10580-15d5-441c-9c85-8211baf4f696": 88,
+    "7581ae2b-0665-4af5-8c26-1c0f2e6114ee": 91,
+    "dcb3c5cd-c767-4f5d-9d8c-d7e56f533745": 88,
+    "4e691d18-fa39-4728-aa01-5f43c33c93fd": 89,
+    "a38fcac3-47aa-4363-bc4a-5b704978835d": 91,
+    "6e5e50ab-c0da-482a-9115-b8dbd2dd55ac": 90,
+    "b4fd6684-dfef-455d-b345-74ec9a294204": 89,
+    "49667278-8ebe-4fb3-9f36-8dab6fcc6a6a": 92,
+    "e91bfe74-7227-4476-9854-4a8e348d3d7a": 89,
+    "6cd467b6-bd56-4be4-aa00-2ccb2e968666": 85,
+    "c250e994-4d8b-4fdc-9601-72b427923d6f": 85,
+    "21c71073-edd0-46fe-a8e1-5c5187fefb5b": 84,
+    "1f0ae8c3-d76e-409e-b3c2-ee89c5d3d4b8": 76,
+    "4caf7da6-e64b-4f65-a6e4-5408c6627caa": 81,
+    "7538eb77-ae6b-4f3b-82fb-1aa0f1051b7c": 83,
+    "279525f1-fb3b-40c3-84d2-5804f6835840": 81,
+    "a26ad871-d874-4100-b345-7d9bae42b0bd": 83,
+    "4ba82318-3069-4fc5-bd03-845fc75f4697": 86,
+    "44d1f928-4897-4794-9997-e7dce1496056": 85,
+    "0d28121c-4e0b-4f38-a63e-320a29684cc0": 80,
+    "74699552-75eb-41ae-8f46-d66ed81815b1": 77,
+    "fbee373b-8741-4851-ad54-ce2f21682211": 79,
+    "2f620fc2-b936-4684-9a97-560d9dcb76f3": 75,
+    "8d47a957-4ef8-4bb1-b484-6c65af1b2f6e": 80,
+    "8e91d984-abda-4b94-b544-0579db3b3a45": 76,
+    "f9d8f49f-8e9e-4574-a498-df5f76ab8898": 76,
+    "66ec4479-2a9f-4ebf-aa49-c2d293ab1a14": 78,
+    "674af0c7-9a8b-428f-ae0a-ff5d1be98bb8": 74,
+    "fdb18ec8-b5b5-42a2-9a4f-64184e8c9b71": 68,
+    "df8ad87f-54f4-44a9-8845-508bd19f3ce6": 72,
+    "eeee96b2-7375-4a78-9442-ff95fc391f4e": 74,
+    "0ecbe66f-c9f8-4480-93c3-8409ac3acbb7": 65,
+    "65f3960f-4816-49fb-8579-c40553744379": 69,
+    "efb9ee87-c380-4293-9bad-96823ca7ed7d": 71,
+    "26293769-d85a-4a65-9314-bf76f3997e30": 60,
+    "2c34dbe9-9980-44be-92dd-e46fd1a0eb47": 67,
+    "666b8c94-ba34-46fb-a594-dab5d6d6ed45": 67,
+    "d8914b44-4423-45d5-ba0e-bf8951072f4a": 57,
+    "f5a59df8-4d14-4000-bddc-f06d54838c8c": 67,
+    "f6d3a8dc-3cc4-4775-a2d5-b211f665bdb9": 64,
+    "54b39dd4-972e-49b4-8496-4e15aff6eead": 53,
+    "25b0500e-cc9a-4ce7-b4ad-556085a49d2b": 62,
+    "1be33c89-8fda-409a-a2c6-ea973dd915e2": 60,
+    "4f1d1694-5677-4c6d-8538-121d55de0958": 54,
+    "18d0792b-18d2-4807-a32c-add604cc82d1": 60,
+    "488acf9e-18c8-4dcb-8cf7-a9dbfdaf2471": 55,
+    "0dfc2694-380c-449e-bf53-d58680c499d1": 55,
+    "1d5f404b-0973-4240-bf80-9bb1c0324b4c": 54,
+    "06f7ea93-0657-4ebb-a304-6927d1a5dcb5": 51,
+    "1f1fb3f1-dfac-4dec-a7de-e138a107b70c": 52,
+    "04c6ec82-9502-48b4-81a3-315aceac7585": 55,
+    "a0263954-3542-459e-a7e5-c44eb66cb2b0": 49,
+    "a5ec1cfd-eef9-4a7e-a416-8c84c47d453c": 51,
+    "dd6b02a7-4fd3-44c9-b5ea-30d33f815967": 48,
+    "82e45084-3971-40e9-9663-b2ead1670014": 44,
+    "57bd7c34-0428-4a07-99ec-89c897375b8f": 45,
+    "8e048dbb-aa37-4713-a820-05af7e30305f": 50,
+    "bb2e3890-bb06-4dc6-94fd-87cd9a3ca31f": 48,
+    "fbcaf4ce-fc60-4266-a4a7-d0d3c091c65c": 45,
+    "954f36ab-aa0e-4472-a638-b8286f52558a": 45,
+    "a5b89be8-43f1-4a1c-8d18-d33fc97986f1": 47,
+    "6153d82a-fba6-463d-8f67-03e652a86696": 41,
+    "7f620e22-f389-4f70-8e07-9f831010f7d6": 47,
+    "be9e72d6-1bba-4c2d-b1ba-ac91a1f66fc8": 48,
+    "77e89d31-4025-4a02-8efc-52ebb6e19e48": 43,
+    "7b3952ec-a93f-4ba5-9848-5c11fc657e7b": 46,
+    "40887079-815f-4473-aae8-702508d0b17a": 47,
+    "92a98dba-213e-417f-8c32-640d32fd92b2": 42,
+    "132dae7d-14bf-4552-bc53-2fe98e5df8df": 46,
+    "bcd76fae-00da-4550-b869-3969149aa7a9": 46,
+    "73f4122f-de52-4f2b-870e-35ec1f4f4247": 42,
+    "3a43af87-c43d-4513-b1f6-db8a8bd50c4b": 45,
+    "33af07c7-9318-4191-aba5-a5aecc5f1de9": 45,
+    "7867be03-3e6a-4bb3-b76e-81b0ca05f8f9": 43,
+    "97445bd8-28ee-4b45-b045-a8a8422a850c": 43,
+    "4a12c405-9551-40f8-abd4-0f16c2f133fe": 44,
+    "98329a7d-8dcf-47aa-bf63-9c6188d0cc1e": 40,
+    "c8eea299-5dc4-459a-842e-e0592497566d": 42,
+    "d409cc55-f915-4d94-92b4-58f2adbc48c5": 44,
+    "1cbc8af4-bb4b-4d53-b78e-9d52ba5edd1f": 43,
+    "d9340839-1969-4cee-9d81-431c510189a6": 39,
+    "6731b7bb-337d-4335-a4e8-536a39c99cb7": 43,
+    "3f69d84d-8465-4709-a169-465037ea8b13": 42,
+    "c5a0ec08-f104-44ed-a17f-69531d6f3fa2": 39,
+    "3cc31c4e-4c23-4e6e-8676-a0b5be7d2075": 40,
+    "b77ca23b-8e72-4028-aeba-e4a3c5e8e93c": 43,
+    "bbddfef2-a994-431b-bcb0-78db21241507": 39,
+    "b7a26fc6-0bb4-472c-bc2b-63f82722a69d": 35,
+    "ed5f8a4f-1564-4ef8-80b8-59499c40522b": 40,
+    "51bc3c32-a9a9-439f-bb72-6f71a649870e": 35,
+    "3347baff-0934-4fe1-b2d5-cf1d2b0e88c2": 37
+  }
+}

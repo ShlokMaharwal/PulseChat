@@ -13,10 +13,30 @@ Prometheus scrapes all three gateways and both processors. Each service exposes 
 | `pulsechat_dedupe_hits_total` | Logical messages already stored when replayed |
 | `pulsechat_dlq_total` | Failed source records acknowledged by the DLQ broker |
 | `pulsechat_rate_limit_rejections_total` | Operations rejected by the shared Redis bucket |
+| `pulsechat_inflight_operations` | Gateway WebSocket operations awaiting completion |
+| `pulsechat_pipeline_stage_seconds{stage}` | Fixed-stage latency histograms; counts include processing attempts |
+| `pulsechat_pipeline_clock_skew_total{stage}` | Negative/nonfinite stage samples omitted from histograms |
+| `pulsechat_producer_queued_records` | Records queued for the next durable produce batch |
+| `pulsechat_producer_batch_records{topic}` | Records per topic in an attempted durable batch, including failed attempts |
 
 The lag probe reports the same group from both processors. Aggregate with `sum(max by(topic, partition)(pulsechat_consumer_lag))`, rather than summing the two reports. The peak is historical within the process lifetime and is explicitly labeled separately from current backlog. Failed lag probes remove their current samples and emit a warning instead of reporting a fabricated zero.
 
 Delivery timing includes the ACK return path. Receipts are cumulative and debounced, so the histogram samples advancing receipt positions rather than every individual message. Histogram quantiles are bucket estimates; they are separate from the raw client measurements used in load tests. Gateway ingress counts attempts, and socket egress counts fan-out deliveries, so their rates need not be equal.
+
+Pipeline stages cover gateway preparation, producer acknowledgement, transfer
+to the consumer batch, per-partition queueing, processor preparation, sequence
+allocation, Mongo insertion, routing lookup, Redis publication, and gateway push.
+Labels are fixed stage/topic names. Producer acknowledgement can overlap consumer
+work, so stage percentiles must not be added into a total. Trace-based client
+percentiles include their sample counts; stored sync results have no diagnostic
+trace. Producer batch histograms describe attempted batches, not proof of durable
+acceptance. The load ledger and MongoDB check establish that separately.
+
+The [performance runner](PERFORMANCE.md) samples actual container CPU and memory,
+records host/Docker settings, and captures generator scheduling delay. Its drain
+barrier requires fresh samples from all gateways and zero source/audit backlog.
+Optional CPU profiles use a local inspector session and are kept separate from
+the unprofiled latency comparison.
 
 Identifiers belong in structured JSON logs, not metric labels. Message acceptance and persistence logs include `messageId`, `chatId`, and `userId`. Receipt logs include chat, user, sequence, status, and the acknowledged message ID when available. No message bodies, passwords, or JWTs are logged by these events.
 

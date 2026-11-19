@@ -9,6 +9,7 @@ import {
   parseConfig,
   SequenceAllocator,
   deadLetterSchema,
+  UserRouter,
 } from '@pulsechat/shared';
 import { TestClient } from '../helpers/test-client.js';
 
@@ -308,6 +309,54 @@ describe('Phase 2 live messaging', () => {
       .findOne({ chatId: chat.id, userId: b.user.id });
     expect(cursor).toMatchObject({ deliveredSeq: 125, readSeq: 125 });
     receiver.read(chat.id, 1);
+    const replayProducer = dependencies.kafka.producer({
+      idempotent: true,
+      maxInFlightRequests: 1,
+    });
+    await replayProducer.connect();
+    try {
+      const [append] = await replayProducer.send({
+        topic: 'receipts',
+        acks: -1,
+        messages: [
+          {
+            key: chat.id,
+            value: JSON.stringify({
+              type: 'receipt_event',
+              chatId: chat.id,
+              userId: b.user.id,
+              status: 'read',
+              seq: 1,
+              timestamp: new Date(0).toISOString(),
+            }),
+          },
+        ],
+      });
+      const until = Date.now() + 60000;
+      for (;;) {
+        const offsets = await dependencies.admin.fetchOffsets({
+          groupId: config.KAFKA_GROUP_ID,
+          topics: ['receipts'],
+        });
+        const committed =
+          offsets[0]?.partitions.find((p) => p.partition === append!.partition)
+            ?.offset ?? '-1';
+        if (BigInt(committed) > BigInt(append!.baseOffset!)) break;
+        if (Date.now() >= until)
+          throw new Error('Stale receipt was not committed');
+        await delay(100);
+      }
+      const afterReplay = await dependencies.db
+        .collection('chat_receipts')
+        .findOne({ chatId: chat.id, userId: b.user.id });
+      expect(afterReplay).toMatchObject({
+        deliveredSeq: 125,
+        readSeq: 125,
+        updatedAt: cursor!.updatedAt,
+      });
+    } finally {
+      await replayProducer.disconnect();
+    }
     const summary = await request<{
       chats: { id: string; unreadCount: number }[];
     }>(gatewayB, '/chats', undefined, b.token);
@@ -328,6 +377,25 @@ describe('Phase 2 live messaging', () => {
     const second = new TestClient();
     clients.push(second);
     await second.connect(gatewayA.replace(/^http/, 'ws') + '/ws', b.token);
+    await dependencies.redis.sadd(`user:${b.user.id}:gateways`, 'stale-route');
+    await dependencies.redis.set(
+      `user:${b.user.id}:gateway`,
+      'stale-route',
+      'EX',
+      30,
+    );
+    const targets = await new UserRouter(
+      dependencies.redis,
+      'integration',
+      30,
+    ).targets(b.user.id);
+    expect(targets).toHaveLength(2);
+    expect(
+      await dependencies.redis.sismember(
+        `user:${b.user.id}:gateways`,
+        'stale-route',
+      ),
+    ).toBe(0);
     await sender.message(chat.id, 'two sessions');
     await Promise.all([
       receiver.waitForSeq(chat.id, 1),

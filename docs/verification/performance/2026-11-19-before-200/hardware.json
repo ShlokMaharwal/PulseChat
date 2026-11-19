@@ -1,0 +1,150 @@
+{
+  "host": {
+    "platform": "win32",
+    "release": "10.0.22621",
+    "cpuModel": "Intel(R) Core(TM) i5-3437U CPU @ 1.90GHz",
+    "logicalCpus": 4,
+    "memoryBytes": 6299365376
+  },
+  "docker": {
+    "version": "25.0.3",
+    "cpus": 4,
+    "memoryBytes": 2978533376,
+    "os": "Docker Desktop (containerized)",
+    "kernel": "6.18.58.1-microsoft-standard-WSL2"
+  },
+  "containers": [
+    {
+      "name": "/pulsechat-nginx-1",
+      "image": "sha256:dc73b49f5124cf2ee538dfbdfbd121f0b4ccdcb20fea30f3a81bd477c02e2bb5",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-gateway-1-1",
+      "image": "sha256:33ca2940851820f1b697ca1c803c86451611a6dd54ffe57cb46958be40161537",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-gateway-2-1",
+      "image": "sha256:33ca2940851820f1b697ca1c803c86451611a6dd54ffe57cb46958be40161537",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-gateway-3-1",
+      "image": "sha256:33ca2940851820f1b697ca1c803c86451611a6dd54ffe57cb46958be40161537",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-processor-1-1",
+      "image": "sha256:ca72d211af06b13efefd37ab10b43e17baa884842efc695cb8d1039889c55f09",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-processor-2-1",
+      "image": "sha256:ca72d211af06b13efefd37ab10b43e17baa884842efc695cb8d1039889c55f09",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-frontend-1",
+      "image": "sha256:58810534601f7d10f7b7b3298d300bd991a163d81b9f7994a68406efdf980e95",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-grafana-1",
+      "image": "sha256:5c42a1c2e40bdbf0d7c55cbef9f51ba8a8c928678ac16421e321f4ca246e2ac3",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-kafka-1",
+      "image": "sha256:44a48f9d78af26959fa4d61accb9be35f939a79bfdae05cad6df4baca8e22eeb",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-mongo-1",
+      "image": "sha256:b1574608720ee095c98916aa9b19d319c297ad21aa92a41c4a3b8875128900bf",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-redis-1",
+      "image": "sha256:bb8953020f6597e47d5d699a9910a25d77a69608dbd58e0f722940598ed85fc0",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    },
+    {
+      "name": "/pulsechat-prometheus-1",
+      "image": "sha256:503e04849f1c820b73ed19f348cb8da0c9728f38b6a4f68eb68d8c3eb0e1869f",
+      "limits": {
+        "memoryBytes": 0,
+        "nanoCpus": 0,
+        "cpuQuota": 0,
+        "cpuPeriod": 0,
+        "cpuset": ""
+      }
+    }
+  ]
+}

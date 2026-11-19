@@ -1,0 +1,288 @@
+{
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": [],
+    "checks": [
+        {
+          "id": "f291411d292ee3e36a4231d25b6c37db",
+          "passes": 500,
+          "fails": 0,
+          "name": "Authenticated welcome received",
+          "path": "::Authenticated welcome received"
+        }
+      ]
+  },
+  "options": {
+    "summaryTrendStats": [
+      "avg",
+      "min",
+      "med",
+      "max",
+      "p(50)",
+      "p(95)",
+      "p(99)"
+    ],
+    "summaryTimeUnit": "",
+    "noColor": false
+  },
+  "state": {
+    "testRunDurationMs": 139293.736704,
+    "isStdOutTTY": false,
+    "isStdErrTTY": false
+  },
+  "metrics": {
+    "ws_msgs_received": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 7582,
+        "rate": 54.43173669833981
+      }
+    },
+    "checks": {
+      "type": "rate",
+      "contains": "default",
+      "values": {
+        "rate": 1,
+        "passes": 500,
+        "fails": 0
+      },
+      "thresholds": {
+        "rate>0.99": {
+          "ok": true
+        }
+      }
+    },
+    "rate_rejections": {
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "ws_session_duration": {
+      "values": {
+        "min": 117481.371152,
+        "med": 126241.624035,
+        "max": 136770.524605,
+        "p(50)": 126241.624035,
+        "p(95)": 133365.3735949,
+        "p(99)": 136399.58473914998,
+        "avg": 126370.60555837795
+      },
+      "type": "trend",
+      "contains": "time"
+    },
+    "messages_confirmed": {
+      "thresholds": {
+        "count>0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 28,
+        "rate": 0.20101406324894683
+      }
+    },
+    "messages_received_acked": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 625,
+        "rate": 4.486921054663991
+      }
+    },
+    "iteration_duration": {
+      "values": {
+        "avg": 138233.95261039998,
+        "min": 135654.191674,
+        "med": 139070.228446,
+        "max": 139167.843047,
+        "p(50)": 139070.228446,
+        "p(95)": 139158.02351375,
+        "p(99)": 139165.87914035
+      },
+      "type": "trend",
+      "contains": "time"
+    },
+    "ordering_violations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      },
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      }
+    },
+    "data_sent": {
+      "type": "counter",
+      "contains": "data",
+      "values": {
+        "count": 1396503,
+        "rate": 10025.597941762286
+      }
+    },
+    "socket_errors": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 576,
+        "rate": 4.135146443978335
+      }
+    },
+    "vus": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 7,
+        "min": 7,
+        "max": 10
+      }
+    },
+    "ws_sessions": {
+      "values": {
+        "count": 688,
+        "rate": 4.939202696974122
+      },
+      "type": "counter",
+      "contains": "default"
+    },
+    "ws_connecting": {
+      "values": {
+        "avg": 7093.1955630566845,
+        "min": 0.04861,
+        "med": 3066.4465935,
+        "max": 17763.414936,
+        "p(50)": 3066.4465935,
+        "p(95)": 16436.95025205,
+        "p(99)": 17163.460932230002
+      },
+      "type": "trend",
+      "contains": "time"
+    },
+    "duplicate_wire_frames": {
+      "thresholds": {
+        "count==0": {
+          "ok": true
+        }
+      },
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 0,
+        "rate": 0
+      }
+    },
+    "data_received": {
+      "contains": "data",
+      "values": {
+        "rate": 8877.872252273986,
+        "count": 1236632
+      },
+      "type": "counter"
+    },
+    "generator_scheduler_delay_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "p(95)": 3117,
+        "p(99)": 7367,
+        "avg": 511.7933789954338,
+        "min": 0,
+        "med": 28,
+        "max": 13050,
+        "p(50)": 28
+      }
+    },
+    "ws_msgs_sent": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 10740,
+        "rate": 77.10325140334602
+      }
+    },
+    "sync_requests": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 4952,
+        "rate": 35.55077290031374
+      }
+    },
+    "vus_max": {
+      "type": "gauge",
+      "contains": "default",
+      "values": {
+        "value": 10,
+        "min": 10,
+        "max": 10
+      }
+    },
+    "connections_opened": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "count": 500,
+        "rate": 3.589536843731193
+      }
+    },
+    "iterations": {
+      "type": "counter",
+      "contains": "default",
+      "values": {
+        "rate": 0.07179073687462387,
+        "count": 10
+      }
+    },
+    "messages_sent": {
+      "contains": "default",
+      "values": {
+        "count": 2233,
+        "rate": 16.03087154410351
+      },
+      "type": "counter"
+    },
+    "received_ack_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "min": 71,
+        "med": 33377,
+        "max": 85659,
+        "p(50)": 33377,
+        "p(95)": 72700,
+        "p(99)": 81683.08,
+        "avg": 33775.39903846154
+      }
+    },
+    "delivery_latency_ms": {
+      "type": "trend",
+      "contains": "time",
+      "values": {
+        "med": 4775.5,
+        "max": 95337,
+        "p(50)": 4775.5,
+        "p(95)": 94083.75,
+        "p(99)": 95117.22,
+        "avg": 29697.39285714286,
+        "min": 726
+      }
+    }
+  },
+  "setup_data": {
+    "steadyStartAt": 1795093249867,
+    "closesAt": 1795093339867,
+    "sendsEndAt": 1795093279867,
+    "startsAt": 1795093209867
+  }
+}
