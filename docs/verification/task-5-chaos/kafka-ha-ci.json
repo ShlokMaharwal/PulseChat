@@ -1,0 +1,30 @@
+{
+  "scenario": "kafka",
+  "result": "PASS",
+  "sent": 120,
+  "stored": 120,
+  "received": 120,
+  "duplicated": 0,
+  "wireDuplicates": 0,
+  "lost": 0,
+  "outOfOrder": 0,
+  "durationMs": 27154,
+  "faultEvidence": {
+    "mode": "ha",
+    "replicationFactor": 3,
+    "minInSyncReplicas": 2,
+    "partition": 0,
+    "previousLeader": 1,
+    "killedService": "kafka",
+    "signal": "SIGKILL",
+    "newLeader": 2,
+    "inSyncReplicasDuringFault": [
+      2,
+      3
+    ],
+    "heldDeadMs": 8003,
+    "allReplicasRestored": true
+  },
+  "ciRun": "https://github.com/ShlokMaharwal/PulseChat/actions/runs/44583022761",
+  "commit": "21f3caaf378458e5e28ba8782a3a1f293e8361c0"
+}

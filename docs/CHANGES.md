@@ -18,6 +18,8 @@ Six default-stack chaos cases passed across 725 sends, including Mongo restart a
 
 ## Product and documentation
 
+The final three-broker CI test passed 120/120 stored and delivered messages after an actual active-leader SIGKILL, with zero loss, logical/wire duplication, or order errors. It verified a new leader with two in-sync replicas during the outage and all replicas restored afterward. All three final runtime CI jobs passed. [Actual HA proof](verification/task-5-chaos/kafka-ha-ci.json).
+
 Retained neutral true-black/emerald and light themes. Added retry countdown/manual reconnect, same-ID failed-send retry, unread navigation, and keyboard focus restoration. Five real browser tests cover auth, chat/receipts, offline recovery, gateway failure, and refresh/logout. Added reproducible two-session demo tooling and repository metadata text. Reorganized historical evidence, shortened the README, and added a relative-link checker.
 
 ## Remaining limits and deliberate exclusions

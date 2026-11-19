@@ -63,6 +63,7 @@ Details: [protocol](docs/PROTOCOL.md), [design and failure boundaries](docs/DESI
 | Source checks | 85 backend and 15 frontend unit tests; lint, format, types, builds passed | [Final verification](docs/verification/task-7.md) |
 | Integration / smoke | Thirteen integration cases, including 1,000 ordered messages; eleven smoke checks | [Reliability verification](docs/verification/task-5.md) |
 | Crash / outage recovery | Six default-stack scenarios, 725 sends, zero loss, logical/wire duplicates, or order errors | [Actual summaries](docs/verification/task-5-chaos/) |
+| Kafka HA broker failure | 120/120 stored and delivered after active-leader SIGKILL; zero loss, duplicates, or order errors | [Three-broker CI proof](docs/verification/task-5-chaos/kafka-ha-ci.json) |
 | Browser recovery | Five real browser tests passed, including offline recovery, gateway SIGKILL, and token renewal/logout | [Browser verification](docs/verification/task-6.md) |
 | Configured 200-user load | Steady peer delivery 4.87 → 11.50 messages/s; all 1,367 optimized sends persisted and reached peers | [Measured comparison and caveats](docs/benchmarks.md) |
 | Overload / acceptance | All 2,233 Kafka-accepted sends persisted in the 500-target overload run | [Classification and historical 17-attempt investigation](docs/verification/task-2.md) |

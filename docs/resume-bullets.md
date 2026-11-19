@@ -2,7 +2,7 @@
 
 - Increased steady peer delivery from 4.87 to 11.50 messages/s (2.36×) in the configured 200-user comparison using bounded Kafka batching, concurrent partitions, and fewer Redis/Mongo round trips; all 1,367 optimized sends persisted and reached peers.
 - Reconciled the historical 992-attempt stress run against retained Kafka offsets and MongoDB: all 975 distinct accepted records persisted; the remaining 17 attempts never reached the durable source log. Original per-attempt ACK identities were unavailable.
-- Automated six default-stack failure scenarios covering 725 sends with zero lost messages, logical/wire duplicates, or ordering violations, including MongoDB restart and a gateway-to-Redis network partition; verified a Redis outage returned UNAVAILABLE in 32 ms.
+- Automated six default-stack failure scenarios covering 725 sends with zero lost messages, logical/wire duplicates, or ordering violations, including MongoDB restart and a gateway-to-Redis partition; additionally verified 120/120 deliveries after active-leader SIGKILL in a three-broker Kafka cluster with minimum ISR two.
 - Hardened authentication with Redis throttling, validated WebSocket origins, 15-minute access tokens, rotating and revocable refresh sessions, and optional authenticated MongoDB/Redis; verified 85 backend unit tests, 13 integration cases, and eleven smoke checks.
 - Verified 15 frontend unit tests and five real browser scenarios covering login, escaped messages, receipts, offline queuing, gateway SIGKILL recovery, silent token renewal, and logout revocation.
 

@@ -12,6 +12,8 @@ The Mongo scenario stops MongoDB for at least eight seconds during 100 queued se
 
 ## Optional Kafka HA profile
 
+**Verified in CI:** [run 44583022761](https://github.com/ShlokMaharwal/PulseChat/actions/runs/44583022761) passed all three jobs. The HA test sent, stored, and received **120/120 messages**, with zero lost messages, logical/wire duplicates, or ordering violations. It killed broker 1 (the active leader of messages partition 0) with SIGKILL, held it dead for 8,003 ms, observed broker 2 elected with brokers 2 and 3 in sync, and verified all three replicas restored afterward. [Actual summary](task-5-chaos/kafka-ha-ci.json). A transient fresh-cluster metadata race found by CI was fixed with bounded retries for Kafka-declared retriable bootstrap errors; incompatible topology and permission failures still fail immediately.
+
 ```sh
 docker compose stop
 docker compose -f docker-compose.yml -f docker-compose.ha.yml --profile ha --parallel 1 up --build -d --wait --wait-timeout 600

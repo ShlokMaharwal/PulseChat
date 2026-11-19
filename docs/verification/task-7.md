@@ -2,6 +2,8 @@
 
 ## Source and runtime checks
 
+[Final runtime CI at commit 21f3caa](https://github.com/ShlokMaharwal/PulseChat/actions/runs/44583022761) passed **all three jobs**: backend, frontend, and kafka-ha. This includes 85 backend unit tests, 15 frontend unit tests, 13 integration cases, eleven smoke checks, all six default chaos cases, optional database authentication, all five real browser cases, and [120-message active Kafka leader failure/recovery](task-5-chaos/kafka-ha-ci.json). The later evidence publication changes documentation only.
+
 Final host source checks passed backend lint, formatting, types, **85 unit tests**, and build, plus frontend lint, formatting, types, **15 unit tests**, and build. The three additional backend tests exercise transient creation/metadata failures and immediate rejection of a non-transient failure. A bounded bootstrap retry handles Kafka metadata propagation during a fresh KRaft cluster startup; it does not change acceptance, ordering, persistence, or offsets.
 
 The [Task 6 backend CI job](https://github.com/ShlokMaharwal/PulseChat/actions/runs/44581536309/job/135763171449) passed the full build, **13 integration cases**, **eleven smoke checks**, **all six default-stack chaos scenarios**, optional authenticated MongoDB/Redis proof, and **all five real browser cases**. Its frontend job also passed. The separate HA job exposed the transient startup race before the broker-kill test; the startup retry is verified by the final CI run. The repository CI badge and workflow artifacts report the exact head result; do not infer HA success from default-stack checks.
@@ -14,4 +16,4 @@ Concurrent host source checks exhausted Windows memory; serial reruns passed. Do
 
 The local HA timeout/readiness attempts remain under [Task 5 evidence](task-5.md); they are not reclassified as successful broker failover. High latency, independent server connection dips, single default MongoDB/Redis/Kafka instances, best-effort Pub/Sub, and terminal DLQ sequence gaps remain documented limits. Groups and typing indicators were deliberately excluded to finish the requested essential work.
 
-Done when: final head CI passes all three jobs, documentation links pass, measured claims match committed evidence, and temporarily stopped Seekr services are restored. See [change summary](../CHANGES.md) and [measured resume bullets](../resume-bullets.md).
+Done when: runtime CI passed all three jobs, documentation links passed, and measured claims match committed evidence. See [change summary](../CHANGES.md) and [measured resume bullets](../resume-bullets.md). Local service restoration is checked separately from these repository results.
