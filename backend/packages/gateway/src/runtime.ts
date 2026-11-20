@@ -1,4 +1,5 @@
 import type { IncomingMessage } from 'node:http';
+import { randomUUID } from 'node:crypto';
 import type { Duplex } from 'node:stream';
 import { WebSocket, WebSocketServer, type RawData } from 'ws';
 import { z } from 'zod';
@@ -30,6 +31,8 @@ const envelopeSchema = z
   .strict();
 
 interface Connection {
+  typingSessionId: string;
+  typing: Map<string, { active: boolean; sentAt: number }>;
   socket: WebSocket;
   userId: string;
   chain: Promise<void>;
@@ -264,6 +267,8 @@ class GatewayRuntime {
 
   private connected(socket: WebSocket, userId: string, expiresAt: number) {
     const connection: Connection = {
+      typingSessionId: randomUUID(),
+      typing: new Map(),
       socket,
       userId,
       chain: Promise.resolve(),
@@ -431,6 +436,38 @@ class GatewayRuntime {
           chatId: frame.chatId,
           ...(clientMsgId ? { clientMsgId } : {}),
         });
+        return;
+      }
+      if (frame.type === 'typing') {
+        const chat = await this.chats.authorize(
+          frame.chatId,
+          connection.userId,
+        );
+        const previous = connection.typing.get(chat.id);
+        if (
+          frame.isTyping &&
+          previous?.active &&
+          Date.now() - previous.sentAt < 1000
+        )
+          return;
+        if (!frame.isTyping && !previous?.active) return;
+        if (frame.isTyping)
+          connection.typing.set(chat.id, { active: true, sentAt: Date.now() });
+        else connection.typing.delete(chat.id);
+        await Promise.all(
+          chat.memberIds
+            .filter((id) => id !== connection.userId)
+            .map((id) =>
+              this.router.publish(id, {
+                type: 'typing',
+                chatId: chat.id,
+                userId: connection.userId,
+                sessionId: connection.typingSessionId,
+                isTyping: frame.isTyping,
+                expiresInMs: 6000,
+              }),
+            ),
+        );
         return;
       }
       if (frame.type === 'sync') {

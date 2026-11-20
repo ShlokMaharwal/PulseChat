@@ -17,6 +17,9 @@ const time = (value: string) =>
 function peer(chat: Chat, ownId: string) {
   return chat.members.find((member) => member.id !== ownId) ?? chat.members[0]!;
 }
+const isGroup = (chat: Chat) => chat.kind === 'group';
+const chatName = (chat: Chat, ownId: string) =>
+  isGroup(chat) ? (chat.name ?? 'Group') : peer(chat, ownId).username;
 export function ChatPage({
   account,
   logout,
@@ -49,6 +52,17 @@ export function ChatPage({
     (item) => item.chatId === selected,
   );
   const lastSeq = selected ? (client.cursors.get(selected) ?? 0) : 0;
+  const typingPeople = active
+    ? client
+        .typingUsers(active.id)
+        .map(
+          (id) => active.members.find((member) => member.id === id)?.username,
+        )
+        .filter((name): name is string => Boolean(name))
+    : [];
+  const typingLabel = typingPeople.length
+    ? `${typingPeople.slice(0, 2).join(' and ')}${typingPeople.length > 2 ? ' and others' : ''} ${typingPeople.length === 1 ? 'is' : 'are'} typing…`
+    : '';
   const selectChat = useCallback(
     (id: string) => {
       const read = client.receipts.get(id)?.get(account.user.id)?.readSeq ?? 0;
@@ -80,6 +94,23 @@ export function ChatPage({
     setDraft('');
     setSendError('');
     if (selected) client.sync(selected);
+    return () => {
+      if (selected) client.setTyping(selected, false);
+    };
+  }, [selected, client]);
+  useEffect(() => {
+    const stop = () => {
+      if (selected) client.setTyping(selected, false);
+    };
+    const hidden = () => {
+      if (document.visibilityState !== 'visible') stop();
+    };
+    window.addEventListener('blur', stop);
+    document.addEventListener('visibilitychange', hidden);
+    return () => {
+      window.removeEventListener('blur', stop);
+      document.removeEventListener('visibilitychange', hidden);
+    };
   }, [selected, client]);
   useEffect(() => {
     if (unreadScroll.current && firstUnread) {
@@ -141,12 +172,18 @@ export function ChatPage({
     }
   }
   function status(message: Message) {
-    const receipt = active
-      ? client.receipts.get(active.id)?.get(peer(active, account.user.id).id)
-      : undefined;
-    return (receipt?.readSeq ?? 0) >= message.seq
+    const peers =
+      active?.members.filter((member) => member.id !== account.user.id) ?? [];
+    const allAt = (field: 'readSeq' | 'deliveredSeq') =>
+      peers.length > 0 &&
+      peers.every(
+        (member) =>
+          (client.receipts.get(message.chatId)?.get(member.id)?.[field] ?? 0) >=
+          message.seq,
+      );
+    return allAt('readSeq')
       ? 'Read'
-      : (receipt?.deliveredSeq ?? 0) >= message.seq
+      : allAt('deliveredSeq')
         ? 'Delivered'
         : 'Sent';
   }
@@ -183,12 +220,14 @@ export function ChatPage({
           ) : (
             sorted
               .filter((chat) =>
-                peer(chat, account.user.id)
-                  .username.toLowerCase()
+                chatName(chat, account.user.id)
+                  .toLowerCase()
                   .includes(filter.toLowerCase()),
               )
               .map((chat) => {
                 const person = peer(chat, account.user.id);
+                const name = chatName(chat, account.user.id);
+                const typing = client.typingUsers(chat.id).length > 0;
                 const last =
                   client.messages.get(chat.id)?.at(-1) ?? chat.lastMessage;
                 const read =
@@ -210,21 +249,23 @@ export function ChatPage({
                     aria-current={selected === chat.id ? 'page' : undefined}
                   >
                     <span className="avatar-wrap">
-                      <Avatar name={person.username} />
-                      {client.presence.get(person.id) && (
+                      <Avatar name={name} group={isGroup(chat)} />
+                      {!isGroup(chat) && client.presence.get(person.id) && (
                         <span className="avatar-online" />
                       )}
                     </span>
                     <span className="chat-row-copy">
                       <span className="chat-row-title">
-                        <strong>{person.username}</strong>
+                        <strong>{name}</strong>
                         {last && <time>{time(last.createdAt)}</time>}
                       </span>
                       <span className="chat-preview">
-                        <span>
-                          {last
-                            ? `${last.senderId === account.user.id ? 'You: ' : ''}${last.body}`
-                            : 'Say the first hello.'}
+                        <span className={typing ? 'typing-preview' : undefined}>
+                          {typing
+                            ? 'typing…'
+                            : last
+                              ? `${last.senderId === account.user.id ? 'You: ' : isGroup(chat) ? `${chat.members.find((member) => member.id === last.senderId)?.username ?? 'Member'}: ` : ''}${last.body}`
+                              : 'Say the first hello.'}
                         </span>
                         {unread > 0 && (
                           <span
@@ -251,8 +292,8 @@ export function ChatPage({
           )}
           {filter &&
             !sorted.some((chat) =>
-              peer(chat, account.user.id)
-                .username.toLowerCase()
+              chatName(chat, account.user.id)
+                .toLowerCase()
                 .includes(filter.toLowerCase()),
             ) && <p className="sidebar-empty">No conversations match.</p>}
         </nav>
@@ -332,19 +373,31 @@ export function ChatPage({
               >
                 <Icon name="back" />
               </button>
-              <Avatar name={peer(active, account.user.id).username} />
+              <Avatar
+                name={chatName(active, account.user.id)}
+                group={isGroup(active)}
+              />
               <div>
-                <h2>{peer(active, account.user.id).username}</h2>
-                <p>
+                <h2>{chatName(active, account.user.id)}</h2>
+                <p
+                  className={typingLabel ? 'typing-preview' : undefined}
+                  role="status"
+                  aria-live="polite"
+                >
                   <span
-                    className={`status-dot ${!client.presence.get(peer(active, account.user.id).id) ? 'muted' : ''}`}
+                    className={`status-dot ${!typingLabel && !client.presence.get(peer(active, account.user.id).id) ? 'muted' : ''}`}
                   />
-                  {client.presence.get(peer(active, account.user.id).id)
-                    ? 'Online'
-                    : 'Offline'}
+                  {typingLabel ||
+                    (isGroup(active)
+                      ? `${active.members.length} members`
+                      : client.presence.get(peer(active, account.user.id).id)
+                        ? 'Online'
+                        : 'Offline')}
                 </p>
               </div>
-              <span className="conversation-label">JUST THE TWO OF YOU</span>
+              <span className="conversation-label">
+                {isGroup(active) ? 'GROUP CONVERSATION' : 'JUST THE TWO OF YOU'}
+              </span>
             </header>
             {(error || (client.error && !client.degraded)) && (
               <div className="notice" role="alert">
@@ -377,12 +430,26 @@ export function ChatPage({
               }}
             >
               <div className="conversation-start">
-                <Avatar name={peer(active, account.user.id).username} />
+                <Avatar
+                  name={chatName(active, account.user.id)}
+                  group={isGroup(active)}
+                />
                 <h3>
-                  This is your conversation with{' '}
-                  {peer(active, account.user.id).username}.
+                  {isGroup(active)
+                    ? `Welcome to ${chatName(active, account.user.id)}.`
+                    : `This is your conversation with ${peer(active, account.user.id).username}.`}
                 </h3>
-                <p>A simple hello is a good place to start.</p>
+                <p>
+                  {isGroup(active)
+                    ? active.members
+                        .map((member) =>
+                          member.id === account.user.id
+                            ? 'You'
+                            : member.username,
+                        )
+                        .join(', ')
+                    : 'A simple hello is a good place to start.'}
+                </p>
               </div>
               <div
                 className="message-stack"
@@ -417,6 +484,13 @@ export function ChatPage({
                         className={`message ${mine ? 'own' : 'other'}`}
                         data-message-id={message.messageId}
                       >
+                        {isGroup(active) && !mine && (
+                          <span className="message-sender">
+                            {active.members.find(
+                              (member) => member.id === message.senderId,
+                            )?.username ?? 'Member'}
+                          </span>
+                        )}
                         {message.messageId === firstUnread && (
                           <span className="unread-divider">
                             Unread messages
@@ -494,9 +568,16 @@ export function ChatPage({
                 <textarea
                   ref={textarea}
                   aria-label="Message"
-                  placeholder={`Message ${peer(active, account.user.id).username}…`}
+                  placeholder={`Message ${chatName(active, account.user.id)}…`}
                   value={draft}
-                  onChange={(event) => setDraft(event.target.value)}
+                  onChange={(event) => {
+                    setDraft(event.target.value);
+                    client.setTyping(
+                      active.id,
+                      Boolean(event.target.value.trim()),
+                    );
+                  }}
+                  onBlur={() => client.setTyping(active.id, false)}
                   onKeyDown={(event) => {
                     if (
                       event.key === 'Enter' &&
@@ -567,7 +648,7 @@ export function ChatPage({
           close={closeNew}
           onCreated={async (id) => {
             await refresh();
-            setSelected(id);
+            selectChat(id);
           }}
         />
       )}

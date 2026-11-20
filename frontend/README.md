@@ -2,6 +2,8 @@
 
 An independent React 18 + TypeScript application. It imports no backend modules. Its HTTP and WebSocket types are written from `../docs/PROTOCOL.md`.
 
+Choose **New conversation → New group** to name a group and select 2–19 other people. Direct chats and groups show live typing; groups also show sender names and receipts from all other members. Login and registration include an accessible show/hide password control. Chat messages and form inputs use a 16px system font in both themes.
+
 Use Node.js 22.13+ and npm for the current lint and build tooling.
 
 ## Run
@@ -36,7 +38,7 @@ npm run build
 npm run test:e2e
 ```
 
-The Vitest suite uses mock WebSockets to verify authentication protocols, ordered gap recovery, duplicate suppression, authoritative pagination across DLQ sequence gaps, reconnect/resend identity, persisted cursors, user isolation, receipt monotonicity, reconnect hints, deliberate shutdown, rate retry, and storage failure.
+The Vitest suite uses mock WebSockets to verify authentication protocols, ordered gap recovery, duplicate suppression, authoritative pagination across DLQ sequence gaps, reconnect/resend identity, persisted cursors, user isolation, receipt monotonicity, reconnect hints, deliberate shutdown, rate retry, storage failure, and typing throttling/expiry across sessions. Typing is ephemeral, clears on disconnect, and is never queued for replay.
 
 ## Recovery and browser state
 

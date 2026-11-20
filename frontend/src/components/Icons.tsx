@@ -12,7 +12,10 @@ export function Icon({
     | 'logout'
     | 'back'
     | 'close'
-    | 'chat';
+    | 'chat'
+    | 'eye'
+    | 'eye-off'
+    | 'group';
 }) {
   const paths = {
     send: 'm4 4 17 8-17 8 3-8-3-8Zm3 8h14',
@@ -24,6 +27,11 @@ export function Icon({
     back: 'm14 6-6 6 6 6',
     close: 'm6 6 12 12M6 18 18 6',
     chat: 'M20 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 18 0Z',
+    eye: 'M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Zm13 0a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
+    'eye-off':
+      'm3 3 18 18M10.5 5.1A12 12 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-3.1 3.9M6.2 6.2A20 20 0 0 0 2 12s3.5 7 10 7a13 13 0 0 0 5.8-1.4M10 10a3 3 0 0 0 4 4',
+    group:
+      'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2m20 0v-2a4 4 0 0 0-3-3.87M15 3.13a4 4 0 0 1 0 7.75M13 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
   };
   return (
     <svg
@@ -65,13 +73,15 @@ export function Brand({ compact = false }: { compact?: boolean }) {
 export function Avatar({
   name,
   small = false,
+  group = false,
 }: {
   name: string;
   small?: boolean;
+  group?: boolean;
 }) {
   return (
     <span className={`avatar ${small ? 'small' : ''}`} aria-hidden="true">
-      {name.slice(0, 2).toUpperCase()}
+      {group ? <Icon name="group" /> : name.slice(0, 2).toUpperCase()}
     </span>
   );
 }

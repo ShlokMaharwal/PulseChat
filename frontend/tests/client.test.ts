@@ -76,6 +76,60 @@ afterEach(() => {
   vi.useRealTimers();
 });
 describe('independent browser recovery SDK', () => {
+  it('throttles typing, stops after idle, and never replays it after reconnect', async () => {
+    const { client, sockets } = setup();
+    client.start();
+    sockets[0]!.welcome();
+    const sent = () =>
+      sockets[0]!.sent.filter((frame) => frame.type === 'typing');
+    client.setTyping(chat, true);
+    client.setTyping(chat, true);
+    await vi.advanceTimersByTimeAsync(1000);
+    client.setTyping(chat, true);
+    expect(sent()).toHaveLength(1);
+    await vi.advanceTimersByTimeAsync(1000);
+    client.setTyping(chat, true);
+    expect(sent()).toHaveLength(2);
+    await vi.advanceTimersByTimeAsync(1500);
+    expect(sent().at(-1)).toEqual({
+      type: 'typing',
+      chatId: chat,
+      isTyping: false,
+    });
+    client.setTyping(chat, true);
+    sockets[0]!.close(1006);
+    await vi.advanceTimersByTimeAsync(500);
+    sockets[1]!.welcome();
+    expect(sockets[1]!.sent.some((frame) => frame.type === 'typing')).toBe(
+      false,
+    );
+  });
+  it('expires typing hints, refreshes their deadline, and keeps other sessions active', async () => {
+    const { client, sockets } = setup();
+    client.start();
+    sockets[0]!.welcome();
+    const frame = {
+      type: 'typing' as const,
+      chatId: chat,
+      userId: peer,
+      sessionId: 'session-a',
+      isTyping: true,
+      expiresInMs: 6000,
+    };
+    sockets[0]!.frame(frame);
+    sockets[0]!.frame({ ...frame, sessionId: 'session-b' });
+    sockets[0]!.frame({ ...frame, isTyping: false });
+    expect(client.typingUsers(chat)).toEqual([peer]);
+    await vi.advanceTimersByTimeAsync(5000);
+    sockets[0]!.frame({ ...frame, sessionId: 'session-b' });
+    await vi.advanceTimersByTimeAsync(1001);
+    expect(client.typingUsers(chat)).toEqual([peer]);
+    await vi.advanceTimersByTimeAsync(5000);
+    expect(client.typingUsers(chat)).toEqual([]);
+    sockets[0]!.frame(frame);
+    client.setOnline(false);
+    expect(client.typingUsers(chat)).toEqual([]);
+  });
   it('retries a failed send with the original ID and exposes reconnect timing', () => {
     const { client, sockets } = setup();
     client.start();

@@ -38,6 +38,8 @@ export interface Receipt {
   readSeq: number;
 }
 export interface Chat {
+  kind?: 'direct' | 'group';
+  name?: string;
   id: string;
   members: User[];
   lastMessage: Message | null;
@@ -53,6 +55,15 @@ export interface HistoryPage {
   receipts: Receipt[];
 }
 export type ServerFrame =
+  | { type: 'chat_created'; chatId: string }
+  | {
+      type: 'typing';
+      chatId: string;
+      userId: string;
+      sessionId: string;
+      isTyping: boolean;
+      expiresInMs: number;
+    }
   | {
       type: 'welcome';
       userId: string;
@@ -87,9 +98,10 @@ export type ServerFrame =
       clientMsgId?: string;
       retryAfterMs?: number;
       chatId?: string;
-      operation?: 'message' | 'sync' | 'delivered' | 'read';
+      operation?: 'message' | 'sync' | 'delivered' | 'read' | 'typing';
     };
 export type ClientFrame =
+  | { type: 'typing'; chatId: string; isTyping: boolean }
   | { type: 'message'; chatId: string; clientMsgId: string; body: string }
   | { type: 'sync'; chatId: string; afterSeq: number; limit: number }
   | { type: 'delivered'; chatId: string; messageId: string }

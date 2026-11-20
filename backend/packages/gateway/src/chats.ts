@@ -15,6 +15,8 @@ export interface ChatRecord {
   memberIds: string[];
   pairKey: string;
   createdAt: string;
+  kind?: 'direct' | 'group';
+  name?: string;
 }
 
 export class ChatService {
@@ -51,9 +53,12 @@ export class ChatService {
     return chat;
   }
 
-  async publicChat(
-    chat: ChatRecord,
-  ): Promise<{ id: string; members: PublicUser[] }> {
+  async publicChat(chat: ChatRecord): Promise<{
+    id: string;
+    members: PublicUser[];
+    kind: 'direct' | 'group';
+    name?: string;
+  }> {
     const users = await this.users
       .find(
         { id: { $in: chat.memberIds } },
@@ -63,6 +68,8 @@ export class ChatService {
     const byId = new Map(users.map((user) => [user.id, user]));
     return {
       id: chat.id,
+      kind: chat.kind ?? 'direct',
+      ...(chat.kind === 'group' ? { name: chat.name } : {}),
       members: chat.memberIds.map((id) => {
         const user = byId.get(id);
         if (!user)
@@ -104,6 +111,43 @@ export class ChatService {
       }
       throw error;
     }
+  }
+
+  async createGroup(userId: string, name: string, peers: string[]) {
+    if (
+      peers.length < 2 ||
+      peers.length > 19 ||
+      new Set(peers).size !== peers.length ||
+      peers.includes(userId) ||
+      !peers.every((id) => uuidSchema.safeParse(id).success)
+    )
+      throw new HttpError(
+        400,
+        'INVALID_REQUEST',
+        'Choose 2 to 19 different people for your group',
+      );
+    const memberIds = [userId, ...peers];
+    if (
+      (await this.users.countDocuments({ id: { $in: memberIds } })) !==
+      memberIds.length
+    )
+      throw new HttpError(
+        404,
+        'NOT_FOUND',
+        'A selected group member was not found',
+      );
+    const id = randomUUID();
+    const chat: ChatRecord = {
+      id,
+      memberIds,
+      kind: 'group',
+      name,
+      // Preserve the existing unique pair index without destructive migrations.
+      pairKey: 'group:' + id,
+      createdAt: new Date().toISOString(),
+    };
+    await this.chats.insertOne({ ...chat });
+    return this.publicChat(chat);
   }
 
   async list(userId: string) {

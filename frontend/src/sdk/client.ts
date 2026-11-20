@@ -43,6 +43,16 @@ export class PulseClient {
   readonly receipts = new Map<string, Map<string, Receipt>>();
   readonly presence = new Map<string, boolean>();
   readonly cursors = new Map<string, number>();
+  private readonly typing = new Map<string, Map<string, string>>();
+  private readonly typingExpiry = new Map<
+    string,
+    ReturnType<typeof setTimeout>
+  >();
+  private readonly typingStops = new Map<
+    string,
+    ReturnType<typeof setTimeout>
+  >();
+  private readonly typingSentAt = new Map<string, number>();
   private socket?: WebSocket;
   private stopped = true;
   private online = true;
@@ -138,6 +148,7 @@ export class PulseClient {
     }
     clearTimeout(this.reconnectTimer);
     clearInterval(this.heartbeat);
+    this.resetTyping();
     for (const timer of this.syncing.values()) clearTimeout(timer);
     this.syncing.clear();
     const socket = this.socket;
@@ -209,6 +220,7 @@ export class PulseClient {
     };
     socket.onclose = (event) => {
       if (this.socket !== socket) return;
+      this.resetTyping();
       clearInterval(this.heartbeat);
       for (const timer of this.syncing.values()) clearTimeout(timer);
       this.syncing.clear();
@@ -340,12 +352,49 @@ export class PulseClient {
           readSeq: frame.status === 'read' ? frame.seq : 0,
         },
       ]);
+    } else if (frame.type === 'chat_created') {
+      this.options.onDiscover?.();
+    } else if (frame.type === 'typing') {
+      if (frame.userId === this.userId) return;
+      if (
+        typeof frame.chatId !== 'string' ||
+        typeof frame.sessionId !== 'string' ||
+        typeof frame.userId !== 'string' ||
+        typeof frame.isTyping !== 'boolean' ||
+        !Number.isFinite(frame.expiresInMs) ||
+        frame.expiresInMs <= 0 ||
+        frame.expiresInMs > 10000
+      )
+        return;
+      const key = frame.chatId + ':' + frame.sessionId;
+      clearTimeout(this.typingExpiry.get(key));
+      this.typingExpiry.delete(key);
+      const sessions =
+        this.typing.get(frame.chatId) ?? new Map<string, string>();
+      if (frame.isTyping) {
+        sessions.set(frame.sessionId, frame.userId);
+        this.typing.set(frame.chatId, sessions);
+        const timer = setTimeout(() => {
+          if (this.typingExpiry.get(key) !== timer) return;
+          this.typingExpiry.delete(key);
+          sessions.delete(frame.sessionId);
+          if (!sessions.size) this.typing.delete(frame.chatId);
+          this.changed();
+        }, frame.expiresInMs);
+        this.typingExpiry.set(key, timer);
+        if (!this.tracked.has(frame.chatId)) this.options.onDiscover?.();
+      } else {
+        sessions.delete(frame.sessionId);
+        if (!sessions.size) this.typing.delete(frame.chatId);
+      }
     } else if (frame.type === 'presence')
       this.presence.set(frame.userId, frame.online);
     else if (frame.type === 'reconnect') {
       this.hint = frame.retryAfterMs;
       this.socket?.close(1000, 'Reconnect requested');
     } else if (frame.type === 'error') {
+      // Typing is ephemeral: never queue or replay it like durable messages.
+      if (frame.operation === 'typing') return;
       if (frame.code === 'UNAVAILABLE') {
         this.degraded = true;
         this.error =
@@ -392,6 +441,36 @@ export class PulseClient {
     const isNew = !this.tracked.has(chatId);
     this.tracked.add(chatId);
     if (isNew) this.sync(chatId);
+  }
+  typingUsers(chatId: string) {
+    return [...new Set(this.typing.get(chatId)?.values() ?? [])];
+  }
+  setTyping(chatId: string, active: boolean) {
+    clearTimeout(this.typingStops.get(chatId));
+    this.typingStops.delete(chatId);
+    if (!active) {
+      if (this.typingSentAt.delete(chatId))
+        this.transmit({ type: 'typing', chatId, isTyping: false });
+      return;
+    }
+    if (this.stopped || this.status !== 'connected') return;
+    const previous = this.typingSentAt.get(chatId);
+    if (previous === undefined || Date.now() - previous >= 2000) {
+      this.transmit({ type: 'typing', chatId, isTyping: true });
+      this.typingSentAt.set(chatId, Date.now());
+    }
+    this.typingStops.set(
+      chatId,
+      setTimeout(() => this.setTyping(chatId, false), 1500),
+    );
+  }
+  private resetTyping() {
+    for (const timer of this.typingStops.values()) clearTimeout(timer);
+    for (const timer of this.typingExpiry.values()) clearTimeout(timer);
+    this.typingStops.clear();
+    this.typingExpiry.clear();
+    this.typingSentAt.clear();
+    this.typing.clear();
   }
   sync(chatId: string, afterSeq = this.cursors.get(chatId) ?? 0) {
     if (this.stopped || this.status !== 'connected' || this.syncing.has(chatId))
@@ -507,6 +586,7 @@ export class PulseClient {
     if (!body.trim()) throw new Error('Write a message first.');
     if (new TextEncoder().encode(JSON.stringify(frame)).length > 16384)
       throw new Error('This message is too long. Please shorten it.');
+    this.setTyping(chatId, false);
     this.pending.set(clientMsgId, {
       clientMsgId,
       chatId,
@@ -557,6 +637,9 @@ export class PulseClient {
       this.socket.send(JSON.stringify(frame));
   }
   stop() {
+    for (const chatId of this.typingSentAt.keys())
+      this.setTyping(chatId, false);
+    this.resetTyping();
     this.stopped = true;
     clearTimeout(this.reconnectTimer);
     clearTimeout(this.receiptTimer);

@@ -81,6 +81,12 @@ export const searchUsers = (
   );
 export const createChat = (token: string, userId: string) =>
   api<{ chat: Pick<Chat, 'id' | 'members'> }>('/chats', token, { userId });
+export const createGroup = (token: string, name: string, memberIds: string[]) =>
+  api<{ chat: Pick<Chat, 'id' | 'members' | 'kind' | 'name'> }>(
+    '/chats/groups',
+    token,
+    { name, memberIds },
+  );
 export const getPresence = (
   token: string,
   userId: string,

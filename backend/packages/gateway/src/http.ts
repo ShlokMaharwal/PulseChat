@@ -83,6 +83,21 @@ export function readJson(
 }
 
 const createChatSchema = z.object({ userId: uuidSchema }).strict();
+const createGroupSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(1)
+      .max(60)
+      .refine(
+        (name) =>
+          !name.includes('\u0000') &&
+          Buffer.from(name, 'utf8').toString('utf8') === name,
+      ),
+    memberIds: z.array(uuidSchema).min(2).max(19),
+  })
+  .strict();
 const pageSchema = z.object({
   afterSeq: z.coerce.number().int().nonnegative().safe().default(0),
   limit: z.coerce.number().int().min(1).max(100).default(100),
@@ -202,6 +217,36 @@ export class GatewayHttpApi {
               userId,
             ),
           });
+        } else if (
+          request.method === 'POST' &&
+          url.pathname === '/chats/groups'
+        ) {
+          const parsed = createGroupSchema.safeParse(
+            await readJson(request, this.config.MAX_MESSAGE_BYTES),
+          );
+          if (!parsed.success)
+            throw new HttpError(
+              400,
+              'INVALID_REQUEST',
+              'Enter a group name (1–60 characters) and choose 2 to 19 people',
+            );
+          const chat = await this.chats.createGroup(
+            userId,
+            parsed.data.name,
+            parsed.data.memberIds,
+          );
+          // Membership is durable; notification is a best-effort discovery hint.
+          await Promise.allSettled(
+            chat.members
+              .filter((member) => member.id !== userId)
+              .map((member) =>
+                this.router.publish(member.id, {
+                  type: 'chat_created',
+                  chatId: chat.id,
+                }),
+              ),
+          );
+          sendJson(response, 201, { chat });
         } else if (request.method === 'POST' && url.pathname === '/chats') {
           const parsed = createChatSchema.safeParse(
             await readJson(request, this.config.MAX_MESSAGE_BYTES),

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createChat, searchUsers } from '../sdk/api';
+import { createChat, createGroup, searchUsers } from '../sdk/api';
 import type { User } from '../types/protocol';
 import { Avatar, Icon } from './Icons';
 export function NewChat({
@@ -14,8 +14,13 @@ export function NewChat({
   const [query, setQuery] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [busy, setBusy] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [mode, setMode] = useState<'direct' | 'group'>('direct');
+  const [groupName, setGroupName] = useState('');
+  const [members, setMembers] = useState<User[]>([]);
   const [error, setError] = useState('');
   const input = useRef<HTMLInputElement>(null);
+  const nameInput = useRef<HTMLInputElement>(null);
   const dialog = useRef<HTMLElement>(null);
   useEffect(() => {
     const previousFocus = document.activeElement as HTMLElement | null;
@@ -45,13 +50,18 @@ export function NewChat({
     };
   }, [close]);
   useEffect(() => {
+    if (mode === 'group') nameInput.current?.focus();
+    else input.current?.focus();
+  }, [mode]);
+  useEffect(() => {
     const controller = new AbortController();
     if (query.trim().length < 2) {
       setUsers([]);
       setError('');
+      setSearching(false);
       return;
     }
-    setBusy(true);
+    setSearching(true);
     const timer = setTimeout(() => {
       void searchUsers(token, query.trim(), controller.signal)
         .then((result) => {
@@ -65,7 +75,7 @@ export function NewChat({
             );
         })
         .finally(() => {
-          if (!controller.signal.aborted) setBusy(false);
+          if (!controller.signal.aborted) setSearching(false);
         });
     }, 250);
     return () => {
@@ -74,6 +84,16 @@ export function NewChat({
     };
   }, [query, token]);
   async function choose(user: User) {
+    if (mode === 'group') {
+      setMembers((selected) =>
+        selected.some((member) => member.id === user.id)
+          ? selected.filter((member) => member.id !== user.id)
+          : selected.length < 19
+            ? [...selected, user]
+            : selected,
+      );
+      return;
+    }
     setBusy(true);
     setError('');
     try {
@@ -83,6 +103,26 @@ export function NewChat({
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Could not start a conversation.',
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function makeGroup() {
+    if (busy || members.length < 2 || !groupName.trim()) return;
+    setBusy(true);
+    setError('');
+    try {
+      const result = await createGroup(
+        token,
+        groupName.trim(),
+        members.map((member) => member.id),
+      );
+      await onCreated(result.chat.id);
+      close();
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'Could not create the group.',
       );
     } finally {
       setBusy(false);
@@ -105,7 +145,9 @@ export function NewChat({
         <header>
           <div>
             <div className="eyebrow">SAY HELLO</div>
-            <h2 id="new-chat-title">A new conversation</h2>
+            <h2 id="new-chat-title">
+              {mode === 'group' ? 'Create a group' : 'A new conversation'}
+            </h2>
           </div>
           <button
             className="icon-button"
@@ -115,6 +157,67 @@ export function NewChat({
             <Icon name="close" />
           </button>
         </header>
+        <div
+          className="conversation-type"
+          role="group"
+          aria-label="Conversation type"
+        >
+          <button
+            aria-pressed={mode === 'direct'}
+            onClick={() => {
+              setMode('direct');
+              setError('');
+            }}
+            disabled={busy}
+          >
+            Direct message
+          </button>
+          <button
+            aria-pressed={mode === 'group'}
+            onClick={() => {
+              setMode('group');
+              setError('');
+            }}
+            disabled={busy}
+          >
+            <Icon name="group" /> New group
+          </button>
+        </div>
+        {mode === 'group' && (
+          <>
+            <label htmlFor="group-name">Group name</label>
+            <input
+              ref={nameInput}
+              className="group-name-input"
+              id="group-name"
+              value={groupName}
+              onChange={(event) => setGroupName(event.target.value)}
+              placeholder="e.g. Project team"
+              maxLength={60}
+              disabled={busy}
+            />
+            <div className="selected-members" aria-label="Selected members">
+              {members.map((member) => (
+                <button
+                  key={member.id}
+                  onClick={() =>
+                    setMembers((selected) =>
+                      selected.filter((person) => person.id !== member.id),
+                    )
+                  }
+                  aria-label={`Remove ${member.username}`}
+                  disabled={busy}
+                >
+                  {member.username}
+                  <Icon name="close" />
+                </button>
+              ))}
+            </div>
+            <p className="group-help">
+              Choose at least 2 people. Up to 20 members, including you.
+            </p>
+          </>
+        )}
         <label htmlFor="user-search">Find someone by username</label>
         <div className="search-field">
           <Icon name="search" />
@@ -124,6 +227,7 @@ export function NewChat({
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search usernames…"
+            disabled={busy}
             maxLength={32}
           />
         </div>
@@ -134,7 +238,7 @@ export function NewChat({
             <p className="empty-search">
               Enter at least two characters to find someone.
             </p>
-          ) : busy ? (
+          ) : searching ? (
             <p className="empty-search">Looking for a match…</p>
           ) : users.length === 0 ? (
             <p className="empty-search">
@@ -146,18 +250,46 @@ export function NewChat({
                 className="user-result"
                 key={user.id}
                 onClick={() => void choose(user)}
-                disabled={busy}
+                disabled={
+                  busy ||
+                  (mode === 'group' &&
+                    members.length >= 19 &&
+                    !members.some((member) => member.id === user.id))
+                }
+                aria-pressed={
+                  mode === 'group'
+                    ? members.some((member) => member.id === user.id)
+                    : undefined
+                }
               >
                 <Avatar name={user.username} />
                 <div>
                   <strong>{user.username}</strong>
-                  <span>Start a conversation</span>
+                  <span>
+                    {mode === 'group'
+                      ? members.some((member) => member.id === user.id)
+                        ? 'Selected'
+                        : 'Add to group'
+                      : 'Start a conversation'}
+                  </span>
                 </div>
                 <Icon name="plus" />
               </button>
             ))
           )}
         </div>
+        {mode === 'group' && (
+          <button
+            className="primary-button create-group-button"
+            onClick={() => void makeGroup()}
+            disabled={busy || members.length < 2 || !groupName.trim()}
+          >
+            {busy
+              ? 'Creating…'
+              : `Create group${members.length ? ` · ${members.length + 1} members` : ''}`}
+            <Icon name="group" />
+          </button>
+        )}
       </section>
     </div>
   );

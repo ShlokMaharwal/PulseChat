@@ -89,6 +89,190 @@ afterAll(async () => {
 });
 
 describe('Phase 2 live messaging', () => {
+  it('creates independent groups and preserves three-sender order, dedupe, and membership', async () => {
+    const { a, b, sender, receiver } = await usersAndChat();
+    const c = await request<{
+      token: string;
+      user: { id: string; username: string };
+    }>(gatewayB, '/auth/register', {
+      username: 'group_' + randomUUID().replaceAll('-', '').slice(0, 12),
+      password,
+    });
+    const third = new TestClient();
+    clients.push(third);
+    await third.connect(gatewayB.replace(/^http/, 'ws') + '/ws', c.token);
+    const input = {
+      name: '  Project team  ',
+      memberIds: [b.user.id, c.user.id],
+    };
+    const created = await request<{
+      chat: {
+        id: string;
+        name: string;
+        kind: string;
+        members: { id: string }[];
+      };
+    }>(gatewayA, '/chats/groups', input, a.token);
+    const group = created.chat;
+    expect(group).toMatchObject({ kind: 'group', name: 'Project team' });
+    expect(group.members.map((member) => member.id).sort()).toEqual(
+      [a.user.id, b.user.id, c.user.id].sort(),
+    );
+    const second = await request<{ chat: { id: string } }>(
+      gatewayA,
+      '/chats/groups',
+      input,
+      a.token,
+    );
+    expect(second.chat.id).not.toBe(group.id);
+    await expect(
+      request(gatewayA, '/chats/groups', { ...input, name: ' ' }, a.token),
+    ).rejects.toThrow('400');
+    await expect(
+      request(
+        gatewayA,
+        '/chats/groups',
+        { ...input, memberIds: [b.user.id] },
+        a.token,
+      ),
+    ).rejects.toThrow('400');
+    await expect(
+      request(
+        gatewayA,
+        '/chats/groups',
+        { ...input, memberIds: Array.from({ length: 20 }, () => randomUUID()) },
+        a.token,
+      ),
+    ).rejects.toThrow('400');
+    await expect(
+      request(
+        gatewayA,
+        '/chats/groups',
+        { ...input, memberIds: [b.user.id, b.user.id] },
+        a.token,
+      ),
+    ).rejects.toThrow('400');
+    await expect(
+      request(
+        gatewayA,
+        '/chats/groups',
+        { ...input, memberIds: [a.user.id, b.user.id] },
+        a.token,
+      ),
+    ).rejects.toThrow('400');
+    await expect(
+      request(
+        gatewayA,
+        '/chats/groups',
+        { ...input, memberIds: [b.user.id, randomUUID()] },
+        a.token,
+      ),
+    ).rejects.toThrow('404');
+    const retryId = randomUUID();
+    await Promise.all(
+      [sender, receiver, third].map(async (client, index) => {
+        for (let number = 0; number < 10; number++)
+          await client.message(
+            group.id,
+            `${index}:${number}`,
+            index === 0 && number === 0 ? retryId : randomUUID(),
+          );
+      }),
+    );
+    await sender.message(group.id, '0:0', retryId);
+    await Promise.all(
+      [sender, receiver, third].map((client) =>
+        client.waitForSeq(group.id, 30),
+      ),
+    );
+    const canonical = sender.messages.filter(
+      (message) => message.chatId === group.id,
+    );
+    expect(canonical.map((message) => message.seq)).toEqual(
+      Array.from({ length: 30 }, (_, index) => index + 1),
+    );
+    for (const client of [receiver, third])
+      expect(
+        client.messages
+          .filter((message) => message.chatId === group.id)
+          .map((message) => message.messageId),
+      ).toEqual(canonical.map((message) => message.messageId));
+    expect(
+      await dependencies.db
+        .collection('messages')
+        .countDocuments({ chatId: group.id }),
+    ).toBe(30);
+    const outsider = await request<{ token: string }>(
+      gatewayA,
+      '/auth/register',
+      {
+        username: 'private_' + randomUUID().replaceAll('-', '').slice(0, 12),
+        password,
+      },
+    );
+    await expect(
+      request(
+        gatewayA,
+        `/chats/${group.id}/messages`,
+        undefined,
+        outsider.token,
+      ),
+    ).rejects.toThrow('403');
+    for (const member of [a, b, c]) {
+      const list = await request<{ chats: { id: string; name?: string }[] }>(
+        gatewayA,
+        '/chats',
+        undefined,
+        member.token,
+      );
+      expect(list.chats).toContainEqual(
+        expect.objectContaining({ id: group.id, name: 'Project team' }),
+      );
+    }
+  });
+  it('routes authorized typing across gateways without storing it and rejects non-members', async () => {
+    const { a, b, chat, sender, receiver } = await usersAndChat();
+    sender.send({ type: 'typing', chatId: chat.id, isTyping: true });
+    const typing = await receiver.waitFor(
+      (frame) =>
+        frame.type === 'typing' && frame.chatId === chat.id && frame.isTyping,
+    );
+    expect(typing).toMatchObject({ userId: a.user.id, expiresInMs: 6000 });
+    sender.send({ type: 'typing', chatId: chat.id, isTyping: false });
+    await receiver.waitFor(
+      (frame) => frame.type === 'typing' && !frame.isTyping,
+    );
+    const other = await request<{ token: string; user: { id: string } }>(
+      gatewayA,
+      '/auth/register',
+      {
+        username: 'outsider_' + randomUUID().replaceAll('-', '').slice(0, 10),
+        password,
+      },
+    );
+    const outsider = new TestClient();
+    clients.push(outsider);
+    await outsider.connect(
+      gatewayA.replace(/^http/, 'ws') + '/ws',
+      other.token,
+    );
+    outsider.send({ type: 'typing', chatId: chat.id, isTyping: true });
+    await outsider.waitFor(
+      (frame) =>
+        frame.type === 'error' &&
+        frame.code === 'FORBIDDEN' &&
+        frame.operation === 'typing',
+    );
+    await expect(
+      request(gatewayA, `/chats/${chat.id}/messages`, undefined, other.token),
+    ).rejects.toThrow('403');
+    expect(
+      await dependencies.db
+        .collection('messages')
+        .countDocuments({ chatId: chat.id }),
+    ).toBe(0);
+    expect(b.user.id).not.toBe(a.user.id);
+  });
   it('rejects unauthenticated upgrades and non-member sends before persistence', async () => {
     const { chat, a, b } = await usersAndChat();
     await expect(request(gatewayA, '/chats')).rejects.toThrow('401');

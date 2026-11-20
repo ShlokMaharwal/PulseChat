@@ -13,6 +13,32 @@ describe('protocol validation', () => {
     clientMsgId: randomUUID(),
     body: 'Hello',
   };
+  it('validates ephemeral typing frames without accepting a spoofed user', () => {
+    const typing = { type: 'typing', chatId: message.chatId, isTyping: true };
+    expect(clientFrameSchema.parse(typing)).toEqual(typing);
+    expect(
+      clientFrameSchema.safeParse({ ...typing, userId: randomUUID() }).success,
+    ).toBe(false);
+    expect(
+      clientFrameSchema.safeParse({ ...typing, isTyping: 'yes' }).success,
+    ).toBe(false);
+    expect(
+      serverFrameSchema.safeParse({
+        ...typing,
+        userId: randomUUID(),
+        sessionId: randomUUID(),
+        expiresInMs: 6000,
+      }).success,
+    ).toBe(true);
+    expect(
+      serverFrameSchema.safeParse({
+        ...typing,
+        userId: randomUUID(),
+        sessionId: randomUUID(),
+        expiresInMs: 60000,
+      }).success,
+    ).toBe(false);
+  });
   it('accepts a valid message and bounds sync pagination', () => {
     expect(clientFrameSchema.parse(message)).toEqual(message);
     expect(

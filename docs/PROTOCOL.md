@@ -18,6 +18,7 @@ Authenticated REST requests include `Authorization: Bearer <token>`. HS256 acces
 | `POST /api/auth/logout` | Same refresh field | `200`, `{ "revoked": true }`; clears the browser session after confirmation |
 | `GET /api/users?query=ali` | Authenticated; username prefix search | `200`, `{ "users": [{ "id": "...", "username": "alice" }] }` |
 | `POST /api/chats` | Authenticated; `{ "userId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" }` | `201` for a new 1:1 chat or `200` for the existing pair; `{ "chat": { "id": "...", "members": [{ "id": "...", "username": "..." }] } }` |
+| `POST /api/chats/groups` | Authenticated; `{ "name": "Project team", "memberIds": ["<peer UUID>", "<another peer UUID>"] }` | `201`, `{ "chat": { "id": "...", "kind": "group", "name": "Project team", "members": [...] } }` |
 | `GET /api/chats` | Authenticated | `200`, `{ "chats": [...] }`, each with `id`, `members`, `lastMessage` (message or null), `lastSeq`, `createdAt`, `unreadCount`, and `receipts` |
 | `GET /api/chats/:chatId/messages?afterSeq=0&limit=100` | Authenticated chat member; ascending history | `200`, `{ "messages": [...], "hasMore": false, "nextAfterSeq": 12 }` |
 | `GET /api/users/:userId/presence` | Authenticated self or chat peer | `200`, `{ "userId": "...", "online": true }` |
@@ -34,6 +35,16 @@ Usernames contain 3–32 ASCII letters, digits, or underscores, and are normaliz
 Authentication endpoints share a Redis IP window (120 requests/minute by default). Login/register additionally share normalized username windows (ten attempts/minute). Credential failures apply exponential username backoff and a fifteen-minute lock after five failures. A `429` includes `Retry-After` seconds and `error.retryAfterMs`. Production rejects default/weak startup secrets. See [security setup and limits](verification/task-4.md).
 
 HTTP application error codes: `INVALID_REQUEST` (400), `UNAUTHORIZED` (401), `FORBIDDEN` (403), `NOT_FOUND` (404), `CONFLICT` (409), `PAYLOAD_TOO_LARGE` (413), `RATE_LIMITED` (429), `UNAVAILABLE` (503), and `INTERNAL_ERROR` (500). Credentials are not echoed in errors. Chat non-members receive `FORBIDDEN` without message contents.
+
+## Groups and typing
+
+`POST /api/chats/groups` accepts `{ "name": "Project team", "memberIds": ["<peer UUID>", "<another peer UUID>"] }`. The authenticated creator is included automatically. Select 2–19 distinct existing peers, excluding the creator, for 3–20 total members. Names are trimmed, nonblank, well-formed text up to 60 characters. Unknown users are rejected. The existing `POST /api/chats` direct-chat route is unchanged. Chat summaries include `kind: "direct" | "group"` and groups include `name`; legacy chats without a stored kind remain direct chats.
+
+Membership is fixed at creation. Every message/history/sync/receipt/typing request checks membership. Groups use the same chat-keyed Kafka pipeline and per-chat sequences; recipients come from the stored member list. Group receipt cursors remain per member; the UI labels a group send delivered/read only once all other members have advanced that cursor. Group creation sends members a best-effort `{ "type": "chat_created", "chatId": "..." }` discovery hint; reconnect/periodic conversation listing also discovers it.
+
+Clients send `{ "type": "typing", "chatId": "...", "isTyping": true }` and send `false` on idle, blur, send or chat switch. The server derives the sender and session identity and routes `{ "type": "typing", "chatId": "...", "userId": "...", "sessionId": "...", "isTyping": true, "expiresInMs": 6000 }` to other members through Redis Pub/Sub. It never writes typing to Kafka or MongoDB. Duplicate active hints from one socket/chat within a second are coalesced; typing costs 0.2 in the shared arrival-time token bucket. Errors correlate `operation: "typing"`.
+
+The browser sends active refreshes at most once per two seconds while input continues, sends stop after 1.5 seconds of idle, and expires received hints after six seconds. Session-scoped hints prevent one tab's stop from hiding another tab still typing. Hints clear on disconnect/offline/logout and are never queued or replayed. Lost hints or stop frames therefore cannot create permanent typing state.
 
 ## WebSocket authentication
 

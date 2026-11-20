@@ -14,6 +14,7 @@ export function AuthPage({
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   async function submit(event: FormEvent) {
@@ -93,20 +94,35 @@ export function AuthPage({
               placeholder="Your username"
             />
             <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              autoComplete={
-                mode === 'login' ? 'current-password' : 'new-password'
-              }
-              required
-              minLength={mode === 'register' ? 10 : 1}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder={
-                mode === 'register' ? 'At least 10 characters' : 'Your password'
-              }
-            />
+            <div className="password-field">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                autoComplete={
+                  mode === 'login' ? 'current-password' : 'new-password'
+                }
+                required
+                minLength={mode === 'register' ? 10 : 1}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder={
+                  mode === 'register'
+                    ? 'At least 10 characters'
+                    : 'Your password'
+                }
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                aria-pressed={showPassword}
+                aria-controls="password"
+                title={showPassword ? 'Hide password' : 'Show password'}
+                onClick={() => setShowPassword((visible) => !visible)}
+              >
+                <Icon name={showPassword ? 'eye-off' : 'eye'} />
+              </button>
+            </div>
             {mode === 'register' && (
               <p className="field-hint">
                 Use 3–32 letters, numbers, or underscores for your username.
@@ -132,6 +148,7 @@ export function AuthPage({
               className="text-button"
               onClick={() => {
                 setMode(mode === 'login' ? 'register' : 'login');
+                setShowPassword(false);
                 setError('');
               }}
             >

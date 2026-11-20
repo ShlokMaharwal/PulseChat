@@ -84,6 +84,13 @@ export const clientFrameSchema = z.discriminatedUnion('type', [
     })
     .strict(),
   z.object({ type: z.literal('heartbeat') }).strict(),
+  z
+    .object({
+      type: z.literal('typing'),
+      chatId: uuidSchema,
+      isTyping: z.boolean(),
+    })
+    .strict(),
 ]);
 export const storedMessageSchema = z
   .object({
@@ -147,6 +154,17 @@ export const receiptSchema = z
   })
   .strict();
 export const serverFrameSchema = z.discriminatedUnion('type', [
+  z.object({ type: z.literal('chat_created'), chatId: uuidSchema }).strict(),
+  z
+    .object({
+      type: z.literal('typing'),
+      chatId: uuidSchema,
+      userId: uuidSchema,
+      sessionId: uuidSchema,
+      isTyping: z.boolean(),
+      expiresInMs: z.number().int().positive().max(10000),
+    })
+    .strict(),
   z
     .object({
       type: z.literal('welcome'),
@@ -211,7 +229,9 @@ export const serverFrameSchema = z.discriminatedUnion('type', [
       clientMsgId: uuidSchema.optional(),
       retryAfterMs: z.number().int().nonnegative().optional(),
       chatId: uuidSchema.optional(),
-      operation: z.enum(['message', 'sync', 'delivered', 'read']).optional(),
+      operation: z
+        .enum(['message', 'sync', 'delivered', 'read', 'typing'])
+        .optional(),
     })
     .strict(),
 ]);

@@ -47,11 +47,33 @@ test.describe.serial('real chat and recovery', () => {
     for (let index = 0; index < 2; index++) {
       const page = pages[index]!;
       await page.goto('/');
+      if (index === 0)
+        await page.screenshot({ path: '../backend/.cache/auth-refined.png' });
       await page
         .getByRole('button', { name: 'Create an account', exact: true })
         .click();
       await page.getByLabel('Username', { exact: true }).fill(names[index]!);
       await page.getByLabel('Password', { exact: true }).fill(password);
+      if (index === 0) {
+        await expect(
+          page.getByLabel('Password', { exact: true }),
+        ).toHaveAttribute('type', 'password');
+        await page
+          .getByRole('button', { name: 'Show password', exact: true })
+          .click();
+        await expect(
+          page.getByLabel('Password', { exact: true }),
+        ).toHaveAttribute('type', 'text');
+        await expect(page.getByLabel('Password', { exact: true })).toHaveValue(
+          password,
+        );
+        await page
+          .getByRole('button', { name: 'Hide password', exact: true })
+          .click();
+        await expect(
+          page.getByLabel('Password', { exact: true }),
+        ).toHaveAttribute('type', 'password');
+      }
       await page
         .getByRole('button', { name: 'Create account', exact: true })
         .click();
@@ -119,6 +141,16 @@ test.describe.serial('real chat and recovery', () => {
       }),
     ).toBeVisible();
     await expect(b.getByText('Unread messages', { exact: true })).toBeVisible();
+    await a
+      .getByRole('textbox', { name: 'Message', exact: true })
+      .fill('Writing a reply');
+    await expect(
+      b.locator('.conversation-header').getByRole('status'),
+    ).toContainText(`${names[0]} is typing`);
+    await a.getByRole('textbox', { name: 'Message', exact: true }).fill('');
+    await expect(
+      b.locator('.conversation-header').getByRole('status'),
+    ).not.toContainText('typing');
     const body = '<img src=x onerror=alert(1)> is ordinary chat text';
     await send(b, body);
     await expect(message(a, body)).toBeVisible();
@@ -221,5 +253,115 @@ test.describe.serial('real chat and recovery', () => {
     });
     expect(response.status()).toBe(401);
     expect(errors).toEqual([]);
+  });
+  test('creates a three-person group with shared messages, typing, and mobile layout', async ({
+    browser,
+  }) => {
+    const a = pages[0]!,
+      b = pages[1]!;
+    await b.getByLabel('Username', { exact: true }).fill(names[1]!);
+    await b.getByLabel('Password', { exact: true }).fill(password);
+    await b.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(
+      b.getByRole('heading', { name: 'Messages', exact: true }),
+    ).toBeVisible();
+    const context = await browser.newContext({
+      baseURL: process.env.TEST_HTTP_URL ?? 'http://127.0.0.1:8081',
+      colorScheme: 'light',
+    });
+    const c = await context.newPage();
+    const thirdName = 'rin_' + suffix;
+    const groupName = 'Project team ' + suffix;
+    try {
+      await c.goto('/');
+      await c
+        .getByRole('button', { name: 'Create an account', exact: true })
+        .click();
+      await c.getByLabel('Username', { exact: true }).fill(thirdName);
+      await c.getByLabel('Password', { exact: true }).fill(password);
+      await c
+        .getByRole('button', { name: 'Create account', exact: true })
+        .click();
+      await expect(
+        c.getByRole('heading', { name: 'Messages', exact: true }),
+      ).toBeVisible();
+      await a
+        .locator('.sidebar-header')
+        .getByRole('button', { name: 'New conversation', exact: true })
+        .click();
+      await a.getByRole('button', { name: 'New group', exact: true }).click();
+      await a.getByLabel('Group name', { exact: true }).fill(groupName);
+      for (const name of [names[1]!, thirdName]) {
+        await a.getByLabel('Find someone by username').fill(name);
+        await a
+          .getByRole('dialog')
+          .locator('.user-result')
+          .filter({ hasText: name })
+          .click();
+      }
+      await a
+        .getByRole('button', { name: 'Create group · 3 members', exact: true })
+        .click();
+      await expect(
+        a.getByRole('heading', { name: groupName, exact: true }),
+      ).toBeVisible();
+      for (const page of [b, c]) {
+        await page.locator('.chat-row').filter({ hasText: groupName }).click();
+        await expect(
+          page.getByRole('heading', { name: groupName, exact: true }),
+        ).toBeVisible();
+        await expect(page.locator('.conversation-header')).toContainText(
+          '3 members',
+        );
+      }
+      const body = 'A message for the whole group';
+      await a.getByRole('textbox', { name: 'Message', exact: true }).fill(body);
+      for (const page of [b, c])
+        await expect(
+          page.locator('.conversation-header').getByRole('status'),
+        ).toContainText(`${names[0]} is typing`);
+      await a
+        .getByRole('button', { name: 'Send message', exact: true })
+        .click();
+      for (const page of [a, b, c])
+        await expect(message(page, body)).toBeVisible();
+      await expect(
+        message(a, body).getByLabel('Read', { exact: true }),
+      ).toBeVisible();
+      await send(b, 'A second group member replies');
+      await expect(message(c, 'A second group member replies')).toBeVisible();
+      await send(c, 'The third member is here too');
+      await expect(message(a, 'The third member is here too')).toBeVisible();
+      await context.setOffline(true);
+      await expect(
+        c.getByText('You are offline. Messages will send when you reconnect.'),
+      ).toBeVisible();
+      await send(a, 'Group history catches up after reconnect');
+      await expect(
+        message(b, 'Group history catches up after reconnect'),
+      ).toBeVisible();
+      await context.setOffline(false);
+      await expect(
+        message(c, 'Group history catches up after reconnect'),
+      ).toBeVisible();
+      expect(
+        await message(a, body)
+          .locator('p')
+          .evaluate((node) => getComputedStyle(node).fontSize),
+      ).toBe('16px');
+      await a.screenshot({ path: '../backend/.cache/group-dark.png' });
+      await c.setViewportSize({ width: 390, height: 844 });
+      await expect(
+        c.getByRole('heading', { name: groupName, exact: true }),
+      ).toBeVisible();
+      expect(
+        await c.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      ).toBe(true);
+      await c.screenshot({ path: '../backend/.cache/group-mobile-light.png' });
+    } finally {
+      await context.close();
+    }
   });
 });
